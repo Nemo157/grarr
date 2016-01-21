@@ -1,11 +1,11 @@
 [package]
 name = "git-appraise-server"
-version = "0.1.0"
+version = "0.0.1"
 authors = ["Wim Looman <wim@nemo157.com>"]
 
 [dependencies]
 
-git-appraise = { path = "../git-appraise" }
+git-appraise = { git = "https://github.com/Nemo157/git-appraise-rs" }
 
 iron = "*"
 router = { git = "https://github.com/iron/router" }

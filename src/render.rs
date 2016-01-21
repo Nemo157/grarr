@@ -145,61 +145,59 @@ pub fn review(review: Review) -> String {
 }
 
 
-struct RequestRenderer<'a>(&'a git_appraise::Request);
+macro_rules! renderer {
+  (($v:ident : $p:path) => { $($t:tt)* }) => (
+    struct Renderer<'a>(&'a $p);
+    impl<'a> Render for Renderer<'a> {
+      fn render(&self, mut w: &mut ::std::fmt::Write) -> ::std::fmt::Result {
+        let $v = self.0;
+        html!(w, $($t)*)
+      }
+    }
+  )
+}
 
-impl<'a> Render for RequestRenderer<'a> {
-  fn render(&self, mut w: &mut fmt::Write) -> fmt::Result {
-    let request = self.0;
-    html!(w, {
-      div {
-        #if let Some(requester) = request.requester() {
-          div { "Requester: " $requester }
-        }
-        #if let Some(timestamp) = request.timestamp() {
-          div { "Timestamp: " $(chrono::naive::datetime::NaiveDateTime::from_timestamp(timestamp.seconds(), 0)) }
-        }
-        #if let (Some(review_ref), Some(target_ref)) = (request.review_ref(), request.target_ref()) {
-          div { "Proposed merge: " $review_ref " -> " $target_ref }
-        }
-        #if let Some(reviewers) = request.reviewers() {
-          div { "Reviewers:"
-            ul {
-              #for reviewer in reviewers {
-                li $reviewer
-              }
-            }
-          }
-        }
-        #if let Some(ref description) = request.description() {
-          div {
-            "Description: "
-            div { $(markdown::from_string(description)) }
+renderer!((request: git_appraise::Request) => {
+  div {
+    #if let Some(requester) = request.requester() {
+      div { "Requester: " $requester }
+    }
+    #if let Some(timestamp) = request.timestamp() {
+      div { "Timestamp: " $(chrono::naive::datetime::NaiveDateTime::from_timestamp(timestamp.seconds(), 0)) }
+    }
+    #if let (Some(review_ref), Some(target_ref)) = (request.review_ref(), request.target_ref()) {
+      div { "Proposed merge: " $review_ref " -> " $target_ref }
+    }
+    #if let Some(reviewers) = request.reviewers() {
+      div { "Reviewers:"
+        ul {
+          #for reviewer in reviewers {
+            li $reviewer
           }
         }
       }
-    })
-  }
-}
-
-struct CommentRenderer<'a>(&'a git_appraise::Comment);
-
-impl<'a> Render for CommentRenderer<'a> {
-  fn render(&self, mut w: &mut fmt::Write) -> fmt::Result {
-    let comment = self.0;
-    html!(w, {
+    }
+    #if let Some(ref description) = request.description() {
       div {
-        #if let Some(author) = comment.author() {
-          div { "Comment from " $author }
-        }
-        div { "Comment Status: " $comment.resolved().map(|r| if r { "lgtm" } else { "nmw" }).unwrap_or("fyi") }
-        #if let Some(location) = comment.location() {
-          div { "Referencing " $(format!("{:?}", location)) }
-        }
-        #if let Some(description) = comment.description() {
-          div { $(markdown::from_string(description)) }
-        }
+        "Description: "
+        div { $(markdown::from_string(description)) }
       }
-    })
+    }
   }
-}
+});
+
+renderer!((comment: git_appraise::Comment) => {
+  div {
+    #if let Some(author) = comment.author() {
+      div { "Comment from " $author }
+    }
+    div { "Comment Status: " $comment.resolved().map(|r| if r { "lgtm" } else { "nmw" }).unwrap_or("fyi") }
+    #if let Some(location) = comment.location() {
+      div { "Referencing " $(format!("{:?}", location)) }
+    }
+    #if let Some(description) = comment.description() {
+      div { $(markdown::from_string(description)) }
+    }
+  }
+});
 
