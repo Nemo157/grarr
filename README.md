@@ -1,8 +1,6 @@
-git-appraise-rs
-===============
+# git-appraise-server
 
-Developing
-----------
+## Developing
 
 If building on OS X with a `homebrew` installed copy of OpenSSL you'll need to
 specify where this is to enable building `libssh2-sys` and `openssl-sys-extras`.
