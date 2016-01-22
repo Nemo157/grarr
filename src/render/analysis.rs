@@ -1,21 +1,23 @@
-use git_appraise::{ Analysis, Analyses };
+use git_appraise::{ Analysis };
+use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
-  AnalysesRenderer(analyses: Analyses) {
-    div {
-      "Analyses: "
-      ul {
-        #for analysis in analyses {
-          #(AnalysisRenderer(analysis))
-        }
-      }
-    }
-  }
-
-  AnalysisRenderer(analysis: Analysis) {
+  AnalysisRenderer(analysis: &'a Analysis) {
     #if let Some(url) = analysis.url() {
-      li {
-        a href={ #url } #url
+      div class="block analysis" {
+        div class="block-header" {
+          h3 {
+            a href={ #url } {
+              "External analysis"
+              #if let Some(timestamp) = analysis.timestamp() {
+                " submitted at "
+                span class="timestamp" {
+                  #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

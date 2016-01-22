@@ -8,23 +8,23 @@ fn summary(request: &Request) -> Option<&str> {
 }
 
 const HEX: &'static [u8; 0x10] = b"0123456789abcdef";
-fn short(oid: &Oid) -> String {
+fn short(oid: Oid) -> String {
   oid.as_bytes().iter().take(3).flat_map(|b| vec![HEX[((b >> 4) & 0xFu8) as usize] as char, HEX[(b & 0xFu8) as usize] as char]).collect()
 }
 
 renderers! {
-  RequestRenderer(id: &'a Oid, request: &'a Request) {
+  RequestRenderer(request: &'a Request) {
     div class="block request" {
-      #RequestHeaderRenderer(id, request)
+      #RequestHeaderRenderer(request)
       #RequestDetailsRenderer(request)
     }
   }
 
-  RequestStubRenderer(id: &'a Oid, request: &'a Request) {
+  RequestStubRenderer(request: &'a Request) {
     div class="request-stub" {
-      a href={ "/" #id } {
+      a href={ "/" #request.commit() } {
         span class="id"
-          #short(id)
+          #short(request.commit())
         " "
         #if let Some(summary) = summary(request) {
           #summary
@@ -36,12 +36,12 @@ renderers! {
     }
   }
 
-  RequestHeaderRenderer(id: &'a Oid, request: &'a Request) {
+  RequestHeaderRenderer(request: &'a Request) {
     div class="block-header request-header" {
       h2 class="float-right" {
-        a href={ "/" #id } {
+        a href={ "/" #request.commit() } {
           span class="id"
-            #short(id)
+            #short(request.commit())
         }
       }
       h4 {

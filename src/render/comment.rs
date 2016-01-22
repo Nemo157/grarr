@@ -1,16 +1,8 @@
-use git_appraise::{ Comment, Comments };
+use git_appraise::{ Comment };
 use maud_pulldown_cmark::markdown;
 use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
-  CommentsRenderer(comments: Comments) {
-    div class="comments" {
-      #for comment in comments {
-        #(CommentRenderer(comment))
-      }
-    }
-  }
-
   CommentHeaderRendererer(comment: &'a Comment) {
     div class="block-header comment-header" {
       h3 {
@@ -25,7 +17,7 @@ renderers! {
         }
         "with status "
         span class={
-          "status "
+          "resolved "
           #comment.resolved().map(|r| if r { "lgtm" } else { "nmw" }).unwrap_or("fyi")
         } {
           #comment.resolved().map(|r| if r { "lgtm" } else { "nmw" }).unwrap_or("fyi")
@@ -48,10 +40,10 @@ renderers! {
     }
   }
 
-  CommentRenderer(comment: Comment) {
+  CommentRenderer(comment: &'a Comment) {
     div class="block comment" {
-      #CommentHeaderRendererer(&comment)
-      #CommentDetailsRendererer(&comment)
+      #CommentHeaderRendererer(comment)
+      #CommentDetailsRendererer(comment)
     }
   }
 }

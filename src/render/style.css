@@ -84,6 +84,10 @@ a:hover {
   color: #d33682;
 }
 
+.agent {
+  color: #6c71c4;
+}
+
 .ref {
   color: #2aa198;
 }
@@ -107,6 +111,10 @@ a:hover {
   color: #b58900;
 }
 
+.ci-status a {
+  color: #839496;
+}
+
 pre {
   padding: 5px 10px;
   overflow: auto;
@@ -124,21 +132,39 @@ code {
   background-color: #073642;
 }
 
+.resolved {
+  padding: 2px 4px;
+  border-radius: 5px;
+  background-color: #002b36;
+}
+
+.resolved.lgtm {
+  color: #859900;
+}
+
+.resolved.nmw {
+  color: #dc322f;
+}
+
+.resolved.fyi {
+  color: #268bd2;
+}
+
 .status {
   padding: 2px 4px;
   border-radius: 5px;
   background-color: #002b36;
 }
 
-.status.lgtm {
+.status.success {
   color: #859900;
 }
 
-.status.nmw {
+.status.failure {
   color: #dc322f;
 }
 
-.status.fyi {
+.status.running {
   color: #268bd2;
 }
 
