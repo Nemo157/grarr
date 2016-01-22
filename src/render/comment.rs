@@ -1,8 +1,21 @@
-use git_appraise;
+use git_appraise::{ Comment, Comments };
 use maud_pulldown_cmark::markdown;
 
 renderers! {
-  CommentRenderer(comment: &'a git_appraise::Comment) {
+  CommentsRenderer(comments: Comments) {
+    div {
+      "Comments: "
+      ul {
+        #for comment in comments {
+          li {
+            #(CommentRenderer(comment))
+          }
+        }
+      }
+    }
+  }
+
+  CommentRenderer(comment: Comment) {
     div {
       #if let Some(author) = comment.author() {
         div { "Comment from " #author }

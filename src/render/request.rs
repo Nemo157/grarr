@@ -1,9 +1,9 @@
-use git_appraise;
+use git_appraise::Request;
 use maud_pulldown_cmark::markdown;
 use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
-  RequestRenderer(request: &'a git_appraise::Request) {
+  RequestRenderer(request: &'a Request) {
     div {
       #if let Some(requester) = request.requester() {
         div { "Requester: " #requester }

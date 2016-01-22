@@ -1,5 +1,5 @@
-use git_appraise::{ Review, Status };
-use super::{ RequestRenderer, CommentRenderer };
+use git_appraise::{ Review };
+use super::{ RequestRenderer, CIStatusesRenderer, AnalysesRenderer, CommentsRenderer };
 
 renderers! {
   ReviewsRenderer(reviews: &'a Vec<Review<'a>>) {
@@ -16,44 +16,8 @@ renderers! {
 
   ReviewRenderer(review: &'a Review<'a>) {
     #(RequestRenderer(review.request()))
-    div {
-      "CI Statuses: "
-      ul {
-        #for status in review.ci_statuses() {
-          li {
-            #if let Some(url) = status.url() {
-              a href={ #url } #status.agent().unwrap_or("<Unknown agent>")
-            }
-            #if status.url().is_none() {
-              #status.agent().unwrap_or("<Unknown agent>")
-            }
-            ": "
-            #status.status().map(|s| match s { Status::Success => "success", Status::Failure => "failure" }).unwrap_or("null")
-          }
-        }
-      }
-    }
-    div {
-      "Analyses: "
-      ul {
-        #for analysis in review.analyses() {
-          #if let Some(url) = analysis.url() {
-            li {
-              a href={ #url } #url
-            }
-          }
-        }
-      }
-    }
-    div {
-      "Comments: "
-      ul {
-        #for comment in review.comments() {
-          li {
-            #(CommentRenderer(&comment))
-          }
-        }
-      }
-    }
+    #(CIStatusesRenderer(review.ci_statuses()))
+    #(AnalysesRenderer(review.analyses()))
+    #(CommentsRenderer(review.comments()))
   }
 }

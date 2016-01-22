@@ -18,4 +18,4 @@ pulldown-cmark = "*"
 maud-pulldown-cmark = "*"
 
 maud = "*"
-maud_macros = { git = "https://git.nemo157.com/forks/maud.git", rev = "dollar-to-pound" }
+maud_macros = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined" }
