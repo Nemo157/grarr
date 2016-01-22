@@ -12,7 +12,7 @@ mod comment;
 mod analysis;
 
 pub use self::style::Style;
-pub use self::request::RequestRenderer;
+pub use self::request::{ RequestRenderer, RequestStubRenderer };
 pub use self::review::{ ReviewRenderer, ReviewsRenderer };
 pub use self::comment::{ CommentRenderer, CommentsRenderer };
 pub use self::status::{ CIStatusRenderer, CIStatusesRenderer };

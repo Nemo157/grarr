@@ -1,24 +1,22 @@
 use git_appraise::{ Review };
-use super::{ RequestRenderer, CIStatusesRenderer, AnalysesRenderer, CommentsRenderer };
+use super::{ RequestRenderer, RequestStubRenderer, CIStatusesRenderer, AnalysesRenderer, CommentsRenderer };
 
 renderers! {
   ReviewsRenderer(reviews: &'a Vec<Review<'a>>) {
-    ol {
-      #for review in reviews {
-        li #ReviewStubRenderer(review)
-      }
+    #for review in reviews {
+      #ReviewStubRenderer(review)
     }
   }
 
   ReviewStubRenderer(review: &'a Review<'a>) {
-    a href={ "/" #review.id() } #review.id()
-    " -> "
-    #review.request().description().unwrap()
+    div class="review-stub" {
+      #RequestStubRenderer(&review.id(), review.request())
+    }
   }
 
   ReviewRenderer(review: &'a Review<'a>) {
     div class="review" {
-      #RequestRenderer(review.request())
+      #RequestRenderer(&review.id(), review.request())
       #CIStatusesRenderer(review.ci_statuses())
       #AnalysesRenderer(review.analyses())
       #CommentsRenderer(review.comments())

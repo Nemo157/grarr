@@ -85,13 +85,21 @@ a:hover {
 }
 
 .ref {
+  color: #2aa198;
+}
+
+.id {
+  color: #cb4b16;
+}
+
+.ref, .id {
+  font-family: monospace;
   padding: 2px 4px;
   border-radius: 5px;
-  color: #2aa198;
   background-color: #073642;
 }
 
-.block-header .ref {
+.block-header .ref, .block-header .id {
   background-color: #002b36;
 }
 
@@ -132,4 +140,12 @@ code {
 
 .status.fyi {
   color: #268bd2;
+}
+
+.review-stub {
+  margin: 5px;
+}
+
+.float-right {
+  float: right;
 }

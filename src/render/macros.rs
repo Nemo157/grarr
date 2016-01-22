@@ -23,7 +23,7 @@ macro_rules! renderers {
     pub struct $name<'a>($(pub &'a $var_type),+);
     impl<'a> ::maud::Render for $name<'a> {
       fn render(&self, mut w: &mut ::std::fmt::Write) -> ::std::fmt::Result {
-        let &$name($($var)+) = self;
+        let &$name($($var),+) = self;
         html!(w, $($html)*)
       }
     }
@@ -33,7 +33,7 @@ macro_rules! renderers {
     pub struct $name($(pub $var_type),+);
     impl ::maud::RenderOnce for $name {
       fn render_once(self, mut w: &mut ::std::fmt::Write) -> ::std::fmt::Result {
-        let $name($($var)+) = self;
+        let $name($($var),+) = self;
         html!(w, $($html)*)
       }
     }
