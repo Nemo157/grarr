@@ -1,0 +1,38 @@
+html * {
+  color-profile: sRGB;
+  rendering-intent: auto;
+}
+
+body {
+  background-color: #002b36;
+  color: #839496;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #93a1a1;
+  border-color: #839496;
+}
+
+body {
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 20px auto;
+  max-width: 650px;
+  line-height: 1.4;
+  font-size: 18px;
+  padding: 0 10px;
+}
+
+h1,h2,h3 {
+  font-family: "Lucida Console", Monaco, monospace;
+  line-height: 1.2;
+}
+
+a {
+  color: #268bd2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  color: #3797db
+}
