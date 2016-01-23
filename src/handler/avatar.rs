@@ -20,16 +20,11 @@ pub struct Avatars {
   cache: Option<Mutex<LruCache<String, Image>>>,
 }
 
-pub enum CacheLimit {
-  Capacity(usize),
-  TimeToLive(Duration),
-  TimeToLiveAndCapacity(Duration, usize),
-}
-
 pub struct Options {
   pub enable_gravatar: bool,
   pub enable_cache: bool,
-  pub cache_limit: CacheLimit,
+  pub cache_capacity: usize,
+  pub cache_time_to_live: Duration,
 }
 
 #[derive(Clone)]
@@ -41,11 +36,7 @@ impl Avatars {
       enable_gravatar: options.enable_gravatar,
       cache: match options.enable_cache {
         false => None,
-        true => Some(Mutex::new(match options.cache_limit {
-          CacheLimit::Capacity(capacity) => LruCache::with_capacity(capacity),
-          CacheLimit::TimeToLive(ttl) => LruCache::with_expiry_duration(ttl),
-          CacheLimit::TimeToLiveAndCapacity(ttl, capacity) => LruCache::with_expiry_duration_and_capacity(ttl, capacity),
-        }))
+        true => Some(Mutex::new(LruCache::with_expiry_duration_and_capacity(options.cache_time_to_live, options.cache_capacity))),
       }
     }
   }

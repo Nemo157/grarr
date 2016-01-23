@@ -25,6 +25,7 @@ use iron::prelude::*;
 use router::*;
 use logger::*;
 use handler::Register;
+use time::Duration;
 
 fn main() {
   let root = env::args().nth(1).unwrap();
@@ -37,7 +38,8 @@ fn main() {
     .register(handler::Avatars::new(handler::avatar::Options {
       enable_gravatar: true,
       enable_cache: true,
-      cache_limit: handler::avatar::CacheLimit::Capacity(10),
+      cache_capacity: 100,
+      cache_time_to_live: Duration::minutes(1),
     }));
 
   let (logger_before, logger_after) = Logger::new(None);
