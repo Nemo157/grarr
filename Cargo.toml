@@ -13,6 +13,7 @@ router = { git = "https://github.com/iron/router" }
 persistent = { git = "https://github.com/iron/persistent" }
 logger = { git = "https://github.com/iron/logger" }
 typemap = "*"
+mime = "*"
 
 chrono = "*"
 maud-pulldown-cmark = "*"
