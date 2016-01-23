@@ -26,7 +26,9 @@ use persistent::{ Read };
 use typemap::Key;
 
 fn get_reviews(repo: &Repository) -> Vec<Review> {
-  repo.all_reviews().unwrap().collect()
+  let mut reviews: Vec<Review> = repo.all_reviews().unwrap().collect();
+  reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
+  reviews
 }
 
 fn get_review(repo: &Repository, id: Oid) -> Review {
