@@ -5,16 +5,18 @@ extern crate maud;
 extern crate iron;
 extern crate router;
 extern crate logger;
-extern crate pulldown_cmark;
 extern crate git_appraise;
 extern crate persistent;
 extern crate typemap;
 extern crate chrono;
 extern crate maud_pulldown_cmark;
+extern crate gravatar;
+extern crate hyper;
 
 #[macro_use]
 mod render;
 
+use gravatar::Gravatar;
 use std::env;
 use iron::prelude::*;
 use iron::status;
@@ -49,9 +51,24 @@ fn reviews_handler(req: &mut iron::request::Request) -> IronResult<Response> {
 fn review_handler(req: &mut iron::request::Request) -> IronResult<Response> {
   let path = req.get::<Read<RepositoryPath>>().unwrap();
   let repo = Repository::open(&*path).unwrap();
-  let id = Oid::from_str(req.extensions.get::<Router>().unwrap().find("query").unwrap()).unwrap();
+  let id = Oid::from_str(req.extensions.get::<Router>().unwrap().find("commit_id").unwrap()).unwrap();
   let review = get_review(&repo, id);
   result(to_string!(#(render::Wrapper(render::ReviewRenderer(&review)))))
+}
+
+fn avatars_handler(req: &mut iron::request::Request) -> IronResult<Response> {
+  use std::io::Read;
+  let user = req.extensions.get::<Router>().unwrap().find("user").unwrap();
+  let mut gravatar = Gravatar::new(user);
+  gravatar.size = Some(30);
+  gravatar.default = Some(gravatar::Default::Identicon);
+  let client = hyper::client::Client::new();
+  let mut res = client.get(&gravatar.image_url()).send().unwrap();
+  assert_eq!(res.status, hyper::Ok);
+  let mut buf = Vec::new();
+  res.read_to_end(&mut buf).unwrap();
+  let mime = res.headers.get::<iron::headers::ContentType>().unwrap().0.clone();
+  Ok(Response::with((status::Ok, buf, mime)))
 }
 
 #[derive(Copy, Clone)]
@@ -63,7 +80,8 @@ fn main() {
 
   let mut router = Router::new();
   router.get("/", reviews_handler);
-  router.get("/:query", review_handler);
+  router.get("/avatars/:user", avatars_handler);
+  router.get("/:commit_id", review_handler);
 
   let (logger_before, logger_after) = Logger::new(None);
 

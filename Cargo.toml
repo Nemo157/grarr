@@ -7,6 +7,7 @@ authors = ["Wim Looman <wim@nemo157.com>"]
 
 git-appraise = { git = "https://github.com/Nemo157/git-appraise-rs" }
 
+hyper = "*"
 iron = "*"
 router = { git = "https://github.com/iron/router" }
 persistent = { git = "https://github.com/iron/persistent" }
@@ -14,8 +15,8 @@ logger = { git = "https://github.com/iron/logger" }
 typemap = "*"
 
 chrono = "*"
-pulldown-cmark = "*"
 maud-pulldown-cmark = "*"
+gravatar = "*"
 
 maud = "*"
 maud_macros = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined" }

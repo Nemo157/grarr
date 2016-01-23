@@ -1,6 +1,7 @@
 use git_appraise::{ Oid, Request };
 use maud_pulldown_cmark::markdown;
 use chrono::naive::datetime::NaiveDateTime;
+use super::{ Avatar };
 
 fn summary(request: &Request) -> Option<&str> {
   request.description()
@@ -22,9 +23,9 @@ renderers! {
 
   RequestStubRenderer(request: &'a Request) {
     div class="request-stub" {
-      a href={ "/" #request.commit() } {
+      a href={ "/" #request.commit_id() } {
         span class="id"
-          #short(request.commit())
+          #short(request.commit_id())
         " "
         #if let Some(summary) = summary(request) {
           #summary
@@ -39,18 +40,18 @@ renderers! {
   RequestHeaderRenderer(request: &'a Request) {
     div class="block-header request-header" {
       h2 class="float-right" {
-        a href={ "/" #request.commit() } {
+        a href={ "/" #request.commit_id() } {
           span class="id"
-            #short(request.commit())
+            #short(request.commit_id())
         }
       }
-      h4 {
+      div class="h4" {
         #if let Some(timestamp) = request.timestamp() {
           span class="timestamp"
             #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
         }
       }
-      h2 {
+      div class="h2" {
         #if let Some(summary) = summary(request) {
           #summary
         }
@@ -58,15 +59,18 @@ renderers! {
           "<No summary provided>"
         }
       }
-      h3 {
-        span class="email"
-          #request.requester().unwrap_or("<unknown requester>")
-        " wants to merge "
-        code class="ref"
-          #request.review_ref().unwrap_or("<unknown ref>")
-        " into "
-        code class="ref"
-          #request.target_ref().unwrap_or("<unknown ref>")
+      div class="h3" {
+        #Avatar(request.requester().unwrap_or("unknown@example.org"))
+        span class="rest" {
+          span class="email"
+            #request.requester().unwrap_or("<unknown requester>")
+          " wants to merge "
+          span class="ref"
+            #request.review_ref().unwrap_or("<unknown ref>")
+          " into "
+          span class="ref"
+            #request.target_ref().unwrap_or("<unknown ref>")
+        }
       }
     }
   }

@@ -5,7 +5,7 @@ renderers! {
   CIStatusRenderer(ci_status: &'a CIStatus) {
     div class="block ci-status" {
       div class="block-header" {
-        h3 {
+        div class="h3" {
           #if let Some(url) = ci_status.url() {
             a href={ #url } {
               #CIStatusTextRenderer(ci_status)

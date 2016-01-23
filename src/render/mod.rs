@@ -11,6 +11,7 @@ mod review;
 mod request;
 mod comment;
 mod analysis;
+mod avatar;
 
 pub use self::style::Style;
 pub use self::event::{ EventRenderer, EventsRenderer };
@@ -19,6 +20,7 @@ pub use self::review::{ ReviewRenderer, ReviewsRenderer };
 pub use self::comment::{ CommentRenderer };
 pub use self::ci_status::{ CIStatusRenderer };
 pub use self::analysis::{ AnalysisRenderer };
+pub use self::avatar::{ Avatar };
 
 pub struct Wrapper<T: Render>(pub T);
 
