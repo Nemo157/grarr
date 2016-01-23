@@ -61,6 +61,6 @@ impl Route for Avatars {
   }
 
   fn route() -> &'static str {
-    "/avatars/:user"
+    "/-/avatars/:user"
   }
 }

@@ -1,9 +1,11 @@
+use std::path::PathBuf;
 use iron::IronResult;
 use iron::middleware::Handler;
 use iron::request::Request;
 use iron::response::Response;
 use mime::Mime;
 use super::route::Route;
+use router::Router;
 use iron::status;
 use iron::method::Method;
 
@@ -11,12 +13,13 @@ use render;
 use git_appraise::{ Repository };
 
 pub struct Reviews {
-  pub repo: String,
+  pub root: PathBuf,
 }
 
 impl Handler for Reviews {
-  fn handle(&self, _: &mut Request) -> IronResult<Response> {
-    let repo = Repository::open(&*self.repo).unwrap();
+  fn handle(&self, req: &mut Request) -> IronResult<Response> {
+    let path = req.extensions.get::<Router>().unwrap().find("repo").unwrap();
+    let repo = Repository::open(self.root.join(path)).unwrap();
     let mut reviews: Vec<_> = repo.all_reviews().unwrap().collect();
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
     let buffer = to_string!(#(render::Wrapper(render::ReviewsRenderer(&reviews))));
@@ -31,6 +34,6 @@ impl Route for Reviews {
   }
 
   fn route() -> &'static str {
-    "/reviews"
+    "/*repo/reviews"
   }
 }

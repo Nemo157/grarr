@@ -25,13 +25,13 @@ use logger::*;
 use handler::Register;
 
 fn main() {
-  let path = env::args().nth(1).unwrap();
+  let root = env::args().nth(1).unwrap();
 
   let mut router = Router::new();
 
   router
-    .register(handler::Review { repo: path.clone() })
-    .register(handler::Reviews { repo: path.clone() })
+    .register(handler::Review { root: From::from(root.clone()) })
+    .register(handler::Reviews { root: From::from(root.clone()) })
     .register(handler::Avatars { enable_gravatar: true });
 
   let (logger_before, logger_after) = Logger::new(None);

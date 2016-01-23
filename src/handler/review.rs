@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use iron::IronResult;
 use iron::middleware::Handler;
 use iron::request::Request;
@@ -12,12 +13,13 @@ use render;
 use git_appraise::{ Oid, Repository };
 
 pub struct Review {
-  pub repo: String,
+  pub root: PathBuf,
 }
 
 impl Handler for Review {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let repo = Repository::open(&*self.repo).unwrap();
+    let path = req.extensions.get::<Router>().unwrap().find("repo").unwrap();
+    let repo = Repository::open(self.root.join(path)).unwrap();
     let id = Oid::from_str(req.extensions.get::<Router>().unwrap().find("commit_id").unwrap()).unwrap();
     let review = repo.review_for(id).unwrap();
     let buffer = to_string!(#(render::Wrapper(render::ReviewRenderer(&review))));
@@ -32,6 +34,6 @@ impl Route for Review {
   }
 
   fn route() -> &'static str {
-    "/reviews/:commit_id"
+    "/*repo/reviews/:commit_id"
   }
 }

@@ -23,7 +23,7 @@ renderers! {
 
   RequestStubRenderer(request: &'a Request) {
     div class="request-stub" {
-      a href={ "/" #request.commit_id() } {
+      a href={ "reviews/" #request.commit_id() } {
         span class="id"
           #short(request.commit_id())
         " "
@@ -40,7 +40,7 @@ renderers! {
   RequestHeaderRenderer(request: &'a Request) {
     div class="block-header request-header" {
       h2 class="float-right" {
-        a href={ "/" #request.commit_id() } {
+        a href={ #request.commit_id() } {
           span class="id"
             #short(request.commit_id())
         }
