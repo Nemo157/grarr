@@ -13,6 +13,8 @@ extern crate maud_pulldown_cmark;
 extern crate gravatar;
 extern crate hyper;
 extern crate mime;
+extern crate lru_time_cache;
+extern crate time;
 
 #[macro_use]
 mod render;
@@ -32,7 +34,11 @@ fn main() {
   router
     .register(handler::Review { root: From::from(root.clone()) })
     .register(handler::Reviews { root: From::from(root.clone()) })
-    .register(handler::Avatars { enable_gravatar: true });
+    .register(handler::Avatars::new(handler::avatar::Options {
+      enable_gravatar: true,
+      enable_cache: true,
+      cache_limit: handler::avatar::CacheLimit::Capacity(10),
+    }));
 
   let (logger_before, logger_after) = Logger::new(None);
 

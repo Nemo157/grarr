@@ -1,4 +1,4 @@
-mod avatar;
+pub mod avatar;
 mod route;
 mod review;
 mod reviews;

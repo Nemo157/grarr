@@ -14,6 +14,8 @@ persistent = { git = "https://github.com/iron/persistent" }
 logger = { git = "https://github.com/iron/logger" }
 typemap = "*"
 mime = "*"
+lru_time_cache = "*"
+time = "*"
 
 chrono = "*"
 maud-pulldown-cmark = "*"
