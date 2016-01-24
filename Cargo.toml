@@ -6,6 +6,7 @@ authors = ["Wim Looman <wim@nemo157.com>"]
 [dependencies]
 
 git-appraise = { git = "https://github.com/Nemo157/git-appraise-rs" }
+git2 = { git = "https://github.com/alexcrichton/git2-rs" }
 
 hyper = "*"
 iron = "*"

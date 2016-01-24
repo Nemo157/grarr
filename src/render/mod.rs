@@ -12,6 +12,7 @@ mod request;
 mod comment;
 mod analysis;
 mod avatar;
+mod commit;
 
 pub use self::style::Style;
 pub use self::event::{ EventRenderer, EventsRenderer };
@@ -21,6 +22,7 @@ pub use self::comment::{ CommentRenderer };
 pub use self::ci_status::{ CIStatusRenderer };
 pub use self::analysis::{ AnalysisRenderer };
 pub use self::avatar::{ Avatar };
+pub use self::commit::{ CommitsRenderer };
 
 pub struct Wrapper<T: Render>(pub T);
 
