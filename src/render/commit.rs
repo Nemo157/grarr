@@ -32,4 +32,8 @@ renderers! {
       }
     }
   }
+
+  CommitRenderer(commit: &'a Commit<'a>) {
+    #CommitStubRenderer(commit)
+  }
 }

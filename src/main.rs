@@ -36,7 +36,9 @@ fn main() {
   router
     .register(handler::Review { root: From::from(root.clone()) })
     .register(handler::Reviews { root: From::from(root.clone()) })
+    .register(handler::Commit { root: From::from(root.clone()) })
     .register(handler::Commits { root: From::from(root.clone()) })
+    .register(handler::Repository { root: From::from(root.clone()) })
     .register(handler::Avatars::new(handler::avatar::Options {
       enable_gravatar: true,
       enable_cache: true,
