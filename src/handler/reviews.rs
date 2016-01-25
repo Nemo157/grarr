@@ -1,16 +1,10 @@
-use std::path::PathBuf;
-use iron::IronResult;
-use iron::middleware::Handler;
-use iron::request::Request;
-use iron::response::Response;
-use mime::Mime;
-use super::route::Route;
-use router::Router;
-use iron::status;
-use iron::method::Method;
+use super::base::*;
 
-use render;
-use git_appraise::{ Repository };
+use std::path::PathBuf;
+use router::Router;
+use git_appraise::Repository;
+
+use render::ReviewsRenderer;
 
 pub struct Reviews {
   pub root: PathBuf,
@@ -22,9 +16,7 @@ impl Handler for Reviews {
     let repo = Repository::open(self.root.join(path)).unwrap();
     let mut reviews: Vec<_> = repo.all_reviews().unwrap().collect();
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
-    let buffer = to_string!(#(render::Wrapper(render::ReviewsRenderer(&reviews))));
-    let mime: Mime = "text/html".parse().unwrap();
-    Ok(Response::with((status::Ok, mime, buffer)))
+    Ok(Html(Wrapper(&ReviewsRenderer(&reviews))).into())
   }
 }
 
