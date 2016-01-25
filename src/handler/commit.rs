@@ -1,16 +1,9 @@
-use std::path::PathBuf;
-use iron::IronResult;
-use iron::middleware::Handler;
-use iron::request::Request;
-use iron::response::Response;
-use mime::Mime;
-use super::route::Route;
-use router::Router;
-use iron::status;
-use iron::method::Method;
+use super::base::*;
 
-use render;
+use std::path::PathBuf;
+use router::Router;
 use git2::{ Oid, Repository };
+use render::CommitRenderer;
 
 pub struct Commit {
   pub root: PathBuf,
@@ -22,9 +15,7 @@ impl Handler for Commit {
     let repo = Repository::open(self.root.join(path)).unwrap();
     let id = Oid::from_str(req.extensions.get::<Router>().unwrap().find("commit").unwrap()).unwrap();
     let commit = repo.find_commit(id).unwrap();
-    let buffer = to_string!(#(render::Wrapper(render::CommitRenderer(&commit))));
-    let mime: Mime = "text/html".parse().unwrap();
-    Ok(Response::with((status::Ok, mime, buffer)))
+    Ok(Html(&CommitRenderer(&commit)).into())
   }
 }
 

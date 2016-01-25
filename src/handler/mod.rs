@@ -6,6 +6,8 @@ pub mod register;
 mod commit;
 mod commits;
 mod repository;
+mod html;
+mod base;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
