@@ -2,6 +2,7 @@
 #![plugin(maud_macros)]
 
 extern crate maud;
+#[macro_use]
 extern crate iron;
 extern crate router;
 extern crate logger;
@@ -51,6 +52,7 @@ fn main() {
   let mut chain = Chain::new(router);
 
   chain.link_before(logger_before);
+  chain.link_after(handler::NotFound);
   chain.link_after(logger_after);
 
   Iron::new(chain).http("localhost:3000").unwrap();

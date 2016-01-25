@@ -14,6 +14,8 @@ mod analysis;
 mod avatar;
 mod commit;
 mod repository;
+mod not_found;
+mod error;
 
 pub use self::style::Style;
 pub use self::event::{ EventRenderer, EventsRenderer };
@@ -25,6 +27,8 @@ pub use self::analysis::{ AnalysisRenderer };
 pub use self::avatar::{ Avatar };
 pub use self::commit::{ CommitRenderer, CommitsRenderer };
 pub use self::repository::{ RepositoryRenderer };
+pub use self::not_found::{ NotFoundRenderer };
+pub use self::error::{ ErrorRenderer };
 
 pub struct Wrapper<T>(pub T);
 

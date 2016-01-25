@@ -11,10 +11,11 @@ pub struct Commit {
 
 impl Handler for Commit {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let path = req.extensions.get::<Router>().unwrap().find("repo").unwrap();
-    let repo = Repository::open(self.root.join(path)).unwrap();
-    let id = Oid::from_str(req.extensions.get::<Router>().unwrap().find("commit").unwrap()).unwrap();
-    let commit = repo.find_commit(id).unwrap();
+    let router = iexpect!(req.extensions.get::<Router>(), status::InternalServerError);
+    let path = iexpect!(router.find("repo"), status::InternalServerError);
+    let repo = itry!(Repository::open(self.root.join(path)), status::NotFound);
+    let id = iexpect!(router.find("commit").and_then(|id| Oid::from_str(id).ok()));
+    let commit = itry!(repo.find_commit(id), status::NotFound);
     Ok(Html(Wrapper(&CommitRenderer(&commit))).into())
   }
 }
