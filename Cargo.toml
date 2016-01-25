@@ -17,6 +17,7 @@ typemap = "*"
 mime = "*"
 lru_time_cache = "*"
 time = "*"
+walkdir = "0.1.5"
 
 chrono = "*"
 maud-pulldown-cmark = "*"

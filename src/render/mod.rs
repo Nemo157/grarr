@@ -27,7 +27,7 @@ pub use self::ci_status::{ CIStatusRenderer };
 pub use self::analysis::{ AnalysisRenderer };
 pub use self::avatar::{ Avatar };
 pub use self::commit::{ CommitRenderer, CommitsRenderer };
-pub use self::repository::{ RepositoryRenderer };
+pub use self::repository::{ RepositoryRenderer, RepositoriesRenderer };
 pub use self::not_found::{ NotFoundRenderer };
 pub use self::bad_request::{ BadRequestRenderer };
 pub use self::error::{ ErrorRenderer };

@@ -17,6 +17,7 @@ extern crate hyper;
 extern crate mime;
 extern crate lru_time_cache;
 extern crate time;
+extern crate walkdir;
 
 #[macro_use]
 mod render;
@@ -41,6 +42,7 @@ fn main() {
     .register(handler::Commit { root: From::from(root.clone()) })
     .register(handler::Commits { root: From::from(root.clone()) })
     .register(handler::Repository { root: From::from(root.clone()) })
+    .register(handler::Repositories { root: From::from(root.clone()) })
     .register(handler::Avatars::new(handler::avatar::Options {
       enable_gravatar: true,
       enable_cache: true,

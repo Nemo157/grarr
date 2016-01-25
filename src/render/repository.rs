@@ -22,4 +22,18 @@ renderers! {
       #(markdown::from_string(&*readme))
     }
   }
+
+  RepositoryStubRenderer(name: &'a str, repo: &'a Repository) {
+    div class="repo-stub" {
+      a href=#name {
+        #name
+      }
+    }
+  }
+
+  RepositoriesRenderer(repos: &'a Vec<(String, Repository)>) {
+    #for &(ref path, ref repo) in repos {
+      #RepositoryStubRenderer(&*path, repo)
+    }
+  }
 }
