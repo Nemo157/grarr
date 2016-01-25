@@ -21,6 +21,7 @@ extern crate time;
 #[macro_use]
 mod render;
 mod handler;
+mod error;
 
 use std::env;
 use iron::prelude::*;
@@ -53,6 +54,7 @@ fn main() {
 
   chain.link_before(logger_before);
   chain.link_after(handler::NotFound);
+  chain.link_after(handler::BadRequest);
   chain.link_after(logger_after);
 
   Iron::new(chain).http("localhost:3000").unwrap();

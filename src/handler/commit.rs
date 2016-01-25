@@ -1,5 +1,6 @@
 use super::base::*;
 
+use error::Error;
 use std::path::PathBuf;
 use router::Router;
 use git2::{ Oid, Repository };
@@ -11,10 +12,11 @@ pub struct Commit {
 
 impl Handler for Commit {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let router = iexpect!(req.extensions.get::<Router>(), status::InternalServerError);
-    let path = iexpect!(router.find("repo"), status::InternalServerError);
+    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let path = itry!(router.find("repo").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let repo = itry!(Repository::open(self.root.join(path)), status::NotFound);
-    let id = iexpect!(router.find("commit").and_then(|id| Oid::from_str(id).ok()));
+    let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
+    let id = itry!(Oid::from_str(commit), status::BadRequest);
     let commit = itry!(repo.find_commit(id), status::NotFound);
     Ok(Html(Wrapper(&CommitRenderer(&commit))).into())
   }
