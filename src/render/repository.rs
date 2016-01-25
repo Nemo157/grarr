@@ -16,8 +16,16 @@ fn find_readme(repo: &Repository) -> Option<String> {
 }
 
 renderers! {
-  RepositoryRenderer(name: &'a str, repo: &'a Repository) {
-    h1 #name
+  RepositoryRenderer(name: &'a str, actual: &'a str, repo: &'a Repository) {
+    h1 {
+      #name
+      #if name != actual {
+        " "
+        small {
+          "(alias of " a href={ "/" #actual } { #actual } ")"
+        }
+      }
+    }
     #if let Some(readme) = find_readme(repo) {
       #(markdown::from_string(&*readme))
     }
