@@ -1,5 +1,5 @@
 [package]
-name = "git-appraise-server"
+name = "grarr"
 version = "0.0.1"
 authors = ["Wim Looman <wim@nemo157.com>"]
 
