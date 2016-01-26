@@ -204,3 +204,39 @@ blockquote {
   border-left: 1px dotted #839496;
   padding-left: 1rem;
 }
+
+.options {
+  display: flex;
+  flex-direction: row;
+}
+
+.options > * {
+  display: flex;
+  border-top: 2px solid #073642;
+  border-bottom: 1px solid #073642;
+  border-right: 1px solid #073642;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.options > :first-child {
+  border-left: 2px solid #073642;
+  border-top-left-radius: 10px;
+}
+
+.options > :last-child {
+  border-right: 2px solid #073642;
+  border-top-right-radius: 10px;
+}
+
+.options .selected {
+  background-color: #073642;
+}
+
+.content {
+  padding: 10px;
+  border-left: 2px solid #073642;
+  border-right: 2px solid #073642;
+  border-bottom: 2px solid #073642;
+  border-bottom-left-radius: 10px;
+}

@@ -47,8 +47,17 @@ renderers! {
         }
       }
     }
-    #if let Some(readme) = find_readme(repo) {
-      #(markdown::from_string(&*readme))
+    div class="repository" {
+      div class="options" {
+        div class="selected overview" { a href={ "/" #name } { "Overview" } }
+        div class="commits" { a href={ "/" #name "/commits" } { "Commits" } }
+        div class="reviews" { a href={ "/" #name "/reviews" } { "Reviews" } }
+      }
+      div class="content overview" {
+        #if let Some(readme) = find_readme(repo) {
+          #(markdown::from_string(&*readme))
+        }
+      }
     }
   }
 

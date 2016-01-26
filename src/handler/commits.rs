@@ -1,5 +1,6 @@
 use super::base::*;
 
+use std::fs;
 use std::path::PathBuf;
 use router::Router;
 
@@ -13,11 +14,12 @@ pub struct Commits {
 impl Handler for Commits {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let path = req.extensions.get::<Router>().unwrap().find("repo").unwrap();
+    let actual = fs::canonicalize(self.root.join(path)).unwrap().strip_prefix(&fs::canonicalize(&self.root).unwrap()).unwrap().to_str().unwrap().to_string();
     let repo = Repository::open(self.root.join(path)).unwrap();
     let mut walker = repo.revwalk().unwrap();
     walker.push_head().unwrap();
     let commits: Vec<_> = walker.map(|id| repo.find_commit(id).unwrap()).collect();
-    Ok(Html(Wrapper(&CommitsRenderer(&commits))).into())
+    Ok(Html(Wrapper(&CommitsRenderer(&*path, &actual, &commits))).into())
   }
 }
 
