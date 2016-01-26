@@ -3,6 +3,7 @@ use git2::{ Repository };
 use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::PreEscaped;
 use maud_pulldown_cmark::markdown;
+use repository_tree::RepositoryTreeEntry;
 
 fn find_readme(repo: &Repository) -> Option<String> {
   let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
@@ -51,10 +52,10 @@ renderers! {
     }
   }
 
-  RepositoryStubRenderer(name: &'a str, repo: &'a Repository) {
+  RepositoryStubRenderer(path: &'a str, name: &'a str, repo: &'a Repository) {
     li class="repo-stub" {
       i class="fa fa-git-square fa-li" { } " "
-      a href=#name {
+      a href={ #path "/" #name } {
         #name
       }
       #if let Some(description) = description(repo) {
@@ -65,10 +66,31 @@ renderers! {
     }
   }
 
-  RepositoriesRenderer(repos: &'a Vec<(String, Repository)>) {
+  RepositoriesRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     ul class="fa-ul" {
-      #for &(ref path, ref repo) in repos {
-        #RepositoryStubRenderer(&*path, repo)
+      #for entry in repos {
+        #if let &RepositoryTreeEntry::Dir(ref name, ref repos) = entry {
+          li {
+            i class="fa fa-sitemap fa-li" { } " "
+            #name
+            #RepositoriesRenderer(&*(path.to_string() + "/" + name), repos)
+          }
+        }
+        #if let &RepositoryTreeEntry::Alias(ref alias, ref actual) = entry {
+          li {
+            i class="fa fa-tag fa-li" { } " "
+            a href={ #path "/" #alias } {
+              #alias
+            }
+            " alias of "
+            a href=#actual {
+              #actual
+            }
+          }
+        }
+        #if let &RepositoryTreeEntry::Repo(ref name, ref repo) = entry {
+          #RepositoryStubRenderer(path, name, repo)
+        }
       }
     }
   }

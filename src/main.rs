@@ -27,6 +27,7 @@ mod macros;
 mod render;
 mod handler;
 mod error;
+mod repository_tree;
 
 use std::env;
 use iron::prelude::*;
