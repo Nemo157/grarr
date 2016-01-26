@@ -20,6 +20,7 @@ time = "*"
 walkdir = "0.1.5"
 
 chrono = "*"
+pulldown-cmark = "*"
 maud-pulldown-cmark = "*"
 gravatar = "*"
 

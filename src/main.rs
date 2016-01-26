@@ -18,6 +18,10 @@ extern crate mime;
 extern crate lru_time_cache;
 extern crate time;
 extern crate walkdir;
+extern crate pulldown_cmark;
+
+#[macro_use]
+mod macros;
 
 #[macro_use]
 mod render;

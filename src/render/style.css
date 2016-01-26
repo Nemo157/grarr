@@ -199,3 +199,8 @@ code {
   display: table;
   clear: both;
 }
+
+blockquote {
+  border-left: 1px dotted #839496;
+  padding-left: 1rem;
+}
