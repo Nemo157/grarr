@@ -1,5 +1,9 @@
 # grarr
 
+`grarr` is a git repository and reviews renderer. It can be run on a personal
+server to provide a nice web interface to view your self-hosted git repositories
+without the overhead of a full on git repository management tool like [GitLab][].
+
 ## Developing
 
 If building on OS X with a `homebrew` installed copy of OpenSSL you'll need to
@@ -11,3 +15,5 @@ OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl/1.0.2d_1 \
 DEP_OPENSSL_INCLUDE=/usr/local/Cellar/openssl/1.0.2d_1/include \
 cargo build
 ```
+
+[GitLab]: https://gitlab.com
