@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use router::Router;
 use git_appraise::Repository;
 
+use error::Error;
 use render::ReviewsRenderer;
 
 pub struct Reviews {
@@ -13,10 +14,11 @@ pub struct Reviews {
 
 impl Handler for Reviews {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let path = req.extensions.get::<Router>().unwrap().find("repo").unwrap();
+    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let path = itry!(router.find("repo").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let actual = fs::canonicalize(self.root.join(path)).unwrap().strip_prefix(&fs::canonicalize(&self.root).unwrap()).unwrap().to_str().unwrap().to_string();
-    let repo = Repository::open(self.root.join(path)).unwrap();
-    let mut reviews: Vec<_> = repo.all_reviews().unwrap().collect();
+    let repo = itry!(Repository::open(self.root.join(path)), status::NotFound);
+    let mut reviews: Vec<_> = repo.all_reviews().map(|revs| revs.collect()).unwrap_or(Vec::new());
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
     Ok(Html(Wrapper(&ReviewsRenderer(&*path, &actual, &reviews))).into())
   }
