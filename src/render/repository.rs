@@ -1,9 +1,16 @@
 use std::str;
 use git2::{ Repository };
 use pulldown_cmark::{ Parser, html, Event, Tag };
-use maud::PreEscaped;
+use maud::{ Render, PreEscaped };
 use maud_pulldown_cmark::markdown;
 use repository_tree::RepositoryTreeEntry;
+
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub enum Tab {
+  Overview,
+  Commits,
+  Reviews,
+}
 
 fn find_readme(repo: &Repository) -> Option<String> {
   let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
@@ -37,6 +44,16 @@ fn description(repo: &Repository) -> Option<String> {
 
 renderers! {
   RepositoryRenderer(name: &'a str, actual: &'a str, repo: &'a Repository) {
+    #RepositoryWrapper(name, actual, &Tab::Overview, &RepositoryOverviewRenderer(repo))
+  }
+
+  RepositoryOverviewRenderer(repo: &'a Repository) {
+    #if let Some(readme) = find_readme(repo) {
+      #(markdown::from_string(&*readme))
+    }
+  }
+
+  RepositoryWrapper(name: &'a str, actual: &'a str, tab: &'a Tab, content: &'a Render) {
     h1 {
       i class="fa fa-git-square" { } " "
       a href={ "/" #name }  { #name }
@@ -48,15 +65,17 @@ renderers! {
       }
     }
     div class="repository" {
-      div class="options" {
-        div class="selected overview" { a href={ "/" #name } { "Overview" } }
-        div class="commits" { a href={ "/" #name "/commits" } { "Commits" } }
-        div class="reviews" { a href={ "/" #name "/reviews" } { "Reviews" } }
+      div class="tabs" {
+        div class={ "overview" #{ if tab == &Tab::Overview { " selected" } else { "" } } } { a href={ "/" #name } { "Overview" } }
+        div class={ "commits" #{ if tab == &Tab::Commits { " selected" } else { "" } } } { a href={ "/" #name "/commits" } { "Commits" } }
+        div class={ "reviews" #{ if tab == &Tab::Reviews { " selected" } else { "" } } } { a href={ "/" #name "/reviews" } { "Reviews" } }
       }
-      div class="content overview" {
-        #if let Some(readme) = find_readme(repo) {
-          #(markdown::from_string(&*readme))
-        }
+      div class={ "content " #{ match tab {
+        &Tab::Overview => "overview",
+        &Tab::Commits => "commits",
+        &Tab::Reviews => "reviews",
+      } } } {
+        #content
       }
     }
   }
@@ -76,13 +95,18 @@ renderers! {
   }
 
   RepositoriesRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
+    h1 { "Repositories" }
+    #RepositoriesListRenderer(path, repos)
+  }
+
+  RepositoriesListRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     ul class="fa-ul" {
       #for entry in repos {
         #if let &RepositoryTreeEntry::Dir(ref name, ref repos) = entry {
           li {
             i class="fa fa-sitemap fa-li" { } " "
             #name
-            #RepositoriesRenderer(&*(path.to_string() + "/" + name), repos)
+            #RepositoriesListRenderer(&*(path.to_string() + "/" + name), repos)
           }
         }
         #if let &RepositoryTreeEntry::Alias(ref alias, ref actual) = entry {

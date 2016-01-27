@@ -205,12 +205,12 @@ blockquote {
   padding-left: 1rem;
 }
 
-.options {
+.tabs {
   display: flex;
   flex-direction: row;
 }
 
-.options > * {
+.tabs > * {
   display: flex;
   border-top: 2px solid #073642;
   border-bottom: 1px solid #073642;
@@ -219,17 +219,17 @@ blockquote {
   justify-content: center;
 }
 
-.options > :first-child {
+.tabs > :first-child {
   border-left: 2px solid #073642;
   border-top-left-radius: 10px;
 }
 
-.options > :last-child {
+.tabs > :last-child {
   border-right: 2px solid #073642;
   border-top-right-radius: 10px;
 }
 
-.options .selected {
+.tabs .selected {
   background-color: #073642;
 }
 
