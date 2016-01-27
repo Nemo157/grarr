@@ -11,28 +11,9 @@ fn summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
 }
 
 renderers! {
-  CommitsRenderer(name: &'a str, actual: &'a str, commits: &'a Vec<Commit<'a>>) {
-    h1 {
-      i class="fa fa-git-square" { } " "
-      a href={ "/" #name }  { #name }
-      #if name != actual {
-        " "
-        small {
-          "(alias of " a href={ "/" #actual } { #actual } ")"
-        }
-      }
-    }
-    div class="repository" {
-      div class="options" {
-        div class="overview" { a href={ "/" #name } { "Overview" } }
-        div class="selected commits" { a href={ "/" #name "/commits" } { "Commits" } }
-        div class="reviews" { a href={ "/" #name "/reviews" } { "Reviews" } }
-      }
-      div class="content commits" {
-        #for commit in commits {
-          #CommitStubRenderer(commit)
-        }
-      }
+  CommitsRenderer(commits: &'a Vec<Commit<'a>>) {
+    #for commit in commits {
+      #CommitStubRenderer(commit)
     }
   }
 

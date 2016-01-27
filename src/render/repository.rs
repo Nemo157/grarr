@@ -4,6 +4,7 @@ use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::{ Render, PreEscaped };
 use maud_pulldown_cmark::markdown;
 use repository_tree::RepositoryTreeEntry;
+use super::fa::{ FA, FAM };
 
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Tab {
@@ -43,20 +44,17 @@ fn description(repo: &Repository) -> Option<String> {
 }
 
 renderers! {
-  RepositoryRenderer(name: &'a str, actual: &'a str, repo: &'a Repository) {
-    #RepositoryWrapper(name, actual, &Tab::Overview, &RepositoryOverviewRenderer(repo))
-  }
-
-  RepositoryOverviewRenderer(repo: &'a Repository) {
+  RepositoryRenderer(repo: &'a Repository) {
     #if let Some(readme) = find_readme(repo) {
       #(markdown::from_string(&*readme))
     }
   }
 
   RepositoryWrapper(name: &'a str, actual: &'a str, tab: &'a Tab, content: &'a Render) {
+    #(FA::LevelUp) " " a href="/" { "Repositories" }
     h1 {
-      i class="fa fa-git-square" { } " "
-      a href={ "/" #name }  { #name }
+      #(FA::GitSquare) " "
+      a href={ "/" #name } { #name }
       #if name != actual {
         " "
         small {
@@ -82,7 +80,7 @@ renderers! {
 
   RepositoryStubRenderer(path: &'a str, name: &'a str, repo: &'a Repository) {
     li class="repo-stub" {
-      i class="fa fa-git-square fa-li" { } " "
+      #(FAM::Li(FA::GitSquare))
       a href={ #path "/" #name } {
         #name
       }
@@ -104,14 +102,14 @@ renderers! {
       #for entry in repos {
         #if let &RepositoryTreeEntry::Dir(ref name, ref repos) = entry {
           li {
-            i class="fa fa-sitemap fa-li" { } " "
+            #(FAM::Li(FA::Sitemap))
             #name
             #RepositoriesListRenderer(&*(path.to_string() + "/" + name), repos)
           }
         }
         #if let &RepositoryTreeEntry::Alias(ref alias, ref actual) = entry {
           li {
-            i class="fa fa-tag fa-li" { } " "
+            #(FAM::Li(FA::Tag))
             a href={ #path "/" #alias } {
               #alias
             }

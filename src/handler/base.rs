@@ -6,6 +6,6 @@ pub use iron::request::Request;
 pub use iron::response::Response;
 pub use iron::status;
 
-pub use render::Wrapper;
+pub use render::{ Wrapper, RepositoryWrapper, Tab };
 pub use super::html::Html;
 pub use super::route::Route;

@@ -20,7 +20,7 @@ impl Handler for Reviews {
     let repo = itry!(Repository::open(self.root.join(path)), status::NotFound);
     let mut reviews: Vec<_> = repo.all_reviews().map(|revs| revs.collect()).unwrap_or(Vec::new());
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
-    Ok(Html(Wrapper(&ReviewsRenderer(&*path, &actual, &reviews))).into())
+    Ok(Html(Wrapper(&(RepositoryWrapper(&*path, &actual, &Tab::Reviews, &ReviewsRenderer(&reviews))))).into())
   }
 }
 

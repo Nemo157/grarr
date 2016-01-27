@@ -19,7 +19,7 @@ impl Handler for Commits {
     let mut walker = repo.revwalk().unwrap();
     walker.push_head().unwrap();
     let commits: Vec<_> = walker.map(|id| repo.find_commit(id).unwrap()).collect();
-    Ok(Html(Wrapper(&CommitsRenderer(&*path, &actual, &commits))).into())
+    Ok(Html(Wrapper(&RepositoryWrapper(&*path, &actual, &Tab::Commits, &CommitsRenderer(&commits)))).into())
   }
 }
 
