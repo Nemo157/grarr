@@ -11,6 +11,8 @@ mod html;
 mod base;
 mod not_found;
 mod bad_request;
+mod tree;
+mod tree_entry;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
@@ -21,5 +23,7 @@ pub use self::repository::Repository;
 pub use self::repositories::Repositories;
 pub use self::not_found::NotFound;
 pub use self::bad_request::BadRequest;
+pub use self::tree::Tree;
+pub use self::tree_entry::TreeEntry;
 
 pub use self::register::Register;

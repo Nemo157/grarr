@@ -9,6 +9,7 @@ use super::fa::{ FA, FAM };
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Tab {
   Overview,
+  Files,
   Commits,
   Reviews,
 }
@@ -65,11 +66,13 @@ renderers! {
     div class="repository" {
       div class="tabs" {
         div class={ "overview" #{ if tab == &Tab::Overview { " selected" } else { "" } } } { a href={ "/" #name } { "Overview" } }
+        div class={ "files" #{ if tab == &Tab::Files { " selected" } else { "" } } } { a href={ "/" #name "/tree" } { "Files" } }
         div class={ "commits" #{ if tab == &Tab::Commits { " selected" } else { "" } } } { a href={ "/" #name "/commits" } { "Commits" } }
         div class={ "reviews" #{ if tab == &Tab::Reviews { " selected" } else { "" } } } { a href={ "/" #name "/reviews" } { "Reviews" } }
       }
       div class={ "content " #{ match tab {
         &Tab::Overview => "overview",
+        &Tab::Files => "files",
         &Tab::Commits => "commits",
         &Tab::Reviews => "reviews",
       } } } {

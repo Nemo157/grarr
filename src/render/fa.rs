@@ -6,6 +6,8 @@ pub enum FA {
   GitSquare,
   Sitemap,
   Tag,
+  File,
+  Question,
 }
 
 pub enum FAM {
@@ -19,6 +21,8 @@ impl FA {
       FA::GitSquare => "fa fa-git-square",
       FA::Sitemap => "fa fa-sitemap",
       FA::Tag => "fa fa-tag",
+      FA::File => "fa fa-file",
+      FA::Question => "fa fa-question",
     }
   }
 }

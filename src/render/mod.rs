@@ -18,6 +18,7 @@ mod not_found;
 mod bad_request;
 mod error;
 mod fa;
+mod tree;
 
 pub use self::style::Style;
 pub use self::event::{ EventRenderer, EventsRenderer };
@@ -32,6 +33,7 @@ pub use self::repository::{ RepositoryWrapper, RepositoryRenderer, RepositoriesR
 pub use self::not_found::{ NotFoundRenderer };
 pub use self::bad_request::{ BadRequestRenderer };
 pub use self::error::{ ErrorRenderer };
+pub use self::tree::{ RootTreeRenderer, TreeEntryRenderer };
 
 pub struct Wrapper<T>(pub T);
 

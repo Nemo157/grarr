@@ -48,6 +48,8 @@ fn main() {
     .register(handler::Commits { root: From::from(root.clone()) })
     .register(handler::Repository { root: From::from(root.clone()) })
     .register(handler::Repositories { root: From::from(root.clone()) })
+    .register(handler::Tree { root: From::from(root.clone()) })
+    .register(handler::TreeEntry { root: From::from(root.clone()) })
     .register(handler::Avatars::new(handler::avatar::Options {
       enable_gravatar: true,
       enable_cache: true,
