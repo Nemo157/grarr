@@ -54,7 +54,7 @@ renderers! {
   TreeRenderer(root: &'a str, path: &'a Path, tree: &'a Tree<'a>) {
     h2.path { #ComponentsRenderer(root, path.components()) }
     ul.fa-ul {
-      li { #(FAM::Li(FA::LevelUp)) a href=#((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+      li { #FAM::Li(FA::LevelUp) a href=#((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
       #for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
         #TreeEntryStubRenderer(&(root.to_string() + path.to_str().unwrap()), &entry)
       }

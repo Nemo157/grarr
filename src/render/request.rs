@@ -48,7 +48,7 @@ renderers! {
       .h4 {
         #if let Some(timestamp) = request.timestamp() {
           span.timestamp
-            #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
+            #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
         }
       }
       .h2 {
@@ -78,7 +78,7 @@ renderers! {
   RequestDetailsRenderer(request: &'a Request) {
     .block-details.request-details {
       #if let Some(description) = request.description() {
-        #(markdown::from_string(description))
+        #markdown::from_string(description)
       }
       #if let None = request.description() {
         i "No description provided"

@@ -12,7 +12,7 @@ impl<T: Render> Render for Wrapper<T> {
           #Style
         }
         body {
-          #(self.0)
+          #self.0
         }
       }
     })
@@ -27,7 +27,7 @@ impl<T: RenderMut> RenderMut for Wrapper<T> {
           #Style
         }
         body {
-          #(self.0)
+          #self.0
         }
       }
     })
@@ -42,7 +42,7 @@ impl<T: RenderOnce> RenderOnce for Wrapper<T> {
           #Style
         }
         body {
-          #(self.0)
+          #self.0
         }
       }
     })

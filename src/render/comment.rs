@@ -15,7 +15,7 @@ renderers! {
           #if let Some(timestamp) = comment.timestamp() {
             "on "
             span.timestamp
-              #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
+              #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
             " "
           }
           "with status "
@@ -39,7 +39,7 @@ renderers! {
     }
     #if let Some(description) = comment.description() {
       .block-details.comment-details {
-        #(markdown::from_string(description))
+        #markdown::from_string(description)
       }
     }
   }

@@ -45,7 +45,7 @@ renderers! {
 
   RepositoryStubRenderer(path: &'a str, name: &'a str, repo: &'a Repository) {
     li.repo-stub {
-      #(FAM::Li(FA::GitSquare))
+      #FAM::Li(FA::GitSquare)
       a href={ #path "/" #name } {
         #name
       }

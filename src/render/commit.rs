@@ -55,7 +55,7 @@ renderers! {
           #Signature(&commit.committer())
           span {
             "committed at "
-            span.timestamp { #(NaiveDateTime::from_timestamp(commit.time().seconds(), 0)) }
+            span.timestamp { #NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
           }
         }
         #if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
@@ -63,14 +63,14 @@ renderers! {
             #Signature(&commit.author())
             span {
               "authored at "
-              span.timestamp { #(NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0)) }
+              span.timestamp { #NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
             }
           }
         }
       }
       #if let Some(non_summary) = non_summary(commit) {
         .block-details.message {
-          #(markdown::from_string(non_summary))
+          #markdown::from_string(non_summary)
         }
       }
     }

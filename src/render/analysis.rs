@@ -12,7 +12,7 @@ renderers! {
               #if let Some(timestamp) = analysis.timestamp() {
                 " submitted at "
                 span.timestamp {
-                  #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
+                  #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
                 }
               }
             }

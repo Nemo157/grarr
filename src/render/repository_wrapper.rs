@@ -16,9 +16,9 @@ impl<'a, R: RenderOnce> RenderOnce for RepositoryWrapper<'a, R> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let RepositoryWrapper(name, actual, tab, content) = self;
     html!(w, {
-      #(FA::LevelUp) " " a href="/" { "Repositories" }
+      #FA::LevelUp " " a href="/" { "Repositories" }
       h1 {
-        #(FA::GitSquare) " "
+        #FA::GitSquare " "
         a href={ "/" #name } { #name }
         #if name != actual {
           " "

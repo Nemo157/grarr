@@ -39,7 +39,7 @@ renderers! {
     #if let Some(timestamp) = ci_status.timestamp() {
       " at "
       span.timestamp
-        #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
+        #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
     }
   }
 }
