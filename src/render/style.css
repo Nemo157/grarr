@@ -86,8 +86,16 @@ a:hover {
   padding: 0 20px;
 }
 
-.email {
+.email, .user {
   color: #d33682;
+}
+
+.email:before {
+  content: "<";
+}
+
+.email:after {
+  content: ">";
 }
 
 .agent {

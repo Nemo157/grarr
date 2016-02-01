@@ -62,7 +62,7 @@ renderers! {
       div class="h3" {
         #Avatar(request.requester().unwrap_or("unknown@example.org"))
         span class="rest" {
-          span class="email"
+          span class="user"
             #request.requester().unwrap_or("<unknown requester>")
           " wants to merge "
           span class="ref"

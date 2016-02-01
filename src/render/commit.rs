@@ -1,8 +1,10 @@
 use std::fmt;
 use git2::{ Oid, Commit };
-use maud::RenderOnce;
+use maud::{ RenderOnce, PreEscaped };
 use maud_pulldown_cmark::markdown;
 use commit_tree::CommitTree;
+use chrono::naive::datetime::NaiveDateTime;
+use super::{ Signature };
 
 const HEX: &'static [u8; 0x10] = b"0123456789abcdef";
 fn short(oid: Oid) -> String {
@@ -37,19 +39,37 @@ renderers! {
   }
 
   CommitRenderer(commit: &'a Commit<'a>) {
-    div class="commit" {
-      h2 {
-        span class="id" #short(commit.id())
-        " "
-        #if let Some(summary) = summary(commit) {
-          #summary
+    div class="commit block" {
+      div class="block-header" {
+        div class="h2" {
+          span class="id" #short(commit.id())
+          #PreEscaped("&nbsp;")
+          #if let Some(summary) = summary(commit) {
+            #summary
+          }
+          #if let None = summary(commit) {
+            "<No summary provided>"
+          }
         }
-        #if let None = summary(commit) {
-          "<No summary provided>"
+        div class="h3" {
+          #Signature(&commit.committer())
+          span {
+            "committed at "
+            span class="timestamp" { #(NaiveDateTime::from_timestamp(commit.time().seconds(), 0)) }
+          }
+        }
+        #if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
+          div class="h3" {
+            #Signature(&commit.author())
+            span {
+              "authored at "
+              span class="timestamp" { #(NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0)) }
+            }
+          }
         }
       }
       #if let Some(non_summary) = non_summary(commit) {
-        div class="message" {
+        div class="block-details message" {
           #(markdown::from_string(non_summary))
         }
       }

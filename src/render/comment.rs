@@ -9,7 +9,7 @@ renderers! {
       div class="h3" {
         #Avatar(comment.author().unwrap_or("unknown@example.org"))
         span class="rest" {
-          span class="email"
+          span class="user"
             #comment.author().unwrap_or("<unknown author>")
           " commented "
           #if let Some(timestamp) = comment.timestamp() {

@@ -18,6 +18,7 @@ mod error;
 mod fa;
 mod tree;
 mod wrapper;
+mod signature;
 
 pub use self::style::Style;
 pub use self::event::{ EventRenderer, EventsRenderer };
@@ -35,3 +36,4 @@ pub use self::bad_request::{ BadRequestRenderer };
 pub use self::error::{ ErrorRenderer };
 pub use self::tree::{ RootTreeRenderer, TreeEntryRenderer };
 pub use self::wrapper::Wrapper;
+pub use self::signature::Signature;
