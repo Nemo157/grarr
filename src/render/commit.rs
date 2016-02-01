@@ -62,11 +62,15 @@ impl<'repo> RenderOnce for CommitsRenderer<'repo> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let CommitsRenderer(commits) = self;
     html!(w, {
-      ul {
+      ul class="no-dot" {
         #for (commit, sub) in commits {
           #CommitStubRenderer(&commit)
           #if !sub.is_empty() {
-            #CommitsRenderer(sub)
+            li {
+              input class="expander" type="checkbox" { }
+              label { i class="fa fa-fw chevron" {} }
+              #CommitsRenderer(sub)
+            }
           }
         }
       }

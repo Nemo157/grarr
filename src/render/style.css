@@ -244,3 +244,36 @@ blockquote {
 .path {
   font-family: monospace;
 }
+
+ul.no-dot {
+  list-style: none;
+}
+
+.commits li {
+  min-height: 28px;
+}
+
+.expander {
+  display: inline-block;
+  margin: 3px 0px 3px 20px;
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+}
+
+.expander + label {
+  display: inline-block;
+  margin-left: -20px;
+  margin-top: 0px;
+}
+
+.expander:checked ~ ul {
+  margin-top: -24px;
+}
+
+.expander         ~ ul > li { display: none; }
+.expander:checked ~ ul > li { display: block; }
+
+.expander         + label > .chevron:before { content: "\f054"; }
+.expander:checked + label > .chevron:before { content: "\f078"; }
+
