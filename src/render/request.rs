@@ -27,11 +27,9 @@ renderers! {
         span.id
           #short(request.commit_id())
         " "
-        #if let Some(summary) = summary(request) {
-          #summary
-        }
-        #if let None = summary(request) {
-          "<No summary provided>"
+        #match summary(request) {
+          Some(summary) => #summary,
+          None => "<No summary provided>",
         }
       }
     }
@@ -52,11 +50,9 @@ renderers! {
         }
       }
       .h2 {
-        #if let Some(summary) = summary(request) {
-          #summary
-        }
-        #if let None = summary(request) {
-          "<No summary provided>"
+        #match summary(request) {
+          Some(summary) => #summary,
+          None => "<No summary provided>",
         }
       }
       .h3 {
@@ -77,11 +73,9 @@ renderers! {
 
   RequestDetailsRenderer(request: &'a Request) {
     .block-details.request-details {
-      #if let Some(description) = request.description() {
-        #markdown::from_string(description)
-      }
-      #if let None = request.description() {
-        i "No description provided"
+      #match request.description() {
+        Some(description) => #markdown::from_string(description),
+        None => i "No description provided",
       }
     }
   }

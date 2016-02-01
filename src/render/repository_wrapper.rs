@@ -34,12 +34,12 @@ impl<'a, R: RenderOnce> RenderOnce for RepositoryWrapper<'a, R> {
           div class={ "commits" #{ if tab == Tab::Commits { " selected" } else { "" } } } { a href={ "/" #name "/commits" } { "Commits" } }
           div class={ "reviews" #{ if tab == Tab::Reviews { " selected" } else { "" } } } { a href={ "/" #name "/reviews" } { "Reviews" } }
         }
-        div class={ "content " #{ match tab {
+        div class={ "content " #match tab {
           Tab::Overview => "overview",
           Tab::Files => "files",
           Tab::Commits => "commits",
           Tab::Reviews => "reviews",
-        } } } {
+        } } {
           #content
         }
       }

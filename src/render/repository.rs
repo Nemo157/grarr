@@ -65,27 +65,29 @@ renderers! {
   RepositoriesListRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     ul.fa-ul {
       #for entry in repos {
-        #if let &RepositoryTreeEntry::Dir(ref name, ref repos) = entry {
-          li {
-            #(FAM::Li(FA::Sitemap))
-            #name
-            #RepositoriesListRenderer(&*(path.to_string() + "/" + name), repos)
-          }
-        }
-        #if let &RepositoryTreeEntry::Alias(ref alias, ref actual) = entry {
-          li {
-            #(FAM::Li(FA::Tag))
-            a href={ #path "/" #alias } {
-              #alias
+        #match entry {
+          &RepositoryTreeEntry::Dir(ref name, ref repos) => {
+            li {
+              #(FAM::Li(FA::Sitemap))
+              #name
+              #RepositoriesListRenderer(&*(path.to_string() + "/" + name), repos)
             }
-            " alias of "
-            a href=#actual {
-              #actual
+          },
+          &RepositoryTreeEntry::Alias(ref alias, ref actual) => {
+            li {
+              #(FAM::Li(FA::Tag))
+              a href={ #path "/" #alias } {
+                #alias
+              }
+              " alias of "
+              a href=#actual {
+                #actual
+              }
             }
-          }
-        }
-        #if let &RepositoryTreeEntry::Repo(ref name, ref repo) = entry {
-          #RepositoryStubRenderer(path, name, repo)
+          },
+          &RepositoryTreeEntry::Repo(ref name, ref repo) => {
+            #RepositoryStubRenderer(path, name, repo)
+          },
         }
       }
     }

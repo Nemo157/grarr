@@ -21,10 +21,17 @@ renderers! {
           "with status "
           span class={
             "resolved "
-            #comment.resolved().map(|r| if r { "lgtm" } else { "nmw" }).unwrap_or("fyi")
+            #match comment.resolved() {
+              Some(true) => "lgtm",
+              Some(false) => "nmw",
+              None => "fyi",
+            }
           } {
-            #comment.resolved().map(|r| if r { "lgtm" } else { "nmw" }).unwrap_or("fyi")
-            // #comment.resolved().map(|r| if r { "👍" } else { "👎" }).unwrap_or("ℹ️")
+            #match comment.resolved() {
+              Some(true) => "👍",
+              Some(false) => "👎",
+              None => "ℹ️",
+            }
           }
         }
       }

@@ -6,13 +6,13 @@ renderers! {
     .block.ci-status {
       .block-header {
         .h3 {
-          #if let Some(url) = ci_status.url() {
-            a href={ #url } {
-              #CIStatusTextRenderer(ci_status)
-            }
-          }
-          #if let None = ci_status.url() {
-            #CIStatusTextRenderer(ci_status)
+          #match ci_status.url() {
+            Some(url) => {
+              a href={ #url } {
+                #CIStatusTextRenderer(ci_status)
+              }
+            },
+            None => #CIStatusTextRenderer(ci_status)
           }
         }
       }
@@ -26,20 +26,21 @@ renderers! {
     " reported status "
     span class={
       "status "
-      #ci_status.status().map(|s| match s {
-        Status::Success => "success",
-        Status::Failure => "failure"
-      }).unwrap_or("running")
+      #match ci_status.status() {
+        Some(Status::Success) => "success",
+        Some(Status::Failure) => "failure",
+        None => "running",
+      }
     } {
-      #ci_status.status().map(|s| match s {
-        Status::Success => "success",
-        Status::Failure => "failure"
-      }).unwrap_or("running")
+      #match ci_status.status() {
+        Some(Status::Success) => "success",
+        Some(Status::Failure) => "failure",
+        None => "running",
+      }
     }
     #if let Some(timestamp) = ci_status.timestamp() {
       " at "
-      span.timestamp
-        #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
+      span.timestamp #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
     }
   }
 }

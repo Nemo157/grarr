@@ -28,11 +28,9 @@ renderers! {
         span.id
           #short(commit.id())
         " "
-        #if let Some(summary) = summary(commit) {
-          #summary
-        }
-        #if let None = summary(commit) {
-          "<No summary provided>"
+        #match summary(commit) {
+          Some(summary) => #summary,
+          None => "<No summary provided>",
         }
       }
     }
@@ -44,11 +42,9 @@ renderers! {
         .h2 {
           span.id #short(commit.id())
           #PreEscaped("&nbsp;")
-          #if let Some(summary) = summary(commit) {
-            #summary
-          }
-          #if let None = summary(commit) {
-            "<No summary provided>"
+          #match summary(commit) {
+            Some(summary) => #summary,
+            None => "<No summary provided>",
           }
         }
         .h3 {

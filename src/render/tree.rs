@@ -21,23 +21,13 @@ renderers! {
 
   TreeEntryRenderer(repo: &'a Repository, root: &'a str, path: &'a Path, entry: &'a TreeEntry<'a>) {
     div {
-      #if let Some(ObjectType::Tree) = entry.kind() {
-        #TreeRenderer(root, path, entry.to_object(repo).unwrap().as_tree().unwrap())
-      }
-      #if let Some(ObjectType::Blob) = entry.kind() {
-        #BlobRenderer(root, path, entry.to_object(repo).unwrap().as_blob().unwrap())
-      }
-      #if let Some(ObjectType::Tag) = entry.kind() {
-        "Can't render ObjectType::Tag yet"
-      }
-      #if let Some(ObjectType::Commit) = entry.kind() {
-        "Can't render ObjectType::Commit yet"
-      }
-      #if let Some(ObjectType::Any) = entry.kind() {
-        "Can't render ObjectType::Any yet"
-      }
-      #if let None = entry.kind() {
-        "Can't render without an ObjectType"
+      #match entry.kind() {
+        Some(ObjectType::Tree) => #TreeRenderer(root, path, entry.to_object(repo).unwrap().as_tree().unwrap()),
+        Some(ObjectType::Blob) => #BlobRenderer(root, path, entry.to_object(repo).unwrap().as_blob().unwrap()),
+        Some(ObjectType::Tag) => "Can't render ObjectType::Tag yet",
+        Some(ObjectType::Commit) => "Can't render ObjectType::Commit yet",
+        Some(ObjectType::Any) => "Can't render ObjectType::Any yet",
+        None => "Can't render without an ObjectType",
       }
     }
   }
@@ -66,14 +56,14 @@ renderers! {
     ul.fa-ul {
       li { #(FAM::Li(FA::LevelUp)) a href=#((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
     }
-    #if blob.is_binary() {
-      pre { code { "Binary file" } }
-    }
-    #if !blob.is_binary() {
-      pre { code { #(str::from_utf8(blob.content()).unwrap()) } }
-      link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
-      script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
-      script { "hljs.initHighlightingOnLoad()" }
+    #match blob.is_binary() {
+      true => pre { code { "Binary file" } },
+      false => {
+        pre { code { #(str::from_utf8(blob.content()).unwrap()) } }
+        link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
+        script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
+        script { "hljs.initHighlightingOnLoad()" }
+      },
     }
   }
 }
