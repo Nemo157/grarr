@@ -9,11 +9,11 @@ renderers! {
   TreeEntryStubRenderer(root: &'a str, entry: &'a TreeEntry<'a>) {
     #if let Some(name) = entry.name() {
       li {
-        #{match entry.kind() {
-          Some(ObjectType::Tree) => FAM::Li(FA::Sitemap),
-          Some(ObjectType::Blob) => FAM::Li(FA::File),
-          _ => FAM::Li(FA::Question),
-        } }
+        #match entry.kind() {
+          Some(ObjectType::Tree) => #FAM::Li(FA::Sitemap),
+          Some(ObjectType::Blob) => #FAM::Li(FA::File),
+          _ => #FAM::Li(FA::Question),
+        }
         a href={ #root "/" #name } { #name }
       }
     }
