@@ -71,6 +71,9 @@ renderers! {
     }
     #if !blob.is_binary() {
       pre { code { #(str::from_utf8(blob.content()).unwrap()) } }
+      link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
+      script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
+      script { "hljs.initHighlightingOnLoad()" }
     }
   }
 }
