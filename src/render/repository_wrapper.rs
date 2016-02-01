@@ -27,8 +27,8 @@ impl<'a, R: RenderOnce> RenderOnce for RepositoryWrapper<'a, R> {
           }
         }
       }
-      div class="repository" {
-        div class="tabs" {
+      .repository {
+        .tabs {
           div class={ "overview" #{ if tab == Tab::Overview { " selected" } else { "" } } } { a href={ "/" #name } { "Overview" } }
           div class={ "files" #{ if tab == Tab::Files { " selected" } else { "" } } } { a href={ "/" #name "/tree" } { "Files" } }
           div class={ "commits" #{ if tab == Tab::Commits { " selected" } else { "" } } } { a href={ "/" #name "/commits" } { "Commits" } }

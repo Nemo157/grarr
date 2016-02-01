@@ -3,9 +3,9 @@ use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
   CIStatusRenderer(ci_status: &'a CIStatus) {
-    div class="block ci-status" {
-      div class="block-header" {
-        div class="h3" {
+    .block.ci-status {
+      .block-header {
+        .h3 {
           #if let Some(url) = ci_status.url() {
             a href={ #url } {
               #CIStatusTextRenderer(ci_status)
@@ -20,7 +20,7 @@ renderers! {
   }
 
   CIStatusTextRenderer(ci_status: &'a CIStatus) {
-    span class="agent" {
+    span.agent {
       #ci_status.agent().unwrap_or("<Unknown agent>")
     }
     " reported status "
@@ -38,7 +38,7 @@ renderers! {
     }
     #if let Some(timestamp) = ci_status.timestamp() {
       " at "
-      span class="timestamp"
+      span.timestamp
         #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
     }
   }

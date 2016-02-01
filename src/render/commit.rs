@@ -23,9 +23,9 @@ fn non_summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
 
 renderers! {
   CommitStubRenderer(commit: &'a Commit<'a>) {
-    li class="commit-stub" {
+    li.commit-stub {
       a href={ "commits/" #commit.id() } {
-        span class="id"
+        span.id
           #short(commit.id())
         " "
         #if let Some(summary) = summary(commit) {
@@ -39,10 +39,10 @@ renderers! {
   }
 
   CommitRenderer(commit: &'a Commit<'a>) {
-    div class="commit block" {
-      div class="block-header" {
-        div class="h2" {
-          span class="id" #short(commit.id())
+    .commit.block {
+      .block-header {
+        .h2 {
+          span.id #short(commit.id())
           #PreEscaped("&nbsp;")
           #if let Some(summary) = summary(commit) {
             #summary
@@ -51,25 +51,25 @@ renderers! {
             "<No summary provided>"
           }
         }
-        div class="h3" {
+        .h3 {
           #Signature(&commit.committer())
           span {
             "committed at "
-            span class="timestamp" { #(NaiveDateTime::from_timestamp(commit.time().seconds(), 0)) }
+            span.timestamp { #(NaiveDateTime::from_timestamp(commit.time().seconds(), 0)) }
           }
         }
         #if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
-          div class="h3" {
+          .h3 {
             #Signature(&commit.author())
             span {
               "authored at "
-              span class="timestamp" { #(NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0)) }
+              span.timestamp { #(NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0)) }
             }
           }
         }
       }
       #if let Some(non_summary) = non_summary(commit) {
-        div class="block-details message" {
+        .block-details.message {
           #(markdown::from_string(non_summary))
         }
       }
@@ -82,13 +82,13 @@ impl<'repo> RenderOnce for CommitsRenderer<'repo> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let CommitsRenderer(commits) = self;
     html!(w, {
-      ul class="no-dot" {
+      ul.no-dot {
         #for (commit, sub) in commits {
           #CommitStubRenderer(&commit)
           #if !sub.is_empty() {
             li {
-              input class="expander" type="checkbox" { }
-              label { i class="fa fa-fw chevron" {} }
+              input.expander type="checkbox" { }
+              label { i.fa.fa-fw.chevron {} }
               #CommitsRenderer(sub)
             }
           }

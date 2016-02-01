@@ -15,16 +15,16 @@ fn short(oid: Oid) -> String {
 
 renderers! {
   RequestRenderer(request: &'a Request) {
-    div class="block request" {
+    .block.request {
       #RequestHeaderRenderer(request)
       #RequestDetailsRenderer(request)
     }
   }
 
   RequestStubRenderer(request: &'a Request) {
-    div class="request-stub" {
+    .request-stub {
       a href={ "reviews/" #request.commit_id() } {
-        span class="id"
+        span.id
           #short(request.commit_id())
         " "
         #if let Some(summary) = summary(request) {
@@ -38,20 +38,20 @@ renderers! {
   }
 
   RequestHeaderRenderer(request: &'a Request) {
-    div class="block-header request-header" {
-      h2 class="float-right" {
+    .block-header.request-header {
+      h2.float-right {
         a href={ #request.commit_id() } {
-          span class="id"
+          span.id
             #short(request.commit_id())
         }
       }
-      div class="h4" {
+      .h4 {
         #if let Some(timestamp) = request.timestamp() {
-          span class="timestamp"
+          span.timestamp
             #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
         }
       }
-      div class="h2" {
+      .h2 {
         #if let Some(summary) = summary(request) {
           #summary
         }
@@ -59,16 +59,16 @@ renderers! {
           "<No summary provided>"
         }
       }
-      div class="h3" {
+      .h3 {
         #Avatar(request.requester().unwrap_or("unknown@example.org"))
-        span class="rest" {
-          span class="user"
+        span.rest {
+          span.user
             #request.requester().unwrap_or("<unknown requester>")
           " wants to merge "
-          span class="ref"
+          span.ref
             #request.review_ref().unwrap_or("<unknown ref>")
           " into "
-          span class="ref"
+          span.ref
             #request.target_ref().unwrap_or("<unknown ref>")
         }
       }
@@ -76,7 +76,7 @@ renderers! {
   }
 
   RequestDetailsRenderer(request: &'a Request) {
-    div class="block-details request-details" {
+    .block-details.request-details {
       #if let Some(description) = request.description() {
         #(markdown::from_string(description))
       }

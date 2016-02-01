@@ -44,7 +44,7 @@ renderers! {
   }
 
   RepositoryStubRenderer(path: &'a str, name: &'a str, repo: &'a Repository) {
-    li class="repo-stub" {
+    li.repo-stub {
       #(FAM::Li(FA::GitSquare))
       a href={ #path "/" #name } {
         #name
@@ -63,7 +63,7 @@ renderers! {
   }
 
   RepositoriesListRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
-    ul class="fa-ul" {
+    ul.fa-ul {
       #for entry in repos {
         #if let &RepositoryTreeEntry::Dir(ref name, ref repos) = entry {
           li {

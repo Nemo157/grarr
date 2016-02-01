@@ -13,7 +13,7 @@ renderers! {
   }
 
   ReviewRenderer(review: &'a Review<'a>) {
-    div class="review" {
+    .review {
       #EventsRenderer(review.events())
     }
   }

@@ -8,11 +8,11 @@ renderers! {
       #Avatar(email)
     }
     #if let Some(name) = signature.name() {
-      span class="name" #name
+      span.name #name
       #PreEscaped("&nbsp;")
     }
     #if let Some(email) = signature.email() {
-      a href={ "mailto:" #email } span class="email" #email
+      a href={ "mailto:" #email } span.email #email
       #PreEscaped("&nbsp;")
     }
   }

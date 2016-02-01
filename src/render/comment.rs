@@ -5,16 +5,16 @@ use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
   CommentHeaderRendererer(comment: &'a Comment) {
-    div class="block-header comment-header" {
-      div class="h3" {
+    .block-header.comment-header {
+      .h3 {
         #Avatar(comment.author().unwrap_or("unknown@example.org"))
-        span class="rest" {
-          span class="user"
+        span.rest {
+          span.user
             #comment.author().unwrap_or("<unknown author>")
           " commented "
           #if let Some(timestamp) = comment.timestamp() {
             "on "
-            span class="timestamp"
+            span.timestamp
               #(NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
             " "
           }
@@ -33,19 +33,19 @@ renderers! {
 
   CommentDetailsRendererer(comment: &'a Comment) {
     #if let Some(location) = comment.location() {
-      div class="block-details comment-details" {
+      .block-details.comment-details {
         pre { code { #(format!("{:?}", location)) } }
       }
     }
     #if let Some(description) = comment.description() {
-      div class="block-details comment-details" {
+      .block-details.comment-details {
         #(markdown::from_string(description))
       }
     }
   }
 
   CommentRenderer(comment: &'a Comment) {
-    div class="block comment" {
+    .block.comment {
       #CommentHeaderRendererer(comment)
       #CommentDetailsRendererer(comment)
     }

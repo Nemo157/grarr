@@ -43,8 +43,8 @@ renderers! {
   }
 
   RootTreeRenderer(root: &'a str, tree: &'a Tree<'a>) {
-    h2 class="path" { #ComponentsRenderer(root, PathBuf::from("/").components()) }
-    ul class="fa-ul" {
+    h2.path { #ComponentsRenderer(root, PathBuf::from("/").components()) }
+    ul.fa-ul {
       #for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
         #TreeEntryStubRenderer(root, &entry)
       }
@@ -52,8 +52,8 @@ renderers! {
   }
 
   TreeRenderer(root: &'a str, path: &'a Path, tree: &'a Tree<'a>) {
-    h2 class="path" { #ComponentsRenderer(root, path.components()) }
-    ul class="fa-ul" {
+    h2.path { #ComponentsRenderer(root, path.components()) }
+    ul.fa-ul {
       li { #(FAM::Li(FA::LevelUp)) a href=#((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
       #for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
         #TreeEntryStubRenderer(&(root.to_string() + path.to_str().unwrap()), &entry)
@@ -62,8 +62,8 @@ renderers! {
   }
 
   BlobRenderer(root: &'a str, path: &'a Path, blob: &'a Blob<'a>) {
-    h2 class="path" { #ComponentsRenderer(root, path.components()) }
-    ul class="fa-ul" {
+    h2.path { #ComponentsRenderer(root, path.components()) }
+    ul.fa-ul {
       li { #(FAM::Li(FA::LevelUp)) a href=#((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
     }
     #if blob.is_binary() {
@@ -86,10 +86,10 @@ impl<'a> ::maud::RenderOnce for ComponentsRenderer<'a> {
     for component in self.1 {
       match component {
         Component::RootDir => {
-          try!(html!(w, { a class="path-component" href={ #root } "<root>" }));
+          try!(html!(w, { a.path-component href={ #root } "<root>" }));
         },
         Component::Normal(component) => {
-          try!(html!(w, { "/" a class="path-component" href={ #root "/" #component.to_str().unwrap() } #component.to_str().unwrap() }));
+          try!(html!(w, { "/" a.path-component href={ #root "/" #component.to_str().unwrap() } #component.to_str().unwrap() }));
           root = root + "/" + component.to_str().unwrap();
         },
         _ => {
