@@ -20,7 +20,7 @@ impl Handler for Commit {
     let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let id = itry!(Oid::from_str(commit), status::BadRequest);
     let commit = itry!(repo.find_commit(id), status::NotFound);
-    Ok(Html(Wrapper(&RepositoryWrapper(&*path, &actual, &Tab::Commits, &CommitRenderer(&commit)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(&*path, &actual, Tab::Commits, &CommitRenderer(&commit)))).into())
   }
 }
 

@@ -1,5 +1,8 @@
+use std::fmt;
 use git2::{ Oid, Commit };
+use maud::RenderOnce;
 use maud_pulldown_cmark::markdown;
+use commit_tree::CommitTree;
 
 const HEX: &'static [u8; 0x10] = b"0123456789abcdef";
 fn short(oid: Oid) -> String {
@@ -17,14 +20,8 @@ fn non_summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
 }
 
 renderers! {
-  CommitsRenderer(commits: &'a Vec<Commit<'a>>) {
-    #for commit in commits {
-      #CommitStubRenderer(commit)
-    }
-  }
-
   CommitStubRenderer(commit: &'a Commit<'a>) {
-    div class="commit-stub" {
+    li class="commit-stub" {
       a href={ "commits/" #commit.id() } {
         span class="id"
           #short(commit.id())
@@ -57,5 +54,22 @@ renderers! {
         }
       }
     }
+  }
+}
+
+pub struct CommitsRenderer<'repo>(pub CommitTree<'repo>);
+impl<'repo> RenderOnce for CommitsRenderer<'repo> {
+  fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
+    let CommitsRenderer(commits) = self;
+    html!(w, {
+      ul {
+        #for (commit, sub) in commits {
+          #CommitStubRenderer(&commit)
+          #if !sub.is_empty() {
+            #CommitsRenderer(sub)
+          }
+        }
+      }
+    })
   }
 }

@@ -21,7 +21,7 @@ impl Handler for Tree {
     let head_id = head.target().unwrap();
     let commit = itry!(repo.find_commit(head_id), status::InternalServerError);
     let tree = itry!(commit.tree(), status::InternalServerError);
-    Ok(Html(Wrapper(&RepositoryWrapper(&*path, &actual, &Tab::Files, &RootTreeRenderer(&("/".to_string() + path + "/tree"), &tree)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(&*path, &actual, Tab::Files, &RootTreeRenderer(&("/".to_string() + path + "/tree"), &tree)))).into())
   }
 }
 

@@ -1,18 +1,10 @@
 use std::str;
 use git2::{ Repository };
 use pulldown_cmark::{ Parser, html, Event, Tag };
-use maud::{ Render, PreEscaped };
+use maud::{ PreEscaped };
 use maud_pulldown_cmark::markdown;
 use repository_tree::RepositoryTreeEntry;
 use super::fa::{ FA, FAM };
-
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub enum Tab {
-  Overview,
-  Files,
-  Commits,
-  Reviews,
-}
 
 fn find_readme(repo: &Repository) -> Option<String> {
   let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
@@ -48,36 +40,6 @@ renderers! {
   RepositoryRenderer(repo: &'a Repository) {
     #if let Some(readme) = find_readme(repo) {
       #(markdown::from_string(&*readme))
-    }
-  }
-
-  RepositoryWrapper(name: &'a str, actual: &'a str, tab: &'a Tab, content: &'a Render) {
-    #(FA::LevelUp) " " a href="/" { "Repositories" }
-    h1 {
-      #(FA::GitSquare) " "
-      a href={ "/" #name } { #name }
-      #if name != actual {
-        " "
-        small {
-          "(alias of " a href={ "/" #actual } { #actual } ")"
-        }
-      }
-    }
-    div class="repository" {
-      div class="tabs" {
-        div class={ "overview" #{ if tab == &Tab::Overview { " selected" } else { "" } } } { a href={ "/" #name } { "Overview" } }
-        div class={ "files" #{ if tab == &Tab::Files { " selected" } else { "" } } } { a href={ "/" #name "/tree" } { "Files" } }
-        div class={ "commits" #{ if tab == &Tab::Commits { " selected" } else { "" } } } { a href={ "/" #name "/commits" } { "Commits" } }
-        div class={ "reviews" #{ if tab == &Tab::Reviews { " selected" } else { "" } } } { a href={ "/" #name "/reviews" } { "Reviews" } }
-      }
-      div class={ "content " #{ match tab {
-        &Tab::Overview => "overview",
-        &Tab::Files => "files",
-        &Tab::Commits => "commits",
-        &Tab::Reviews => "reviews",
-      } } } {
-        #content
-      }
     }
   }
 
