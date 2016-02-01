@@ -1,4 +1,5 @@
 use git2::{ Oid, Commit };
+use maud_pulldown_cmark::markdown;
 
 const HEX: &'static [u8; 0x10] = b"0123456789abcdef";
 fn short(oid: Oid) -> String {
@@ -8,6 +9,11 @@ fn short(oid: Oid) -> String {
 fn summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
   commit.message()
     .and_then(|message| message.lines().nth(0))
+}
+
+fn non_summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
+  commit.message()
+    .and_then(|message| message.splitn(2, '\n').map(|l| if l.starts_with('\r') { &l[1..] } else { l }).nth(1))
 }
 
 renderers! {
@@ -34,6 +40,22 @@ renderers! {
   }
 
   CommitRenderer(commit: &'a Commit<'a>) {
-    #CommitStubRenderer(commit)
+    div class="commit" {
+      h2 {
+        span class="id" #short(commit.id())
+        " "
+        #if let Some(summary) = summary(commit) {
+          #summary
+        }
+        #if let None = summary(commit) {
+          "<No summary provided>"
+        }
+      }
+      #if let Some(non_summary) = non_summary(commit) {
+        div class="message" {
+          #(markdown::from_string(non_summary))
+        }
+      }
+    }
   }
 }
