@@ -38,20 +38,20 @@ fn description(repo: &Repository) -> Option<String> {
 
 renderers! {
   RepositoryRenderer(repo: &'a Repository) {
-    #if let Some(readme) = find_readme(repo) {
-      #(markdown::from_string(&*readme))
+    @if let Some(readme) = find_readme(repo) {
+      ^markdown::from_string(&*readme)
     }
   }
 
   RepositoryStubRenderer(path: &'a str, name: &'a str, repo: &'a Repository) {
     li.repo-stub {
-      #FAM::Li(FA::GitSquare)
-      a href={ #path "/" #name } {
-        #name
+      ^FAM::Li(FA::GitSquare)
+      a href={ ^path "/" ^name } {
+        ^name
       }
-      #if let Some(description) = description(repo) {
+      @if let Some(description) = description(repo) {
         blockquote {
-          #(PreEscaped(description))
+          ^PreEscaped(description)
         }
       }
     }
@@ -59,34 +59,34 @@ renderers! {
 
   RepositoriesRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     h1 { "Repositories" }
-    #RepositoriesListRenderer(path, repos)
+    ^RepositoriesListRenderer(path, repos)
   }
 
   RepositoriesListRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     ul.fa-ul {
-      #for entry in repos {
-        #match entry {
+      @for entry in repos {
+        @match entry {
           &RepositoryTreeEntry::Dir(ref name, ref repos) => {
             li {
-              #(FAM::Li(FA::Sitemap))
-              #name
-              #RepositoriesListRenderer(&*(path.to_string() + "/" + name), repos)
+              ^FAM::Li(FA::Sitemap)
+              ^name
+              ^RepositoriesListRenderer(&*(path.to_string() + "/" + name), repos)
             }
           },
           &RepositoryTreeEntry::Alias(ref alias, ref actual) => {
             li {
-              #(FAM::Li(FA::Tag))
-              a href={ #path "/" #alias } {
-                #alias
+              ^FAM::Li(FA::Tag)
+              a href={ ^path "/" ^alias } {
+                ^alias
               }
               " alias of "
-              a href=#actual {
-                #actual
+              a href=^actual {
+                ^actual
               }
             }
           },
           &RepositoryTreeEntry::Repo(ref name, ref repo) => {
-            #RepositoryStubRenderer(path, name, repo)
+            ^RepositoryStubRenderer(path, name, repo)
           },
         }
       }

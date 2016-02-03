@@ -7,23 +7,23 @@ use std::path::{ Path, PathBuf, Components, Component };
 
 renderers! {
   TreeEntryStubRenderer(root: &'a str, entry: &'a TreeEntry<'a>) {
-    #if let Some(name) = entry.name() {
+    @if let Some(name) = entry.name() {
       li {
-        #match entry.kind() {
-          Some(ObjectType::Tree) => #FAM::Li(FA::Sitemap),
-          Some(ObjectType::Blob) => #FAM::Li(FA::File),
-          _ => #FAM::Li(FA::Question),
+        @match entry.kind() {
+          Some(ObjectType::Tree) => ^FAM::Li(FA::Sitemap),
+          Some(ObjectType::Blob) => ^FAM::Li(FA::File),
+          _ => ^FAM::Li(FA::Question),
         }
-        a href={ #root "/" #name } { #name }
+        a href={ ^root "/" ^name } { ^name }
       }
     }
   }
 
   TreeEntryRenderer(repo: &'a Repository, root: &'a str, path: &'a Path, entry: &'a TreeEntry<'a>) {
     div {
-      #match entry.kind() {
-        Some(ObjectType::Tree) => #TreeRenderer(root, path, entry.to_object(repo).unwrap().as_tree().unwrap()),
-        Some(ObjectType::Blob) => #BlobRenderer(root, path, entry.to_object(repo).unwrap().as_blob().unwrap()),
+      @match entry.kind() {
+        Some(ObjectType::Tree) => ^TreeRenderer(root, path, entry.to_object(repo).unwrap().as_tree().unwrap()),
+        Some(ObjectType::Blob) => ^BlobRenderer(root, path, entry.to_object(repo).unwrap().as_blob().unwrap()),
         Some(ObjectType::Tag) => "Can't render ObjectType::Tag yet",
         Some(ObjectType::Commit) => "Can't render ObjectType::Commit yet",
         Some(ObjectType::Any) => "Can't render ObjectType::Any yet",
@@ -33,33 +33,33 @@ renderers! {
   }
 
   RootTreeRenderer(root: &'a str, tree: &'a Tree<'a>) {
-    h2.path { #ComponentsRenderer(root, PathBuf::from("/").components()) }
+    h2.path { ^ComponentsRenderer(root, PathBuf::from("/").components()) }
     ul.fa-ul {
-      #for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-        #TreeEntryStubRenderer(root, &entry)
+      @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
+        ^TreeEntryStubRenderer(root, &entry)
       }
     }
   }
 
   TreeRenderer(root: &'a str, path: &'a Path, tree: &'a Tree<'a>) {
-    h2.path { #ComponentsRenderer(root, path.components()) }
+    h2.path { ^ComponentsRenderer(root, path.components()) }
     ul.fa-ul {
-      li { #FAM::Li(FA::LevelUp) a href=#((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
-      #for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-        #TreeEntryStubRenderer(&(root.to_string() + path.to_str().unwrap()), &entry)
+      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+      @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
+        ^TreeEntryStubRenderer(&(root.to_string() + path.to_str().unwrap()), &entry)
       }
     }
   }
 
   BlobRenderer(root: &'a str, path: &'a Path, blob: &'a Blob<'a>) {
-    h2.path { #ComponentsRenderer(root, path.components()) }
+    h2.path { ^ComponentsRenderer(root, path.components()) }
     ul.fa-ul {
-      li { #(FAM::Li(FA::LevelUp)) a href=#((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
     }
-    #match blob.is_binary() {
+    @match blob.is_binary() {
       true => pre { code { "Binary file" } },
       false => {
-        pre { code { #(str::from_utf8(blob.content()).unwrap()) } }
+        pre { code { ^str::from_utf8(blob.content()).unwrap() } }
         link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
         script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
         script { "hljs.initHighlightingOnLoad()" }
@@ -76,10 +76,10 @@ impl<'a> ::maud::RenderOnce for ComponentsRenderer<'a> {
     for component in self.1 {
       match component {
         Component::RootDir => {
-          try!(html!(w, { a.path-component href={ #root } "<root>" }));
+          try!(html!(w, { a.path-component href={ ^root } "<root>" }));
         },
         Component::Normal(component) => {
-          try!(html!(w, { "/" a.path-component href={ #root "/" #component.to_str().unwrap() } #component.to_str().unwrap() }));
+          try!(html!(w, { "/" a.path-component href={ ^root "/" ^component.to_str().unwrap() } ^component.to_str().unwrap() }));
           root = root + "/" + component.to_str().unwrap();
         },
         _ => {

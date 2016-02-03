@@ -16,31 +16,31 @@ impl<'a, R: RenderOnce> RenderOnce for RepositoryWrapper<'a, R> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let RepositoryWrapper(name, actual, tab, content) = self;
     html!(w, {
-      #FA::LevelUp " " a href="/" { "Repositories" }
+      ^FA::LevelUp " " a href="/" { "Repositories" }
       h1 {
-        #FA::GitSquare " "
-        a href={ "/" #name } { #name }
-        #if name != actual {
+        ^FA::GitSquare " "
+        a href={ "/" ^name } { ^name }
+        @if name != actual {
           " "
           small {
-            "(alias of " a href={ "/" #actual } { #actual } ")"
+            "(alias of " a href={ "/" ^actual } { ^actual } ")"
           }
         }
       }
       .repository {
         .tabs {
-          div class={ "overview" #{ if tab == Tab::Overview { " selected" } else { "" } } } { a href={ "/" #name } { "Overview" } }
-          div class={ "files" #{ if tab == Tab::Files { " selected" } else { "" } } } { a href={ "/" #name "/tree" } { "Files" } }
-          div class={ "commits" #{ if tab == Tab::Commits { " selected" } else { "" } } } { a href={ "/" #name "/commits" } { "Commits" } }
-          div class={ "reviews" #{ if tab == Tab::Reviews { " selected" } else { "" } } } { a href={ "/" #name "/reviews" } { "Reviews" } }
+          div class={ "overview" @if tab == Tab::Overview { " selected" } } { a href={ "/" ^name } { "Overview" } }
+          div class={ "files" @if tab == Tab::Files { " selected" } } { a href={ "/" ^name "/tree" } { "Files" } }
+          div class={ "commits" @if tab == Tab::Commits { " selected" } } { a href={ "/" ^name "/commits" } { "Commits" } }
+          div class={ "reviews" @if tab == Tab::Reviews { " selected" } } { a href={ "/" ^name "/reviews" } { "Reviews" } }
         }
-        div class={ "content " #match tab {
+        div class={ "content " @match tab {
           Tab::Overview => "overview",
           Tab::Files => "files",
           Tab::Commits => "commits",
           Tab::Reviews => "reviews",
         } } {
-          #content
+          ^content
         }
       }
     })

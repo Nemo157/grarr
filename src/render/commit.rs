@@ -24,12 +24,12 @@ fn non_summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
 renderers! {
   CommitStubRenderer(commit: &'a Commit<'a>) {
     li.commit-stub {
-      a href={ "commits/" #commit.id() } {
+      a href={ "commits/" ^commit.id() } {
         span.id
-          #short(commit.id())
+          ^short(commit.id())
         " "
-        #match summary(commit) {
-          Some(summary) => #summary,
+        @match summary(commit) {
+          Some(summary) => ^summary,
           None => "<No summary provided>",
         }
       }
@@ -40,33 +40,33 @@ renderers! {
     .commit.block {
       .block-header {
         .h2 {
-          span.id #short(commit.id())
-          #PreEscaped("&nbsp;")
-          #match summary(commit) {
-            Some(summary) => #summary,
+          span.id ^short(commit.id())
+          ^PreEscaped("&nbsp;")
+          @match summary(commit) {
+            Some(summary) => ^summary,
             None => "<No summary provided>",
           }
         }
         .h3 {
-          #Signature(&commit.committer())
+          ^Signature(&commit.committer())
           span {
             "committed at "
-            span.timestamp { #NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
+            span.timestamp { ^NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
           }
         }
-        #if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
+        @if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
           .h3 {
-            #Signature(&commit.author())
+            ^Signature(&commit.author())
             span {
               "authored at "
-              span.timestamp { #NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
+              span.timestamp { ^NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
             }
           }
         }
       }
-      #if let Some(non_summary) = non_summary(commit) {
+      @if let Some(non_summary) = non_summary(commit) {
         .block-details.message {
-          #markdown::from_string(non_summary)
+          ^markdown::from_string(non_summary)
         }
       }
     }
@@ -79,13 +79,13 @@ impl<'repo> RenderOnce for CommitsRenderer<'repo> {
     let CommitsRenderer(commits) = self;
     html!(w, {
       ul.no-dot {
-        #for (commit, sub) in commits {
-          #CommitStubRenderer(&commit)
-          #if !sub.is_empty() {
+        @for (commit, sub) in commits {
+          ^CommitStubRenderer(&commit)
+          @if !sub.is_empty() {
             li {
               input.expander type="checkbox" { }
               label { i.fa.fa-fw.chevron {} }
-              #CommitsRenderer(sub)
+              ^CommitsRenderer(sub)
             }
           }
         }

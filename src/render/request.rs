@@ -16,19 +16,19 @@ fn short(oid: Oid) -> String {
 renderers! {
   RequestRenderer(request: &'a Request) {
     .block.request {
-      #RequestHeaderRenderer(request)
-      #RequestDetailsRenderer(request)
+      ^RequestHeaderRenderer(request)
+      ^RequestDetailsRenderer(request)
     }
   }
 
   RequestStubRenderer(request: &'a Request) {
     .request-stub {
-      a href={ "reviews/" #request.commit_id() } {
+      a href={ "reviews/" ^request.commit_id() } {
         span.id
-          #short(request.commit_id())
+          ^short(request.commit_id())
         " "
-        #match summary(request) {
-          Some(summary) => #summary,
+        @match summary(request) {
+          Some(summary) => ^summary,
           None => "<No summary provided>",
         }
       }
@@ -38,34 +38,34 @@ renderers! {
   RequestHeaderRenderer(request: &'a Request) {
     .block-header.request-header {
       h2.float-right {
-        a href={ #request.commit_id() } {
+        a href={ ^request.commit_id() } {
           span.id
-            #short(request.commit_id())
+            ^short(request.commit_id())
         }
       }
       .h4 {
-        #if let Some(timestamp) = request.timestamp() {
+        @if let Some(timestamp) = request.timestamp() {
           span.timestamp
-            #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
+            ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
         }
       }
       .h2 {
-        #match summary(request) {
-          Some(summary) => #summary,
+        @match summary(request) {
+          Some(summary) => ^summary,
           None => "<No summary provided>",
         }
       }
       .h3 {
-        #Avatar(request.requester().unwrap_or("unknown@example.org"))
+        ^Avatar(request.requester().unwrap_or("unknown@example.org"))
         span.rest {
           span.user
-            #request.requester().unwrap_or("<unknown requester>")
+            ^request.requester().unwrap_or("<unknown requester>")
           " wants to merge "
           span.ref
-            #request.review_ref().unwrap_or("<unknown ref>")
+            ^request.review_ref().unwrap_or("<unknown ref>")
           " into "
           span.ref
-            #request.target_ref().unwrap_or("<unknown ref>")
+            ^request.target_ref().unwrap_or("<unknown ref>")
         }
       }
     }
@@ -73,8 +73,8 @@ renderers! {
 
   RequestDetailsRenderer(request: &'a Request) {
     .block-details.request-details {
-      #match request.description() {
-        Some(description) => #markdown::from_string(description),
+      @match request.description() {
+        Some(description) => ^markdown::from_string(description),
         None => i "No description provided",
       }
     }

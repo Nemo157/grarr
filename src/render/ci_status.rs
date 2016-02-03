@@ -6,13 +6,13 @@ renderers! {
     .block.ci-status {
       .block-header {
         .h3 {
-          #match ci_status.url() {
+          @match ci_status.url() {
             Some(url) => {
-              a href={ #url } {
-                #CIStatusTextRenderer(ci_status)
+              a href={ ^url } {
+                ^CIStatusTextRenderer(ci_status)
               }
             },
-            None => #CIStatusTextRenderer(ci_status)
+            None => ^CIStatusTextRenderer(ci_status)
           }
         }
       }
@@ -21,26 +21,26 @@ renderers! {
 
   CIStatusTextRenderer(ci_status: &'a CIStatus) {
     span.agent {
-      #ci_status.agent().unwrap_or("<Unknown agent>")
+      ^ci_status.agent().unwrap_or("<Unknown agent>")
     }
     " reported status "
     span class={
       "status "
-      #match ci_status.status() {
+      @match ci_status.status() {
         Some(Status::Success) => "success",
         Some(Status::Failure) => "failure",
         None => "running",
       }
     } {
-      #match ci_status.status() {
+      @match ci_status.status() {
         Some(Status::Success) => "success",
         Some(Status::Failure) => "failure",
         None => "running",
       }
     }
-    #if let Some(timestamp) = ci_status.timestamp() {
+    @if let Some(timestamp) = ci_status.timestamp() {
       " at "
-      span.timestamp #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
+      span.timestamp ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
     }
   }
 }

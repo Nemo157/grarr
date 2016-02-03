@@ -7,27 +7,27 @@ renderers! {
   CommentHeaderRendererer(comment: &'a Comment) {
     .block-header.comment-header {
       .h3 {
-        #Avatar(comment.author().unwrap_or("unknown@example.org"))
+        ^Avatar(comment.author().unwrap_or("unknown@example.org"))
         span.rest {
           span.user
-            #comment.author().unwrap_or("<unknown author>")
+            ^comment.author().unwrap_or("<unknown author>")
           " commented "
-          #if let Some(timestamp) = comment.timestamp() {
+          @if let Some(timestamp) = comment.timestamp() {
             "on "
             span.timestamp
-              #NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
+              ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
             " "
           }
           "with status "
           span class={
             "resolved "
-            #match comment.resolved() {
+            @match comment.resolved() {
               Some(true) => "lgtm",
               Some(false) => "nmw",
               None => "fyi",
             }
           } {
-            #match comment.resolved() {
+            @match comment.resolved() {
               Some(true) => "👍",
               Some(false) => "👎",
               None => "ℹ️",
@@ -39,22 +39,22 @@ renderers! {
   }
 
   CommentDetailsRendererer(comment: &'a Comment) {
-    #if let Some(location) = comment.location() {
+    @if let Some(location) = comment.location() {
       .block-details.comment-details {
-        pre { code { #(format!("{:?}", location)) } }
+        pre { code { ^(format!("{:?}", location)) } }
       }
     }
-    #if let Some(description) = comment.description() {
+    @if let Some(description) = comment.description() {
       .block-details.comment-details {
-        #markdown::from_string(description)
+        ^markdown::from_string(description)
       }
     }
   }
 
   CommentRenderer(comment: &'a Comment) {
     .block.comment {
-      #CommentHeaderRendererer(comment)
-      #CommentDetailsRendererer(comment)
+      ^CommentHeaderRendererer(comment)
+      ^CommentDetailsRendererer(comment)
     }
   }
 }

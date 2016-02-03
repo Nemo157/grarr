@@ -37,12 +37,12 @@ impl FAM {
 
 impl RenderOnce for FA {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    html!(w, { i class=#self.class() { } })
+    html!(w, { i class=^self.class() { } })
   }
 }
 
 impl RenderOnce for FAM {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    html!(w, { i class=#self.class() { } })
+    html!(w, { i class=^self.class() { } })
   }
 }

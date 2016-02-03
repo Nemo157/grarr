@@ -3,18 +3,18 @@ use super::{ RequestStubRenderer, EventsRenderer };
 
 renderers! {
   ReviewsRenderer(reviews: &'a Vec<Review<'a>>) {
-    #for review in reviews {
-      #ReviewStubRenderer(review)
+    @for review in reviews {
+      ^ReviewStubRenderer(review)
     }
   }
 
   ReviewStubRenderer(review: &'a Review<'a>) {
-    #RequestStubRenderer(review.request())
+    ^RequestStubRenderer(review.request())
   }
 
   ReviewRenderer(review: &'a Review<'a>) {
     .review {
-      #EventsRenderer(review.events())
+      ^EventsRenderer(review.events())
     }
   }
 }

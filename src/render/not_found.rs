@@ -5,6 +5,6 @@ renderers! {
   NotFoundRenderer(error: &'a Error) {
     h1 "Not Found"
     h2 "Details"
-    #ErrorRenderer(error)
+    ^ErrorRenderer(error)
   }
 }
