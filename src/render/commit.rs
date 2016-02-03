@@ -35,40 +35,49 @@ renderers! {
     }
   }
 
-  Commit(commit: &'a git2::Commit<'a>) {
-    .commit.block {
-      .block-header {
-        .h2 {
-          span.id ^short(commit.id())
-          ^PreEscaped("&nbsp;")
-          @match summary(commit) {
-            Some(summary) => ^summary,
-            None => "<No summary provided>",
-          }
+  CommitHeader(commit: &'a git2::Commit<'a>) {
+    .block-header {
+      .h2 {
+        span.id ^short(commit.id())
+        ^PreEscaped("&nbsp;")
+        @match summary(commit) {
+          Some(summary) => ^summary,
+          None => "<No summary provided>",
         }
+      }
+      .h3 {
+        ^super::Signature(&commit.committer())
+        span {
+          "committed at "
+          span.timestamp { ^NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
+        }
+      }
+      @if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
         .h3 {
-          ^super::Signature(&commit.committer())
+          ^super::Signature(&commit.author())
           span {
-            "committed at "
-            span.timestamp { ^NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
-          }
-        }
-        @if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
-          .h3 {
-            ^super::Signature(&commit.author())
-            span {
-              "authored at "
-              span.timestamp { ^NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
-            }
+            "authored at "
+            span.timestamp { ^NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
           }
         }
       }
+    }
+  }
+
+  CommitDetails(commit: &'a git2::Commit<'a>) {
+    .commit.block {
+      ^CommitHeader(commit)
       @if let Some(non_summary) = non_summary(commit) {
         .block-details.message {
           ^markdown::from_string(non_summary)
         }
       }
     }
+  }
+
+  Commit(repo: &'a git2::Repository, commit: &'a git2::Commit<'a>) {
+    ^CommitDetails(commit)
+    ^super::DiffCommit(repo, commit)
   }
 }
 
