@@ -128,3 +128,15 @@ impl PartialOrd for Sorter {
     Some(self.cmp(other))
   }
 }
+
+impl<'a> super::repository_wrapper::RepositoryTab for &'a TreeEntry<'a> {
+  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
+}
+
+impl<'a> super::repository_wrapper::RepositoryTab for &'a Tree<'a> {
+  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
+}
+
+impl<'a> super::repository_wrapper::RepositoryTab for &'a RootTree<'a> {
+  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
+}

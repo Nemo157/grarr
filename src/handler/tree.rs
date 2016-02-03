@@ -9,7 +9,7 @@ impl Handler for Tree {
     let head_id = head.target().unwrap();
     let commit = itry!(context.repository.find_commit(head_id), status::InternalServerError);
     let tree = itry!(commit.tree(), status::InternalServerError);
-    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Files, &render::RootTree(&("/".to_string() + context.requested_path.to_str().unwrap() + "/tree"), &tree)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), &render::RootTree(&("/".to_string() + context.requested_path.to_str().unwrap() + "/tree"), &tree)))).into())
   }
 }
 

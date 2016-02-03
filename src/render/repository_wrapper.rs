@@ -10,11 +10,16 @@ pub enum Tab {
   Reviews,
 }
 
-pub struct RepositoryWrapper<'a, R>(pub &'a str, pub &'a str, pub Tab, pub R);
+pub trait RepositoryTab {
+  fn tab() -> Tab;
+}
 
-impl<'a, R: RenderOnce> RenderOnce for RepositoryWrapper<'a, R> {
+pub struct RepositoryWrapper<'a, R: RepositoryTab>(pub &'a str, pub &'a str, pub R);
+
+impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let RepositoryWrapper(name, actual, tab, content) = self;
+    let tab = R::tab();
+    let RepositoryWrapper(name, actual, content) = self;
     html!(w, {
       ^FA::LevelUp " " a href="/" { "Repositories" }
       h1 {

@@ -10,6 +10,6 @@ pub use iron::status;
 
 pub use error::Error;
 pub use repository_context::RepositoryContext;
-pub use render::{ self, Wrapper, RepositoryWrapper, Tab };
+pub use render::{ self, Wrapper, RepositoryWrapper };
 pub use super::html::Html;
 pub use super::route::Route;

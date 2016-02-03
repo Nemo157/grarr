@@ -92,3 +92,11 @@ impl<'repo> RenderOnce for Commits<'repo> {
     })
   }
 }
+
+impl<'a> super::repository_wrapper::RepositoryTab for &'a Commit<'a> {
+  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Commits }
+}
+
+impl<'a> super::repository_wrapper::RepositoryTab for Commits<'a> {
+  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Commits }
+}

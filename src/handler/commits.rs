@@ -6,7 +6,7 @@ use commit_tree::CommitTree;
 pub struct Commits;
 
 fn render(path: &str, actual: &str, repo: &Repository) -> IronResult<Response> {
-  Ok(Html(Wrapper(RepositoryWrapper(path, actual, Tab::Commits, render::Commits(CommitTree::new(repo))))).into())
+  Ok(Html(Wrapper(RepositoryWrapper(path, actual, render::Commits(CommitTree::new(repo))))).into())
 }
 
 impl Handler for Commits {

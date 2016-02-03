@@ -30,7 +30,7 @@ pub use self::analysis::{ Analysis };
 pub use self::avatar::{ Avatar };
 pub use self::commit::{ Commit, Commits };
 pub use self::repository::{ Repository, Repositories };
-pub use self::repository_wrapper::{ RepositoryWrapper, Tab };
+pub use self::repository_wrapper::{ RepositoryWrapper };
 pub use self::not_found::{ NotFound };
 pub use self::bad_request::{ BadRequest };
 pub use self::error::{ Error };
