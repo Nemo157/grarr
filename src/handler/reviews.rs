@@ -1,7 +1,5 @@
 use super::base::*;
 
-use render::ReviewsRenderer;
-
 pub struct Reviews;
 
 impl Handler for Reviews {
@@ -10,7 +8,7 @@ impl Handler for Reviews {
     let mut reviews: Vec<_> = context.appraised.all_reviews().map(|revs| revs.collect()).unwrap_or(Vec::new());
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
     reviews.reverse();
-    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Reviews, &ReviewsRenderer(&reviews)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Reviews, &render::Reviews(&reviews)))).into())
   }
 }
 

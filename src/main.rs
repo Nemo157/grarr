@@ -24,7 +24,7 @@ extern crate pulldown_cmark;
 mod macros;
 
 #[macro_use]
-mod render;
+pub mod render;
 mod handler;
 mod error;
 mod repository_tree;

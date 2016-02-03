@@ -2,11 +2,11 @@ use std::str;
 use std::cmp::{ Ord, PartialOrd, Ordering };
 use std::fmt;
 use super::fa::{ FA, FAM };
-use git2::{ Tree, TreeEntry, ObjectType, Repository, Blob };
-use std::path::{ Path, PathBuf, Components, Component };
+use git2::{ self, ObjectType };
+use std::path::{ self, Path, PathBuf, Component };
 
 renderers! {
-  TreeEntryStubRenderer(root: &'a str, entry: &'a TreeEntry<'a>) {
+  TreeEntryStub(root: &'a str, entry: &'a git2::TreeEntry<'a>) {
     @if let Some(name) = entry.name() {
       li {
         @match entry.kind() {
@@ -19,11 +19,11 @@ renderers! {
     }
   }
 
-  TreeEntryRenderer(repo: &'a Repository, root: &'a str, path: &'a Path, entry: &'a TreeEntry<'a>) {
+  TreeEntry(repo: &'a git2::Repository, root: &'a str, path: &'a Path, entry: &'a git2::TreeEntry<'a>) {
     div {
       @match entry.kind() {
-        Some(ObjectType::Tree) => ^TreeRenderer(root, path, entry.to_object(repo).unwrap().as_tree().unwrap()),
-        Some(ObjectType::Blob) => ^BlobRenderer(root, path, entry.to_object(repo).unwrap().as_blob().unwrap()),
+        Some(ObjectType::Tree) => ^Tree(root, path, entry.to_object(repo).unwrap().as_tree().unwrap()),
+        Some(ObjectType::Blob) => ^Blob(root, path, entry.to_object(repo).unwrap().as_blob().unwrap()),
         Some(ObjectType::Tag) => "Can't render ObjectType::Tag yet",
         Some(ObjectType::Commit) => "Can't render ObjectType::Commit yet",
         Some(ObjectType::Any) => "Can't render ObjectType::Any yet",
@@ -32,27 +32,27 @@ renderers! {
     }
   }
 
-  RootTreeRenderer(root: &'a str, tree: &'a Tree<'a>) {
-    h2.path { ^ComponentsRenderer(root, PathBuf::from("/").components()) }
+  RootTree(root: &'a str, tree: &'a git2::Tree<'a>) {
+    h2.path { ^Components(root, PathBuf::from("/").components()) }
     ul.fa-ul {
       @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-        ^TreeEntryStubRenderer(root, &entry)
+        ^TreeEntryStub(root, &entry)
       }
     }
   }
 
-  TreeRenderer(root: &'a str, path: &'a Path, tree: &'a Tree<'a>) {
-    h2.path { ^ComponentsRenderer(root, path.components()) }
+  Tree(root: &'a str, path: &'a Path, tree: &'a git2::Tree<'a>) {
+    h2.path { ^Components(root, path.components()) }
     ul.fa-ul {
       li { ^FAM::Li(FA::LevelUp) a href=^((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
       @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-        ^TreeEntryStubRenderer(&(root.to_string() + path.to_str().unwrap()), &entry)
+        ^TreeEntryStub(&(root.to_string() + path.to_str().unwrap()), &entry)
       }
     }
   }
 
-  BlobRenderer(root: &'a str, path: &'a Path, blob: &'a Blob<'a>) {
-    h2.path { ^ComponentsRenderer(root, path.components()) }
+  Blob(root: &'a str, path: &'a Path, blob: &'a git2::Blob<'a>) {
+    h2.path { ^Components(root, path.components()) }
     ul.fa-ul {
       li { ^FAM::Li(FA::LevelUp) a href=^((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
     }
@@ -68,9 +68,9 @@ renderers! {
   }
 }
 
-pub struct ComponentsRenderer<'a>(&'a str, pub Components<'a>);
+pub struct Components<'a>(&'a str, pub path::Components<'a>);
 
-impl<'a> ::maud::RenderOnce for ComponentsRenderer<'a> {
+impl<'a> ::maud::RenderOnce for Components<'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let mut root = self.0.to_string();
     for component in self.1 {

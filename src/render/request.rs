@@ -1,9 +1,8 @@
-use git_appraise::{ Oid, Request };
+use git_appraise::{ self, Oid };
 use maud_pulldown_cmark::markdown;
 use chrono::naive::datetime::NaiveDateTime;
-use super::{ Avatar };
 
-fn summary(request: &Request) -> Option<&str> {
+fn summary(request: &git_appraise::Request) -> Option<&str> {
   request.description()
     .and_then(|description| description.lines().nth(0))
 }
@@ -14,14 +13,14 @@ fn short(oid: Oid) -> String {
 }
 
 renderers! {
-  RequestRenderer(request: &'a Request) {
+  Request(request: &'a git_appraise::Request) {
     .block.request {
-      ^RequestHeaderRenderer(request)
-      ^RequestDetailsRenderer(request)
+      ^RequestHeader(request)
+      ^RequestDetails(request)
     }
   }
 
-  RequestStubRenderer(request: &'a Request) {
+  RequestStub(request: &'a git_appraise::Request) {
     .request-stub {
       a href={ "reviews/" ^request.commit_id() } {
         span.id
@@ -35,7 +34,7 @@ renderers! {
     }
   }
 
-  RequestHeaderRenderer(request: &'a Request) {
+  RequestHeader(request: &'a git_appraise::Request) {
     .block-header.request-header {
       h2.float-right {
         a href={ ^request.commit_id() } {
@@ -56,7 +55,7 @@ renderers! {
         }
       }
       .h3 {
-        ^Avatar(request.requester().unwrap_or("unknown@example.org"))
+        ^super::Avatar(request.requester().unwrap_or("unknown@example.org"))
         span.rest {
           span.user
             ^request.requester().unwrap_or("<unknown requester>")
@@ -71,7 +70,7 @@ renderers! {
     }
   }
 
-  RequestDetailsRenderer(request: &'a Request) {
+  RequestDetails(request: &'a git_appraise::Request) {
     .block-details.request-details {
       @match request.description() {
         Some(description) => ^markdown::from_string(description),

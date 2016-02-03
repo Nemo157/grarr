@@ -1,13 +1,12 @@
-use git_appraise::{ Comment };
+use git_appraise;
 use maud_pulldown_cmark::markdown;
-use super::{ Avatar };
 use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
-  CommentHeaderRendererer(comment: &'a Comment) {
+  CommentHeader(comment: &'a git_appraise::Comment) {
     .block-header.comment-header {
       .h3 {
-        ^Avatar(comment.author().unwrap_or("unknown@example.org"))
+        ^super::Avatar(comment.author().unwrap_or("unknown@example.org"))
         span.rest {
           span.user
             ^comment.author().unwrap_or("<unknown author>")
@@ -38,7 +37,7 @@ renderers! {
     }
   }
 
-  CommentDetailsRendererer(comment: &'a Comment) {
+  CommentDetails(comment: &'a git_appraise::Comment) {
     @if let Some(location) = comment.location() {
       .block-details.comment-details {
         pre { code { ^(format!("{:?}", location)) } }
@@ -51,10 +50,10 @@ renderers! {
     }
   }
 
-  CommentRenderer(comment: &'a Comment) {
+  Comment(comment: &'a git_appraise::Comment) {
     .block.comment {
-      ^CommentHeaderRendererer(comment)
-      ^CommentDetailsRendererer(comment)
+      ^CommentHeader(comment)
+      ^CommentDetails(comment)
     }
   }
 }

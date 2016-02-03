@@ -3,7 +3,6 @@ use super::base::*;
 use std::fs;
 use std::path::PathBuf;
 use git2::Repository;
-use render::RepositoriesRenderer;
 use repository_tree::RepositoryTreeEntry;
 
 pub struct Repositories {
@@ -51,7 +50,7 @@ impl Handler for Repositories {
   fn handle(&self, _: &mut Request) -> IronResult<Response> {
     let root = fs::canonicalize(&self.root).unwrap_or(self.root.clone());
     let repos = get_repos(&root, &root).unwrap_or(Vec::new());
-    Ok(Html(Wrapper(&RepositoriesRenderer("", &repos))).into())
+    Ok(Html(Wrapper(&render::Repositories("", &repos))).into())
   }
 }
 

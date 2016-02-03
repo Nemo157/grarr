@@ -1,7 +1,7 @@
-use iron::Error;
+use iron;
 
 renderers! {
-  ErrorRenderer(error: &'a Error) {
+  Error(error: &'a iron::Error) {
     pre code ^error
   }
 }

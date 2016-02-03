@@ -1,13 +1,12 @@
 use super::base::*;
 
-use render::CommitsRenderer;
 use git2::Repository;
 use commit_tree::CommitTree;
 
 pub struct Commits;
 
 fn render(path: &str, actual: &str, repo: &Repository) -> IronResult<Response> {
-  Ok(Html(Wrapper(RepositoryWrapper(path, actual, Tab::Commits, CommitsRenderer(CommitTree::new(repo))))).into())
+  Ok(Html(Wrapper(RepositoryWrapper(path, actual, Tab::Commits, render::Commits(CommitTree::new(repo))))).into())
 }
 
 impl Handler for Commits {

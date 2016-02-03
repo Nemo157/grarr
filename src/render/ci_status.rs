@@ -1,25 +1,25 @@
-use git_appraise::{ Status, CIStatus };
+use git_appraise::{ self, Status };
 use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
-  CIStatusRenderer(ci_status: &'a CIStatus) {
+  CIStatus(ci_status: &'a git_appraise::CIStatus) {
     .block.ci-status {
       .block-header {
         .h3 {
           @match ci_status.url() {
             Some(url) => {
               a href={ ^url } {
-                ^CIStatusTextRenderer(ci_status)
+                ^CIStatusText(ci_status)
               }
             },
-            None => ^CIStatusTextRenderer(ci_status)
+            None => ^CIStatusText(ci_status)
           }
         }
       }
     }
   }
 
-  CIStatusTextRenderer(ci_status: &'a CIStatus) {
+  CIStatusText(ci_status: &'a git_appraise::CIStatus) {
     span.agent {
       ^ci_status.agent().unwrap_or("<Unknown agent>")
     }

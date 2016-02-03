@@ -1,25 +1,24 @@
-use git_appraise::{ Event, Events };
-use super::{ RequestRenderer, CIStatusRenderer, AnalysisRenderer, CommentRenderer };
+use git_appraise;
 
 renderers! {
-  EventsRenderer(events: Events) {
+  Events(events: git_appraise::Events) {
     @for event in events {
-      ^EventRenderer(event)
+      ^Event(event)
     }
   }
 
-  EventRenderer(event: Box<Event>) {
+  Event(event: Box<git_appraise::Event>) {
     @if let Some(request) = event.as_request() {
-      ^RequestRenderer(request)
+      ^super::Request(request)
     }
     @if let Some(comment) = event.as_comment() {
-      ^CommentRenderer(comment)
+      ^super::Comment(comment)
     }
     @if let Some(analysis) = event.as_analysis() {
-      ^AnalysisRenderer(analysis)
+      ^super::Analysis(analysis)
     }
     @if let Some(ci_status) = event.as_ci_status() {
-      ^CIStatusRenderer(ci_status)
+      ^super::CIStatus(ci_status)
     }
   }
 }

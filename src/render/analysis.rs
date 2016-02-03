@@ -1,8 +1,8 @@
-use git_appraise::{ Analysis };
+use git_appraise;
 use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
-  AnalysisRenderer(analysis: &'a Analysis) {
+  Analysis(analysis: &'a git_appraise::Analysis) {
     @if let Some(url) = analysis.url() {
       .block.analysis {
         .block-header {

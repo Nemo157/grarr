@@ -1,28 +1,27 @@
 use std::fmt;
-use git2::{ Oid, Commit };
+use git2::{ self, Oid };
 use maud::{ RenderOnce, PreEscaped };
 use maud_pulldown_cmark::markdown;
 use commit_tree::CommitTree;
 use chrono::naive::datetime::NaiveDateTime;
-use super::{ Signature };
 
 const HEX: &'static [u8; 0x10] = b"0123456789abcdef";
 fn short(oid: Oid) -> String {
   oid.as_bytes().iter().take(3).flat_map(|b| vec![HEX[((b >> 4) & 0xFu8) as usize] as char, HEX[(b & 0xFu8) as usize] as char]).collect()
 }
 
-fn summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
+fn summary<'a>(commit: &'a git2::Commit<'a>) -> Option<&'a str> {
   commit.message()
     .and_then(|message| message.lines().nth(0))
 }
 
-fn non_summary<'a>(commit: &'a Commit<'a>) -> Option<&'a str> {
+fn non_summary<'a>(commit: &'a git2::Commit<'a>) -> Option<&'a str> {
   commit.message()
     .and_then(|message| message.splitn(2, '\n').map(|l| if l.starts_with('\r') { &l[1..] } else { l }).nth(1))
 }
 
 renderers! {
-  CommitStubRenderer(commit: &'a Commit<'a>) {
+  CommitStub(commit: &'a git2::Commit<'a>) {
     li.commit-stub {
       a href={ "commits/" ^commit.id() } {
         span.id
@@ -36,7 +35,7 @@ renderers! {
     }
   }
 
-  CommitRenderer(commit: &'a Commit<'a>) {
+  Commit(commit: &'a git2::Commit<'a>) {
     .commit.block {
       .block-header {
         .h2 {
@@ -48,7 +47,7 @@ renderers! {
           }
         }
         .h3 {
-          ^Signature(&commit.committer())
+          ^super::Signature(&commit.committer())
           span {
             "committed at "
             span.timestamp { ^NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
@@ -56,7 +55,7 @@ renderers! {
         }
         @if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
           .h3 {
-            ^Signature(&commit.author())
+            ^super::Signature(&commit.author())
             span {
               "authored at "
               span.timestamp { ^NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
@@ -73,19 +72,19 @@ renderers! {
   }
 }
 
-pub struct CommitsRenderer<'repo>(pub CommitTree<'repo>);
-impl<'repo> RenderOnce for CommitsRenderer<'repo> {
+pub struct Commits<'repo>(pub CommitTree<'repo>);
+impl<'repo> RenderOnce for Commits<'repo> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let CommitsRenderer(commits) = self;
+    let Commits(commits) = self;
     html!(w, {
       ul.no-dot {
         @for (commit, sub) in commits {
-          ^CommitStubRenderer(&commit)
+          ^CommitStub(&commit)
           @if !sub.is_empty() {
             li {
               input.expander type="checkbox" { }
               label { i.fa.fa-fw.chevron {} }
-              ^CommitsRenderer(sub)
+              ^Commits(sub)
             }
           }
         }

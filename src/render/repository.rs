@@ -1,12 +1,12 @@
 use std::str;
-use git2::{ Repository };
+use git2;
 use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::{ PreEscaped };
 use maud_pulldown_cmark::markdown;
 use repository_tree::RepositoryTreeEntry;
 use super::fa::{ FA, FAM };
 
-fn find_readme(repo: &Repository) -> Option<String> {
+fn find_readme(repo: &git2::Repository) -> Option<String> {
   let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
   let head = try_expect!(repo.find_commit(head_id));
   let tree = try_expect!(head.tree());
@@ -16,7 +16,7 @@ fn find_readme(repo: &Repository) -> Option<String> {
   str::from_utf8(blob.content()).ok().map(|s| s.to_string())
 }
 
-fn description(repo: &Repository) -> Option<String> {
+fn description(repo: &git2::Repository) -> Option<String> {
   // Render the readme and grab the first <p> element from it.
   find_readme(repo)
     .map(|readme| {
@@ -37,13 +37,13 @@ fn description(repo: &Repository) -> Option<String> {
 }
 
 renderers! {
-  RepositoryRenderer(repo: &'a Repository) {
+  Repository(repo: &'a git2::Repository) {
     @if let Some(readme) = find_readme(repo) {
       ^markdown::from_string(&*readme)
     }
   }
 
-  RepositoryStubRenderer(path: &'a str, name: &'a str, repo: &'a Repository) {
+  RepositoryStub(path: &'a str, name: &'a str, repo: &'a git2::Repository) {
     li.repo-stub {
       ^FAM::Li(FA::GitSquare)
       a href={ ^path "/" ^name } {
@@ -57,12 +57,12 @@ renderers! {
     }
   }
 
-  RepositoriesRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
+  Repositories(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     h1 { "Repositories" }
-    ^RepositoriesListRenderer(path, repos)
+    ^RepositoriesList(path, repos)
   }
 
-  RepositoriesListRenderer(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
+  RepositoriesList(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     ul.fa-ul {
       @for entry in repos {
         @match entry {
@@ -70,7 +70,7 @@ renderers! {
             li {
               ^FAM::Li(FA::Sitemap)
               ^name
-              ^RepositoriesListRenderer(&*(path.to_string() + "/" + name), repos)
+              ^RepositoriesList(&*(path.to_string() + "/" + name), repos)
             }
           },
           &RepositoryTreeEntry::Alias(ref alias, ref actual) => {
@@ -86,7 +86,7 @@ renderers! {
             }
           },
           &RepositoryTreeEntry::Repo(ref name, ref repo) => {
-            ^RepositoryStubRenderer(path, name, repo)
+            ^RepositoryStub(path, name, repo)
           },
         }
       }

@@ -2,7 +2,6 @@ use super::base::*;
 
 use router::Router;
 use git2::{ Oid };
-use render::CommitRenderer;
 
 pub struct Commit;
 
@@ -13,7 +12,7 @@ impl Handler for Commit {
     let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let id = itry!(Oid::from_str(commit), status::BadRequest);
     let commit = itry!(context.repository.find_commit(id), status::NotFound);
-    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Commits, &CommitRenderer(&commit)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Commits, &render::Commit(&commit)))).into())
   }
 }
 
