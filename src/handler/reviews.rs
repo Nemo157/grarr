@@ -8,7 +8,7 @@ impl Handler for Reviews {
     let mut reviews: Vec<_> = context.appraised.all_reviews().map(|revs| revs.collect()).unwrap_or(Vec::new());
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
     reviews.reverse();
-    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), &render::Reviews(&reviews)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(&context, &render::Reviews(&reviews)))).into())
   }
 }
 

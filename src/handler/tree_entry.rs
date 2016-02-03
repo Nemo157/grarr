@@ -16,7 +16,7 @@ impl Handler for TreeEntry {
     let tree = itry!(commit.tree(), status::InternalServerError);
     let entry = itry!(tree.get_path(Path::new(entry_path)), status::NotFound);
     let parent = "/".to_string() + context.requested_path.to_str().unwrap() + "/tree";
-    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), &render::TreeEntry(&context.repository, &parent, Path::new(&("/".to_string() + entry_path)), &entry)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(&context, &render::TreeEntry(&context.repository, &parent, Path::new(&("/".to_string() + entry_path)), &entry)))).into())
   }
 }
 
