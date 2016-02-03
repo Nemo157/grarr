@@ -1,26 +1,19 @@
 use super::base::*;
 
-use std::fs;
-use error::Error;
-use std::path::PathBuf;
 use router::Router;
-use git2::{ Oid, Repository };
+use git2::{ Oid };
 use render::CommitRenderer;
 
-pub struct Commit {
-  pub root: PathBuf,
-}
+pub struct Commit;
 
 impl Handler for Commit {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let path = itry!(router.find("repo").ok_or(Error::MissingPathComponent), status::InternalServerError);
-    let actual = fs::canonicalize(self.root.join(path)).unwrap().strip_prefix(&fs::canonicalize(&self.root).unwrap()).unwrap().to_str().unwrap().to_string();
-    let repo = itry!(Repository::open(self.root.join(path)), status::NotFound);
+    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
     let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let id = itry!(Oid::from_str(commit), status::BadRequest);
-    let commit = itry!(repo.find_commit(id), status::NotFound);
-    Ok(Html(Wrapper(RepositoryWrapper(&*path, &actual, Tab::Commits, &CommitRenderer(&commit)))).into())
+    let commit = itry!(context.repository.find_commit(id), status::NotFound);
+    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Commits, &CommitRenderer(&commit)))).into())
   }
 }
 
@@ -29,7 +22,7 @@ impl Route for Commit {
     Method::Get
   }
 
-  fn route() -> &'static str {
-    "/*repo/commits/:commit"
+  fn route() -> Cow<'static, str> {
+    "/commits/:commit".into()
   }
 }

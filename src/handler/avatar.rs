@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use gravatar::{ self, Gravatar };
 use hyper;
 use hyper::client::Client;
@@ -98,7 +99,7 @@ impl Route for Avatars {
     Method::Get
   }
 
-  fn route() -> &'static str {
-    "/-/avatars/:user"
+  fn route() -> Cow<'static, str> {
+    "/-/avatars/:user".into()
   }
 }

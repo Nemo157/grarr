@@ -1,21 +1,13 @@
 use super::base::*;
 
-use std::fs;
-use std::path::PathBuf;
-use router::Router;
-use git2::Repository as GitRepository;
 use render::RepositoryRenderer;
 
-pub struct Repository {
-  pub root: PathBuf,
-}
+pub struct Repository;
 
 impl Handler for Repository {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let path = req.extensions.get::<Router>().unwrap().find("repo").unwrap();
-    let actual = fs::canonicalize(self.root.join(path)).unwrap().strip_prefix(&fs::canonicalize(&self.root).unwrap()).unwrap().to_str().unwrap().to_string();
-    let repo = GitRepository::open(self.root.join(path)).unwrap();
-    Ok(Html(Wrapper(RepositoryWrapper(&*path, &actual, Tab::Overview, &RepositoryRenderer(&repo)))).into())
+    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Overview, &RepositoryRenderer(&context.repository)))).into())
   }
 }
 
@@ -24,7 +16,7 @@ impl Route for Repository {
     Method::Get
   }
 
-  fn route() -> &'static str {
-    "/*repo"
+  fn route() -> Cow<'static, str> {
+    "".into()
   }
 }

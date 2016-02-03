@@ -1,5 +1,5 @@
 pub mod avatar;
-mod route;
+pub mod route;
 mod review;
 mod reviews;
 pub mod register;

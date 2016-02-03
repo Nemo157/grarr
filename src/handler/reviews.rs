@@ -1,27 +1,16 @@
 use super::base::*;
 
-use std::fs;
-use std::path::PathBuf;
-use router::Router;
-use git_appraise::Repository;
-
-use error::Error;
 use render::ReviewsRenderer;
 
-pub struct Reviews {
-  pub root: PathBuf,
-}
+pub struct Reviews;
 
 impl Handler for Reviews {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let path = itry!(router.find("repo").ok_or(Error::MissingPathComponent), status::InternalServerError);
-    let actual = fs::canonicalize(self.root.join(path)).unwrap().strip_prefix(&fs::canonicalize(&self.root).unwrap()).unwrap().to_str().unwrap().to_string();
-    let repo = itry!(Repository::open(self.root.join(path)), status::NotFound);
-    let mut reviews: Vec<_> = repo.all_reviews().map(|revs| revs.collect()).unwrap_or(Vec::new());
+    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let mut reviews: Vec<_> = context.appraised.all_reviews().map(|revs| revs.collect()).unwrap_or(Vec::new());
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
     reviews.reverse();
-    Ok(Html(Wrapper(RepositoryWrapper(&*path, &actual, Tab::Reviews, &ReviewsRenderer(&reviews)))).into())
+    Ok(Html(Wrapper(RepositoryWrapper(context.requested_path.to_str().unwrap(), context.canonical_path.to_str().unwrap(), Tab::Reviews, &ReviewsRenderer(&reviews)))).into())
   }
 }
 
@@ -30,7 +19,7 @@ impl Route for Reviews {
     Method::Get
   }
 
-  fn route() -> &'static str {
-    "/*repo/reviews"
+  fn route() -> Cow<'static, str> {
+    "/reviews".into()
   }
 }

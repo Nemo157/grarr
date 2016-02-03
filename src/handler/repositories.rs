@@ -60,7 +60,7 @@ impl Route for Repositories {
     Method::Get
   }
 
-  fn route() -> &'static str {
-    "/"
+  fn route() -> Cow<'static, str> {
+    "/".into()
   }
 }

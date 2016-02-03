@@ -29,13 +29,16 @@ mod handler;
 mod error;
 mod repository_tree;
 mod commit_tree;
+mod repository_context;
 
 use std::env;
+use std::path::Path;
 use iron::prelude::*;
 use router::*;
 use logger::*;
 use handler::Register;
 use time::Duration;
+use repository_context::inject_repository_context;
 
 fn main() {
   let root = env::args().nth(1).unwrap();
@@ -43,14 +46,14 @@ fn main() {
   let mut router = Router::new();
 
   router
-    .register(handler::Review { root: From::from(root.clone()) })
-    .register(handler::Reviews { root: From::from(root.clone()) })
-    .register(handler::Commit { root: From::from(root.clone()) })
-    .register(handler::Commits { root: From::from(root.clone()) })
-    .register(handler::Repository { root: From::from(root.clone()) })
-    .register(handler::Repositories { root: From::from(root.clone()) })
-    .register(handler::Tree { root: From::from(root.clone()) })
-    .register(handler::TreeEntry { root: From::from(root.clone()) })
+    .register(inject_repository_context(Path::new(&root), handler::Review))
+    .register(inject_repository_context(Path::new(&root), handler::Reviews))
+    .register(inject_repository_context(Path::new(&root), handler::Commit))
+    .register(inject_repository_context(Path::new(&root), handler::Commits))
+    .register(inject_repository_context(Path::new(&root), handler::Repository))
+    .register(handler::Repositories { root: root.clone().into() })
+    .register(inject_repository_context(Path::new(&root), handler::Tree))
+    .register(inject_repository_context(Path::new(&root), handler::TreeEntry))
     .register(handler::Avatars::new(handler::avatar::Options {
       enable_gravatar: true,
       enable_cache: true,
