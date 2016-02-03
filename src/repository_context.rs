@@ -43,7 +43,9 @@ impl<H: Handler> Handler for RepositoryContextHandler<H> {
       let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
       PathBuf::from(itry!(router.find("repo").ok_or(Error::MissingPathComponent), status::InternalServerError))
     };
-    let canonical_path = fs::canonicalize(self.canonical_root.join(&requested_path)).unwrap().strip_prefix(&self.canonical_root).unwrap().to_owned();
+    let full_path = self.canonical_root.join(&requested_path);
+    let full_canonical_path = itry!(fs::canonicalize(&full_path), status::NotFound);
+    let canonical_path = itry!(full_canonical_path.strip_prefix(&self.canonical_root), status::InternalServerError).to_owned();
     let repository = itry!(git2::Repository::open(self.canonical_root.join(&requested_path)), status::NotFound);
     let appraised = itry!(git_appraise::Repository::open(self.canonical_root.join(&requested_path)), status::NotFound);
     req.extensions.insert::<RepositoryContext>(RepositoryContext {
