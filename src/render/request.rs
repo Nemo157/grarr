@@ -1,4 +1,5 @@
-use git_appraise::{ self, Oid };
+use git_appraise;
+use git2::Oid;
 use maud_pulldown_cmark::markdown;
 use chrono::naive::datetime::NaiveDateTime;
 

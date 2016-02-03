@@ -1,5 +1,4 @@
 use git2;
-use git_appraise;
 use std::fs;
 use std::path::{ Path, PathBuf };
 use std::borrow::Cow;
@@ -18,7 +17,6 @@ pub struct RepositoryContext {
   pub requested_path: PathBuf,
   pub canonical_path: PathBuf,
   pub repository: git2::Repository,
-  pub appraised: git_appraise::Repository,
 }
 
 impl Key for RepositoryContext {
@@ -47,12 +45,10 @@ impl<H: Handler> Handler for RepositoryContextHandler<H> {
     let full_canonical_path = itry!(fs::canonicalize(&full_path), status::NotFound);
     let canonical_path = itry!(full_canonical_path.strip_prefix(&self.canonical_root), status::InternalServerError).to_owned();
     let repository = itry!(git2::Repository::open(self.canonical_root.join(&requested_path)), status::NotFound);
-    let appraised = itry!(git_appraise::Repository::open(self.canonical_root.join(&requested_path)), status::NotFound);
     req.extensions.insert::<RepositoryContext>(RepositoryContext {
       requested_path: requested_path,
       canonical_path: canonical_path,
       repository: repository,
-      appraised: appraised,
     });
     self.handler.handle(req)
   }

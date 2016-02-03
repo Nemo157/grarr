@@ -1,7 +1,8 @@
 use super::base::*;
 
 use router::Router;
-use git_appraise::{ Oid };
+use git2::Oid;
+use git_appraise::AppraisedRepository;
 
 pub struct Review;
 
@@ -11,7 +12,7 @@ impl Handler for Review {
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
     let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let id = itry!(Oid::from_str(commit), status::BadRequest);
-    let review = itry!(context.appraised.review_for(id), status::NotFound);
+    let review = itry!(context.repository.review_for(id), status::NotFound);
     Ok(Html(Wrapper(RepositoryWrapper(&context, &render::Review(&review)))).into())
   }
 }
