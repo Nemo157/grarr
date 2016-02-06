@@ -1,6 +1,7 @@
 use std::mem;
 use std::path::PathBuf;
-use git2::{ self, Commit, DiffFormat, Repository };
+use std::cell::RefCell;
+use git2::{ self, Commit, Repository };
 use maud::{ RenderOnce };
 
 renderers! {
@@ -41,7 +42,7 @@ renderers! {
     }
   }
 
-  DiffDetails(hunks: Vec<(Option<DiffHunk>, Vec<DiffLine>)>) {
+  DiffDetails(hunks: Vec<(DiffHunk, Vec<DiffLine>)>) {
     .block-details {
       pre code {
         @for (_, lines) in hunks {
@@ -200,50 +201,46 @@ impl<'a> From<git2::DiffLine<'a>> for DiffLine {
   }
 }
 
-fn group(diff: git2::Diff) -> Result<Vec<(DiffDelta, Vec<(Option<DiffHunk>, Vec<DiffLine>)>)>, git2::Error> {
+fn group(diff: git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLine>)>)>, git2::Error> {
   let mut deltas = Vec::new();
-  let mut hunks = Vec::new();
-  let mut lines = Vec::new();
-  let mut last_delta = None;
-  let mut last_hunk = None;
-  {
-    let hunks = &mut hunks;
-    let lines = &mut lines;
-    try!(diff.print(DiffFormat::Patch, |delta, hunk, line| {
-      let (delta, hunk, line) = (delta.into(), hunk.map(|h| h.into()), line.into());
-      if Some(&delta) == last_delta.as_ref() {
-        if Some(&hunk) == last_hunk.as_ref() {
-          lines.push(line);
-        } else {
-          let mut new_lines = vec![line];
-          mem::swap(lines, &mut new_lines);
-          if let Some(last_hunk) = last_hunk.take() {
-            hunks.push((last_hunk, new_lines));
-          }
-          last_hunk = Some(hunk);
-        }
-      } else {
-        let mut new_lines = vec![line];
-        mem::swap(lines, &mut new_lines);
-        if let Some(last_hunk) = last_hunk.take() {
-          hunks.push((last_hunk, new_lines));
-        }
-        let mut new_hunks = vec![];
-        mem::swap(hunks, &mut new_hunks);
-        if let Some(last_delta) = last_delta.take() {
-          deltas.push((last_delta, new_hunks));
-        }
-        last_hunk = Some(hunk);
-        last_delta = Some(delta);
+  let hunks = RefCell::new(Vec::new());
+  let lines = RefCell::new(Vec::new());
+  let last_delta = RefCell::new(None);
+  let last_hunk = RefCell::new(None);
+  try!(diff.foreach(
+    &mut |delta, _progress| {
+      if let Some(last_hunk) = last_hunk.borrow_mut().take() {
+        let mut new_lines = vec![];
+        mem::swap(&mut *lines.borrow_mut(), &mut new_lines);
+        hunks.borrow_mut().push((last_hunk, new_lines));
       }
+      if let Some(last_delta) = last_delta.borrow_mut().take() {
+        let mut new_hunks = vec![];
+        mem::swap(&mut *hunks.borrow_mut(), &mut new_hunks);
+        deltas.push((last_delta, new_hunks));
+      }
+      *last_delta.borrow_mut() = Some(delta.into());
       true
-    }));
+    },
+    None,
+    Some(&mut |_delta, hunk| {
+      if let Some(last_hunk) = last_hunk.borrow_mut().take() {
+        let mut new_lines = vec![];
+        mem::swap(&mut *lines.borrow_mut(), &mut new_lines);
+        hunks.borrow_mut().push((last_hunk, new_lines));
+      }
+      *last_hunk.borrow_mut() = Some(hunk.into());
+      true
+    }),
+    Some(&mut |_delta, _hunk, line| {
+      lines.borrow_mut().push(line.into());
+      true
+    })));
+  if let Some(last_hunk) = last_hunk.into_inner() {
+    hunks.borrow_mut().push((last_hunk, lines.into_inner()));
   }
-  if let Some(last_hunk) = last_hunk {
-    hunks.push((last_hunk, lines));
-  }
-  if let Some(last_delta) = last_delta {
-    deltas.push((last_delta, hunks));
+  if let Some(last_delta) = last_delta.into_inner() {
+    deltas.push((last_delta, hunks.into_inner()));
   }
   Ok(deltas)
 }
