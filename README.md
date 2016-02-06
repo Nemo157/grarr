@@ -11,8 +11,8 @@ specify where this is to enable building `libssh2-sys` and `openssl-sys-extras`.
 Use something like:
 
 ```sh
-OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl/1.0.2d_1 \
-DEP_OPENSSL_INCLUDE=/usr/local/Cellar/openssl/1.0.2d_1/include \
+OPENSSL_ROOT_DIR=/usr/local/opt/openssl \
+DEP_OPENSSL_INCLUDE=/usr/local/opt/openssl/include \
 cargo build
 ```
 

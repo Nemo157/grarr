@@ -1,6 +1,6 @@
 use git_appraise;
 use git2::Oid;
-use maud_pulldown_cmark::markdown;
+use maud_pulldown_cmark::Markdown;
 use chrono::naive::datetime::NaiveDateTime;
 
 fn summary(request: &git_appraise::Request) -> Option<&str> {
@@ -74,7 +74,7 @@ renderers! {
   RequestDetails(request: &'a git_appraise::Request) {
     .block-details.request-details {
       @match request.description() {
-        Some(description) => ^markdown::from_string(description),
+        Some(description) => ^Markdown::from_string(description),
         None => i "No description provided",
       }
     }

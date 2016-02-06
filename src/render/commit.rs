@@ -1,7 +1,7 @@
 use std::fmt;
 use git2::{ self, Oid };
 use maud::{ RenderOnce, PreEscaped };
-use maud_pulldown_cmark::markdown;
+use maud_pulldown_cmark::Markdown;
 use commit_tree::CommitTree;
 use chrono::naive::datetime::NaiveDateTime;
 
@@ -69,7 +69,7 @@ renderers! {
       ^CommitHeader(commit)
       @if let Some(non_summary) = non_summary(commit) {
         .block-details.message {
-          ^markdown::from_string(non_summary)
+          ^Markdown::from_string(non_summary)
         }
       }
     }

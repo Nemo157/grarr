@@ -21,8 +21,8 @@ walkdir = "0.1.5"
 
 chrono = "*"
 pulldown-cmark = "*"
-maud-pulldown-cmark = "*"
-gravatar = "*"
+maud-pulldown-cmark = { git = "https://git.nemo157.com/rust/maud-pulldown-cmark.git", rev = "maud-consuming-render" }
+gravatar = { git = "https://github.com/Nemo157/rust-gravatar", rev = "fix-type-resolve-failure" }
 
-maud = "*"
-maud_macros = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined" }
+maud = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined2" }
+maud_macros = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined2" }

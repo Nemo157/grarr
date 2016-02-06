@@ -1,5 +1,5 @@
 use git_appraise;
-use maud_pulldown_cmark::markdown;
+use maud_pulldown_cmark::Markdown;
 use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
@@ -45,7 +45,7 @@ renderers! {
     }
     @if let Some(description) = comment.description() {
       .block-details.comment-details {
-        ^markdown::from_string(description)
+        ^Markdown::from_string(description)
       }
     }
   }

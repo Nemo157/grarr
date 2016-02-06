@@ -2,7 +2,7 @@ use std::str;
 use git2;
 use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::{ PreEscaped };
-use maud_pulldown_cmark::markdown;
+use maud_pulldown_cmark::Markdown;
 use repository_tree::RepositoryTreeEntry;
 use super::fa::{ FA, FAM };
 
@@ -39,7 +39,7 @@ fn description(repo: &git2::Repository) -> Option<String> {
 renderers! {
   Repository(repo: &'a git2::Repository) {
     @if let Some(readme) = find_readme(repo) {
-      ^markdown::from_string(&*readme)
+      ^Markdown::from_string(&*readme)
     }
   }
 
