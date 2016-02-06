@@ -229,6 +229,14 @@ fn group(diff: &git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLin
         mem::swap(&mut *lines.borrow_mut(), &mut new_lines);
         hunks.borrow_mut().push((last_hunk, new_lines));
       }
+      lines.borrow_mut().push(DiffLine {
+        old_lineno: None,
+        new_lineno: None,
+        num_lines: 1,
+        content_offset: 0,
+        content: String::from_utf8(hunk.header().into()).ok(),
+        origin: Origin::HunkHeader,
+      });
       *last_hunk.borrow_mut() = Some(hunk.into());
       true
     }),
