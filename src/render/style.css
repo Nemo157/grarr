@@ -313,7 +313,7 @@ ul.no-dot {
 }
 
 .diff .line:before {
-  content: "         ";
+  content: "           ";
   padding: 3px 0;
   border-right: 1px dotted #586e75;
   font-size: 0.7rem;

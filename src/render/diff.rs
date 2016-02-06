@@ -7,7 +7,7 @@ use maud::{ RenderOnce };
 renderers! {
   DiffCommits(repo: &'a Repository, old_commit: &'a Option<&'a Commit<'a>>, new_commit: &'a Commit<'a>) {
     @match repo.diff_tree_to_tree(old_commit.map(|commit| commit.tree().unwrap()).as_ref(), Some(&new_commit.tree().unwrap()), None) {
-      Ok(diff) => ^Diff(diff),
+      Ok(ref diff) => ^Diff(diff),
       Err(ref error) => ^super::Error(error),
     }
   }
@@ -54,20 +54,20 @@ renderers! {
               },
               (Origin::LineContext, Some(ref content)) => {
                 .line.context
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >3}", num)) } else { "   " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >3}", num)) } else { "   " } }
+                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } else { "    " } }
+                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } else { "    " } }
                   span.text ^content
               },
               (Origin::LineAddition, Some(ref content)) => {
                 .line.addition
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >3}", num)) } else { "   " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >3}", num)) } else { "   " } }
+                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } else { "    " } }
+                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } else { "    " } }
                   span.text ^content
               },
               (Origin::LineDeletion, Some(ref content)) => {
                 .line.deletion
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >3}", num)) } else { "   " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >3}", num)) } else { "   " } }
+                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } else { "    " } }
+                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } else { "    " } }
                   span.text ^content
               },
               (Origin::AddEOF, _) => {
@@ -94,7 +94,7 @@ renderers! {
     }
   }
 
-  Diff(diff: git2::Diff) {
+  Diff(diff: &'a git2::Diff<'a>) {
     @for (delta, hunks) in group(diff).unwrap() {
       .diff.block {
         ^DiffHeader(delta)
@@ -201,7 +201,7 @@ impl<'a> From<git2::DiffLine<'a>> for DiffLine {
   }
 }
 
-fn group(diff: git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLine>)>)>, git2::Error> {
+fn group(diff: &git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLine>)>)>, git2::Error> {
   let mut deltas = Vec::new();
   let hunks = RefCell::new(Vec::new());
   let lines = RefCell::new(Vec::new());
