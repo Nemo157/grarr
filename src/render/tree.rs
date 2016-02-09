@@ -44,9 +44,9 @@ renderers! {
   Tree(root: &'a str, path: &'a Path, tree: &'a git2::Tree<'a>) {
     h2.path { ^Components(root, path.components()) }
     ul.fa-ul {
-      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_owned() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
       @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-        ^TreeEntryStub(&(root.to_string() + path.to_str().unwrap()), &entry)
+        ^TreeEntryStub(&(root.to_owned() + path.to_str().unwrap()), &entry)
       }
     }
   }
@@ -54,7 +54,7 @@ renderers! {
   Blob(root: &'a str, path: &'a Path, blob: &'a git2::Blob<'a>) {
     h2.path { ^Components(root, path.components()) }
     ul.fa-ul {
-      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_string() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_owned() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
     }
     @match blob.is_binary() {
       true => pre { code { "Binary file" } },
@@ -72,7 +72,7 @@ pub struct Components<'a>(&'a str, pub path::Components<'a>);
 
 impl<'a> ::maud::RenderOnce for Components<'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let mut root = self.0.to_string();
+    let mut root = self.0.to_owned();
     for component in self.1 {
       match component {
         Component::RootDir => {

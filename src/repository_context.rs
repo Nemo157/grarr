@@ -56,5 +56,5 @@ impl<H: Handler> Handler for RepositoryContextHandler<H> {
 
 impl<'a, H: Handler + Route> Route for RepositoryContextHandler<H> {
   fn method() -> Method { H::method() }
-  fn route() -> Cow<'static, str> { ("/*repo".to_string() + &H::route()).into() }
+  fn route() -> Cow<'static, str> { ("/*repo".to_owned() + &H::route()).into() }
 }

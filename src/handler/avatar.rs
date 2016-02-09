@@ -53,14 +53,14 @@ impl Avatars {
 
   fn cache(&self, user: &str, image: Image) -> Image {
     match self.cache {
-      Some(ref cache) => { cache.lock().unwrap().insert(user.to_string(), image.clone()); },
+      Some(ref cache) => { cache.lock().unwrap().insert(user.to_owned(), image.clone()); },
       None => (),
     }
     image
   }
 
   fn find_cached(&self, user: &str) -> Option<Image> {
-    self.cache.as_ref().and_then(|cache| cache.lock().unwrap().get(&user.to_string()).map(|image| image.clone()))
+    self.cache.as_ref().and_then(|cache| cache.lock().unwrap().get(&user.to_owned()).map(|image| image.clone()))
   }
 
   fn find_gravatar(&self, user: &str) -> Option<Image> {

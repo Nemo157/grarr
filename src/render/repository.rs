@@ -13,7 +13,7 @@ fn find_readme(repo: &git2::Repository) -> Option<String> {
   let entry = expect!(tree.get_name("README").or_else(|| tree.get_name("README.md")));
   let object = try_expect!(entry.to_object(repo));
   let blob = expect!(object.as_blob());
-  str::from_utf8(blob.content()).ok().map(|s| s.to_string())
+  str::from_utf8(blob.content()).ok().map(|s| s.to_owned())
 }
 
 fn description(repo: &git2::Repository) -> Option<String> {
@@ -70,7 +70,7 @@ renderers! {
             li {
               ^FAM::Li(FA::Sitemap)
               ^name
-              ^RepositoriesList(&*(path.to_string() + "/" + name), repos)
+              ^RepositoriesList(&*(path.to_owned() + "/" + name), repos)
             }
           },
           &RepositoryTreeEntry::Alias(ref alias, ref actual) => {

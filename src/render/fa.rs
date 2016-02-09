@@ -30,7 +30,7 @@ impl FA {
 impl FAM {
   fn class(self) -> String {
     match self {
-      FAM::Li(fa) => "fa-li ".to_string() + fa.class()
+      FAM::Li(fa) => "fa-li ".to_owned() + fa.class()
     }
   }
 }

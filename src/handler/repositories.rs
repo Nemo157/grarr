@@ -23,7 +23,7 @@ fn get_repos(root: &PathBuf, dir: &PathBuf) -> Option<Vec<RepositoryTreeEntry>> 
                     if actual == entry.path() {
                       RepositoryTreeEntry::Repo(filename.clone(), repo)
                     } else {
-                      let actual = actual.strip_prefix(root).ok().and_then(|stripped| stripped.to_str().map(|s| s.to_string()));
+                      let actual = actual.strip_prefix(root).ok().and_then(|stripped| stripped.to_str().map(|s| s.to_owned()));
                       match actual {
                         Some(actual) => RepositoryTreeEntry::Alias(filename.clone(), actual),
                         None => RepositoryTreeEntry::Repo(filename.clone(), repo),
