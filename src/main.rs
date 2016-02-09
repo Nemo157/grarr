@@ -1,4 +1,5 @@
 #![feature(plugin)]
+#![plugin(clippy)]
 #![plugin(maud_macros)]
 #![warn(trivial_numeric_casts)]
 #![warn(unsafe_code)]

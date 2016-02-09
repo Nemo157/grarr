@@ -24,3 +24,5 @@ gravatar = { git = "https://github.com/Nemo157/rust-gravatar", rev = "fix-type-r
 
 maud = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined2" }
 maud_macros = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined2" }
+
+clippy = { version = "*" }
