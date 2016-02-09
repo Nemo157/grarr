@@ -3,12 +3,23 @@ use maud::RenderOnce;
 use super::fa::{ FA };
 use repository_context::RepositoryContext;
 
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Tab {
   Overview,
   Files,
   Commits,
   Reviews,
+}
+
+impl Tab {
+  fn css_class(&self) -> &'static str {
+    match *self {
+      Tab::Overview => "overview",
+      Tab::Files => "files",
+      Tab::Commits => "commits",
+      Tab::Reviews => "reviews",
+    }
+  }
 }
 
 pub trait RepositoryTab {
@@ -21,8 +32,8 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let tab = R::tab();
     let RepositoryWrapper(context, content) = self;
-    let requested_path = context.requested_path.to_string_lossy();
-    let canonical_path = context.canonical_path.to_string_lossy();
+    let requested_path = context.requested_path.to_string_lossy().into_owned();
+    let canonical_path = context.canonical_path.to_string_lossy().into_owned();
     html!(w, {
       ^FA::LevelUp " " a href="/" { "Repositories" }
       h1 {
@@ -36,21 +47,22 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
         }
       }
       .repository {
-        .tabs {
-          div class={ "overview" @if tab == Tab::Overview { " selected" } } { a href={ "/" ^requested_path } { "Overview" } }
-          div class={ "files" @if tab == Tab::Files { " selected" } } { a href={ "/" ^requested_path "/tree" } { "Files" } }
-          div class={ "commits" @if tab == Tab::Commits { " selected" } } { a href={ "/" ^requested_path "/commits" } { "Commits" } }
-          div class={ "reviews" @if tab == Tab::Reviews { " selected" } } { a href={ "/" ^requested_path "/reviews" } { "Reviews" } }
-        }
-        div class={ "content " @match tab {
-          Tab::Overview => "overview",
-          Tab::Files => "files",
-          Tab::Commits => "commits",
-          Tab::Reviews => "reviews",
-        } } {
+        ^RepositoryWrapperTabs(tab, requested_path)
+        div class={ "content " ^tab.css_class() } {
           ^content
         }
       }
     })
+  }
+}
+
+renderers! {
+  RepositoryWrapperTabs(tab: Tab, requested_path: String) {
+    .tabs {
+      div class={ "overview" @if tab == Tab::Overview { " selected" } } { a href={ "/" ^requested_path } { "Overview" } }
+      div class={ "files" @if tab == Tab::Files { " selected" } } { a href={ "/" ^requested_path "/tree" } { "Files" } }
+      div class={ "commits" @if tab == Tab::Commits { " selected" } } { a href={ "/" ^requested_path "/commits" } { "Commits" } }
+      div class={ "reviews" @if tab == Tab::Reviews { " selected" } } { a href={ "/" ^requested_path "/reviews" } { "Reviews" } }
+    }
   }
 }
