@@ -1,5 +1,5 @@
 use std::vec::IntoIter;
-use git2::{ Oid, Repository, Commit };
+use git2::{ self, Oid, Repository, Commit };
 
 pub struct CommitTree<'repo> {
   repo: &'repo Repository,
@@ -9,12 +9,12 @@ pub struct CommitTree<'repo> {
 }
 
 impl<'repo> CommitTree<'repo> {
-  pub fn new(repo: &'repo Repository) -> CommitTree<'repo> {
-    let mut walker = repo.revwalk().unwrap();
-    walker.push_head().unwrap();
+  pub fn new(repo: &'repo Repository) -> Result<CommitTree<'repo>, git2::Error> {
+    let mut walker = try!(repo.revwalk());
+    try!(walker.push_head());
     walker.simplify_first_parent();
-    let commits = walker.map(|id| repo.find_commit(id).unwrap()).collect();
-    CommitTree::create(repo, commits, Vec::new())
+    let commits = try!(walker.map(|id| repo.find_commit(id)).collect());
+    Ok(CommitTree::create(repo, commits, Vec::new()))
   }
 
   pub fn is_empty(&self) -> bool {
