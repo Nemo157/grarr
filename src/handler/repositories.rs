@@ -49,7 +49,7 @@ fn get_repos(root: &PathBuf, dir: &PathBuf) -> Option<Vec<RepositoryTreeEntry>> 
 impl Handler for Repositories {
   fn handle(&self, _: &mut Request) -> IronResult<Response> {
     let root = fs::canonicalize(&self.root).unwrap_or(self.root.clone());
-    let repos = get_repos(&root, &root).unwrap_or(Vec::new());
+    let repos = get_repos(&root, &root).unwrap_or_default();
     Ok(Html(Wrapper(&render::Repositories("", &repos))).into())
   }
 }
