@@ -52,9 +52,8 @@ impl Avatars {
   }
 
   fn cache(&self, user: &str, image: Image) -> Image {
-    match self.cache {
-      Some(ref cache) => { cache.lock().unwrap().insert(user.to_owned(), image.clone()); },
-      None => (),
+    if let Some(ref cache) = self.cache {
+      cache.lock().unwrap().insert(user.to_owned(), image.clone());
     }
     image
   }
