@@ -60,7 +60,7 @@ impl Avatars {
   }
 
   fn find_cached(&self, user: &str) -> Option<Image> {
-    self.cache.as_ref().and_then(|cache| cache.lock().unwrap().get(&user.to_owned()).map(|image| image.clone()))
+    self.cache.as_ref().and_then(|cache| cache.lock().unwrap().get(&user.to_owned()).cloned())
   }
 
   fn find_gravatar(&self, user: &str) -> Option<Image> {
