@@ -35,9 +35,10 @@ impl Avatars {
   pub fn new(options: Options) -> Avatars {
     Avatars {
       enable_gravatar: options.enable_gravatar,
-      cache: match options.enable_cache {
-        false => None,
-        true => Some(Mutex::new(LruCache::with_expiry_duration_and_capacity(options.cache_time_to_live, options.cache_capacity))),
+      cache: if options.enable_cache {
+        Some(Mutex::new(LruCache::with_expiry_duration_and_capacity(options.cache_time_to_live, options.cache_capacity)))
+      } else {
+        None
       }
     }
   }
