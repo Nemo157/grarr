@@ -24,12 +24,12 @@ fn description(repo: &git2::Repository) -> Option<String> {
       html::push_html(
         &mut s,
         Parser::new(&*readme)
-          .skip_while(|ev| match ev {
-            &Event::Start(Tag::Paragraph) => false,
+          .skip_while(|ev| match *ev {
+            Event::Start(Tag::Paragraph) => false,
             _ => true,
           })
-          .take_while(|ev| match ev {
-            &Event::End(Tag::Paragraph) => false,
+          .take_while(|ev| match *ev {
+            Event::End(Tag::Paragraph) => false,
             _ => true,
           }));
       s
@@ -65,15 +65,15 @@ renderers! {
   RepositoriesList(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
     ul.fa-ul {
       @for entry in repos {
-        @match entry {
-          &RepositoryTreeEntry::Dir(ref name, ref repos) => {
+        @match *entry {
+          RepositoryTreeEntry::Dir(ref name, ref repos) => {
             li {
               ^FAM::Li(FA::Sitemap)
               ^name
               ^RepositoriesList(&*(path.to_owned() + "/" + name), repos)
             }
           },
-          &RepositoryTreeEntry::Alias(ref alias, ref actual) => {
+          RepositoryTreeEntry::Alias(ref alias, ref actual) => {
             li {
               ^FAM::Li(FA::Tag)
               a href={ ^path "/" ^alias } {
@@ -85,7 +85,7 @@ renderers! {
               }
             }
           },
-          &RepositoryTreeEntry::Repo(ref name, ref repo) => {
+          RepositoryTreeEntry::Repo(ref name, ref repo) => {
             ^RepositoryStub(path, name, repo)
           },
         }
