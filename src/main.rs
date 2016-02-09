@@ -1,5 +1,10 @@
 #![feature(plugin)]
 #![plugin(maud_macros)]
+#![warn(trivial_numeric_casts)]
+#![warn(unsafe_code)]
+#![warn(unused_extern_crates)]
+#![warn(unused_qualifications)]
+#![warn(variant_size_differences)]
 
 extern crate maud;
 #[macro_use]
@@ -8,7 +13,6 @@ extern crate router;
 extern crate logger;
 extern crate git2;
 extern crate git_appraise;
-extern crate persistent;
 extern crate typemap;
 extern crate chrono;
 extern crate maud_pulldown_cmark;
@@ -17,7 +21,6 @@ extern crate hyper;
 extern crate mime;
 extern crate lru_time_cache;
 extern crate time;
-extern crate walkdir;
 extern crate pulldown_cmark;
 
 #[macro_use]

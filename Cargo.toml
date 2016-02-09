@@ -11,13 +11,11 @@ git2 = { git = "https://github.com/Nemo157/git2-rs", rev="foreach-diff" }
 hyper = "*"
 iron = "*"
 router = { git = "https://github.com/Nemo157/router", rev = "reverse_priority" }
-persistent = { git = "https://github.com/iron/persistent" }
 logger = { git = "https://github.com/iron/logger" }
 typemap = "*"
 mime = "*"
 lru_time_cache = "*"
 time = "*"
-walkdir = "0.1.5"
 
 chrono = "*"
 pulldown-cmark = "*"
