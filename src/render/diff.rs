@@ -199,6 +199,7 @@ impl<'a> From<git2::DiffLine<'a>> for DiffLine {
   }
 }
 
+#[allow(type_complexity)] // This is temporary till I figure out a nicer way to do this without all the allocation
 fn group(diff: &git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLine>)>)>, git2::Error> {
   let mut deltas = Vec::new();
   let hunks = RefCell::new(Vec::new());
