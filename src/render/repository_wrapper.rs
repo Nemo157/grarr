@@ -55,7 +55,7 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
         }
       }
       div.repository {
-        ^RepositoryWrapperTabs(tab, requested_path)
+        ^RepositoryWrapperTabs(tab, requested_path, context.repository.head().unwrap().shorthand().unwrap().to_owned())
         div class={ "content " ^tab.css_class() } {
           ^content
         }
@@ -65,10 +65,10 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
 }
 
 renderers! {
-  RepositoryWrapperTabs(tab: Tab, requested_path: String) {
+  RepositoryWrapperTabs(tab: Tab, requested_path: String, head: String) {
     div.tabs {
       div class={ "overview" @if tab == Tab::Overview { " selected" } } { a href={ "/" ^requested_path } { "Overview" } }
-      div class={ "files" @if tab == Tab::Files { " selected" } } { a href={ "/" ^requested_path "/tree" } { "Files" } }
+      div class={ "files" @if tab == Tab::Files { " selected" } } { a href={ "/" ^requested_path "/tree/" ^head } { "Files" } }
       div class={ "commits" @if tab == Tab::Commits { " selected" } } { a href={ "/" ^requested_path "/commits" } { "Commits" } }
       div class={ "reviews" @if tab == Tab::Reviews { " selected" } } { a href={ "/" ^requested_path "/reviews" } { "Reviews" } }
     }

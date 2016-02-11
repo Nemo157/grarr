@@ -5,6 +5,7 @@ use std::fmt;
 pub enum Error {
   MissingExtension,
   MissingPathComponent,
+  FromString(&'static str),
 }
 
 impl error::Error for Error {
@@ -12,6 +13,7 @@ impl error::Error for Error {
     match *self {
       Error::MissingExtension => "Missing request extension",
       Error::MissingPathComponent => "Missing path component",
+      Error::FromString(s) => s,
     }
   }
 }

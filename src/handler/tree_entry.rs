@@ -9,13 +9,13 @@ impl Handler for TreeEntry {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let reff = itry!(router.find("ref").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let entry_path = itry!(router.find("path").ok_or(Error::MissingPathComponent), status::InternalServerError);
-    let head = itry!(context.repository.head().and_then(|head| head.resolve()), status::InternalServerError);
-    let head_id = head.target().unwrap();
-    let commit = itry!(context.repository.find_commit(head_id), status::InternalServerError);
+    let object = itry!(context.repository.revparse_single(reff), status::NotFound);
+    let commit = itry!(object.as_commit().ok_or(Error::FromString("Object is not commit...")), status::InternalServerError);
     let tree = itry!(commit.tree(), status::InternalServerError);
     let entry = itry!(tree.get_path(Path::new(entry_path)), status::NotFound);
-    let parent = "/".to_owned() + context.requested_path.to_str().unwrap() + "/tree";
+    let parent = "/".to_owned() + context.requested_path.to_str().unwrap() + "/tree/" + reff;
     Ok(Html(Wrapper(RepositoryWrapper(&context, &render::TreeEntry(&context.repository, &parent, Path::new(&("/".to_owned() + entry_path)), &entry)))).into())
   }
 }
@@ -26,6 +26,6 @@ impl Route for TreeEntry {
   }
 
   fn route() -> Cow<'static, str> {
-    "/tree/*path".into()
+    "/tree/:ref/*path".into()
   }
 }
