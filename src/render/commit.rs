@@ -2,7 +2,7 @@ use std::fmt;
 use git2::{ self, Oid };
 use maud::{ RenderOnce, PreEscaped };
 use maud_pulldown_cmark::Markdown;
-use commit_tree::CommitTree;
+use commit_tree;
 use chrono::naive::datetime::NaiveDateTime;
 
 const HEX: &'static [u8; 0x10] = b"0123456789abcdef";
@@ -68,8 +68,10 @@ renderers! {
     div.commit.block {
       ^CommitHeader(commit)
       @if let Some(non_summary) = non_summary(commit) {
-        div.block-details.message {
-          ^Markdown::from_string(non_summary)
+        @if !non_summary.is_empty() {
+          div.block-details.message {
+            ^Markdown::from_string(non_summary)
+          }
         }
       }
     }
@@ -81,10 +83,27 @@ renderers! {
   }
 }
 
-pub struct Commits<'repo, 'a>(pub &'a str, pub CommitTree<'repo>);
+pub struct Commits<'repo, 'a>(pub &'a str, pub &'a str, pub commit_tree::CommitTree<'repo>);
 impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let Commits(root, commits) = self;
+    let Commits(root, reff, commits) = self;
+    html!(w, {
+      div.block {
+        div.block-header {
+          h3 { "Commits for ref " span.ref { ^reff } }
+        }
+        div.block-details {
+          ^CommitTree(root, commits)
+        }
+      }
+    })
+  }
+}
+
+pub struct CommitTree<'repo, 'a>(pub &'a str, pub commit_tree::CommitTree<'repo>);
+impl<'repo, 'a> RenderOnce for CommitTree<'repo, 'a> {
+  fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
+    let CommitTree(root, commits) = self;
     html!(w, {
       ul.no-dot {
         @for (commit, sub) in commits {
@@ -93,7 +112,7 @@ impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
             li {
               input.expander type="checkbox" { }
               label { i.fa.fa-fw.chevron {} }
-              ^Commits(root, sub)
+              ^CommitTree(root, sub)
             }
           }
         }

@@ -13,8 +13,10 @@ pub enum FA {
   Home,
 }
 
+#[allow(dead_code)]
 pub enum FAM {
   Li(FA),
+  FixedWidth(FA),
 }
 
 impl FA {
@@ -35,7 +37,8 @@ impl FA {
 impl FAM {
   fn class(self) -> String {
     match self {
-      FAM::Li(fa) => "fa-li ".to_owned() + fa.class()
+      FAM::Li(fa) => "fa-li ".to_owned() + fa.class(),
+      FAM::FixedWidth(fa) => "fa-fw ".to_owned() + fa.class(),
     }
   }
 }

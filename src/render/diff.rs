@@ -20,22 +20,22 @@ renderers! {
     div.block-header {
       @match (delta.status.0, delta.new_file, delta.old_file) {
         (git2::Delta::Added, Some(ref new_file), _) => {
-          div.h3 { span { "Added " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Added " span.filename ^new_file.to_string_lossy() } }
         },
         (git2::Delta::Deleted, _, Some(ref old_file)) => {
-          div.h3 { span { "Deleted " span.filename ^old_file.to_string_lossy() } }
+          h3 { span { "Deleted " span.filename ^old_file.to_string_lossy() } }
         },
         (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file == new_file => {
-          div.h3 { span { "Modified " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Modified " span.filename ^new_file.to_string_lossy() } }
         },
         (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file != new_file => {
-          div.h3 { span { "Modified " span.filename ^new_file.to_string_lossy() "(Previously " span.filename ^old_file.to_string_lossy() ")" } }
+          h3 { span { "Modified " span.filename ^new_file.to_string_lossy() "(Previously " span.filename ^old_file.to_string_lossy() ")" } }
         },
         (git2::Delta::Renamed, Some(ref new_file), Some(ref old_file)) => {
-          div.h3 { span { "Renamed " span.filename ^old_file.to_string_lossy() " to " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Renamed " span.filename ^old_file.to_string_lossy() " to " span.filename ^new_file.to_string_lossy() } }
         },
         (git2::Delta::Copied, Some(ref new_file), Some(ref old_file)) => {
-          div.h3 { span { "Copied " span.filename ^old_file.to_string_lossy() " to " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Copied " span.filename ^old_file.to_string_lossy() " to " span.filename ^new_file.to_string_lossy() } }
         },
         (status, ref new_file, ref old_file) =>  ^(format!("{:?} ({:?} -> {:?}) (should not happen)", status, old_file, new_file))
       }
@@ -43,48 +43,49 @@ renderers! {
   }
 
   DiffDetails(hunks: Vec<(DiffHunk, Vec<DiffLine>)>) {
-    div.block-details {
-      pre code {
-        @for (hunk, lines) in hunks {
-          div.line.hunk-header
-            span.text ^hunk.header.unwrap()
-          @for line in lines {
-            @match (line.origin, line.content) {
-              (Origin::LineContext, Some(ref content)) => {
-                div.line.context
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  span.text ^content
-              },
-              (Origin::LineAddition, Some(ref content)) => {
-                div.line.addition
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  span.text ^content
-              },
-              (Origin::LineDeletion, Some(ref content)) => {
-                div.line.deletion
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  span.text ^content
-              },
-              (Origin::AddEOF, _) => {
-                div.line.add-eof
-                  span.text "Added EOF"
-              },
-              (Origin::RemoveEOF, _) => {
-                div.line.remove-eof
-                  span.text "Removed EOF"
-              },
-              (Origin::LineBinary, _) => {
-                div.line.binary
-                  span.text "Binary file changed"
-              },
-              (Origin::ContextEOF, _) | (Origin::FileHeader, _) | (Origin::HunkHeader, _) => {
-              },
-              (_, _) => {
-                "UNREACHABLE"
-              }
+    pre.block-details code {
+      @if hunks.is_empty() {
+        div.line.hunk-header span.text "No content"
+      }
+      @for (hunk, lines) in hunks {
+        div.line.hunk-header
+          span.text ^hunk.header.unwrap()
+        @for line in lines {
+          @match (line.origin, line.content) {
+            (Origin::LineContext, Some(ref content)) => {
+              div.line.context
+                data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                span.text ^content
+            },
+            (Origin::LineAddition, Some(ref content)) => {
+              div.line.addition
+                data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                span.text ^content
+            },
+            (Origin::LineDeletion, Some(ref content)) => {
+              div.line.deletion
+                data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                span.text ^content
+            },
+            (Origin::AddEOF, _) => {
+              div.line.add-eof
+                span.text "Added EOF"
+            },
+            (Origin::RemoveEOF, _) => {
+              div.line.remove-eof
+                span.text "Removed EOF"
+            },
+            (Origin::LineBinary, _) => {
+              div.line.binary
+                span.text "Binary file changed"
+            },
+            (Origin::ContextEOF, _) | (Origin::FileHeader, _) | (Origin::HunkHeader, _) => {
+            },
+            (_, _) => {
+              "UNREACHABLE"
             }
           }
         }

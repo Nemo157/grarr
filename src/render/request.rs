@@ -37,25 +37,25 @@ renderers! {
 
   RequestHeader(request: &'a git_appraise::Request) {
     div.block-header.request-header {
-      h2.float-right {
+      h3.float-right {
         a href={ ^request.commit_id() } {
           span.id
             ^short(request.commit_id())
         }
       }
-      div.h4 {
+      h5 {
         @if let Some(timestamp) = request.timestamp() {
           span.timestamp
             ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
         }
       }
-      div.h2 {
+      h3 {
         @match summary(request) {
           Some(summary) => ^summary,
           None => "<No summary provided>",
         }
       }
-      div.h3 {
+      h4 {
         ^super::Avatar(request.requester().unwrap_or("unknown@example.org"))
         span.rest {
           span.user

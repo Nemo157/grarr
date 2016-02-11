@@ -2,8 +2,12 @@ use git_appraise;
 
 renderers! {
   Reviews(reviews: &'a Vec<git_appraise::Review<'a>>) {
-    @for review in reviews {
-      ^ReviewStub(review)
+    div.block {
+      div.block-details {
+        @for review in reviews {
+          ^ReviewStub(review)
+        }
+      }
     }
   }
 

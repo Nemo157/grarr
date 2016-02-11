@@ -6,7 +6,7 @@ renderers! {
     @if let Some(url) = analysis.url() {
       div.block.analysis {
         div.block-header {
-          div.h3 {
+          h5 {
             a href={ ^url } {
               "External analysis"
               @if let Some(timestamp) = analysis.timestamp() {

@@ -5,7 +5,7 @@ renderers! {
   CIStatus(ci_status: &'a git_appraise::CIStatus) {
     div.block.ci-status {
       div.block-header {
-        div.h3 {
+        h5 {
           @match ci_status.url() {
             Some(url) => {
               a href={ ^url } {

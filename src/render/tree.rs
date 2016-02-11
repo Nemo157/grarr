@@ -33,37 +33,65 @@ renderers! {
   }
 
   RootTree(root: &'a str, tree: &'a git2::Tree<'a>) {
-    h2.path { ^Components(root, PathBuf::from("/").components()) }
-    ul.fa-ul {
-      @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-        ^TreeEntryStub(root, &entry)
+    div.block {
+      div.block-header {
+        h2.path span {
+          ^FAM::FixedWidth(FA::Sitemap) " "
+          ^Components(root, PathBuf::from("/").components())
+        }
+      }
+      div.block-details {
+        ul.fa-ul {
+          @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
+            ^TreeEntryStub(root, &entry)
+          }
+        }
       }
     }
   }
 
   Tree(root: &'a str, path: &'a Path, tree: &'a git2::Tree<'a>) {
-    h2.path { ^Components(root, path.components()) }
-    ul.fa-ul {
-      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_owned() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
-      @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-        ^TreeEntryStub(&(root.to_owned() + path.to_str().unwrap()), &entry)
+    div.block {
+      div.block-header {
+        h2.path span {
+          ^FAM::FixedWidth(FA::Sitemap) " "
+          ^Components(root, path.components())
+        }
+      }
+      div.block-details {
+        ul.fa-ul {
+          li { ^FAM::Li(FA::LevelUp) a href=^((root.to_owned() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+          @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
+            ^TreeEntryStub(&(root.to_owned() + path.to_str().unwrap()), &entry)
+          }
+        }
       }
     }
   }
 
   Blob(root: &'a str, path: &'a Path, blob: &'a git2::Blob<'a>) {
-    h2.path { ^Components(root, path.components()) }
-    ul.fa-ul {
-      li { ^FAM::Li(FA::LevelUp) a href=^((root.to_owned() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
-    }
-    @match blob.is_binary() {
-      true => pre { code { "Binary file" } },
-      false => {
-        pre { code { ^str::from_utf8(blob.content()).unwrap() } }
-        link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
-        script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
-        script { "hljs.initHighlightingOnLoad()" }
-      },
+    div.block {
+      div.block-header {
+        h2.path span {
+          ^FAM::FixedWidth(FA::File) " "
+          ^Components(root, path.components())
+        }
+      }
+      pre.block-details {
+        @match blob.is_binary() {
+          true => code { "Binary file" },
+          false => code {
+            @for (i, line) in str::from_utf8(blob.content()).unwrap().lines().enumerate() {
+              div.line data-line-num=^(format!("{: >4}", i + 1)) {
+                span.text ^line
+              }
+            }
+          },
+        }
+      }
+      link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
+      script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
+      script { "hljs.initHighlightingOnLoad()" }
     }
   }
 }

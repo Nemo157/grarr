@@ -39,7 +39,11 @@ fn description(repo: &git2::Repository) -> Option<String> {
 renderers! {
   Repository(repo: &'a git2::Repository) {
     @if let Some(readme) = find_readme(repo) {
-      ^Markdown::from_string(&*readme)
+      div.block {
+        div.block-details {
+          ^Markdown::from_string(&*readme)
+        }
+      }
     }
   }
 

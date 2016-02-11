@@ -36,30 +36,28 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
     let canonical_path = context.canonical_path.to_string_lossy().into_owned();
     html!(w, {
       ^FA::LevelUp " " a href="/" { "Repositories" }
-      h1 {
-        @match context.repository.origin_url() {
-          Some(_) => ^FA::CodeFork,
-          None => ^FA::Home,
+      div.repository-header {
+        h1 {
+          @match context.repository.origin_url() {
+            Some(_) => ^FA::CodeFork,
+            None => ^FA::Home,
+          }
+          " "
+          a href={ "/" ^requested_path } { ^requested_path }
         }
-        " "
-        a href={ "/" ^requested_path } { ^requested_path }
-      }
-      @if requested_path != canonical_path {
-        h2 {
-          "(alias of " a href={ "/" ^canonical_path } { ^canonical_path } ")"
+        @if requested_path != canonical_path {
+          h4 {
+            "(alias of " a href={ "/" ^canonical_path } { ^canonical_path } ")"
+          }
         }
-      }
-      @if let Some(origin) = context.repository.origin_url() {
-        h2 {
-          "(fork of " ^super::MaybeLink(&origin, &origin) ")"
+        @if let Some(origin) = context.repository.origin_url() {
+          h4 {
+            "(fork of " ^super::MaybeLink(&origin, &origin) ")"
+          }
         }
-      }
-      div.repository {
         ^RepositoryWrapperTabs(tab, requested_path, context.repository.head().unwrap().shorthand().unwrap().to_owned())
-        div class={ "content " ^tab.css_class() } {
-          ^content
-        }
       }
+      ^content
     })
   }
 }

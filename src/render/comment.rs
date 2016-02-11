@@ -5,7 +5,7 @@ use chrono::naive::datetime::NaiveDateTime;
 renderers! {
   CommentHeader(comment: &'a git_appraise::Comment) {
     div.block-header.comment-header {
-      div.h3 {
+      h4 {
         ^super::Avatar(comment.author().unwrap_or("unknown@example.org"))
         span.rest {
           span.user
