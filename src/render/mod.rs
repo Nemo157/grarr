@@ -18,6 +18,7 @@ mod tree;
 mod wrapper;
 mod signature;
 mod diff;
+mod utils;
 
 pub use self::style::Style;
 pub use self::event::{ Event, Events };
@@ -35,3 +36,4 @@ pub use self::tree::{ RootTree, TreeEntry };
 pub use self::wrapper::Wrapper;
 pub use self::signature::Signature;
 pub use self::diff::DiffCommit;
+pub use self::utils::MaybeLink;

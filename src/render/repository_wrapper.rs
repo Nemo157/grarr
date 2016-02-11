@@ -1,7 +1,7 @@
 use std::fmt;
 use maud::RenderOnce;
 use super::fa::{ FA };
-use repository_context::RepositoryContext;
+use { RepositoryContext, RepositoryExtension };
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Tab {
@@ -36,14 +36,15 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
     let canonical_path = context.canonical_path.to_string_lossy().into_owned();
     html!(w, {
       ^FA::LevelUp " " a href="/" { "Repositories" }
-      h1 {
-        ^FA::GitSquare " "
-        a href={ "/" ^requested_path } { ^requested_path }
-        @if requested_path != canonical_path {
-          " "
-          small {
-            "(alias of " a href={ "/" ^canonical_path } { ^canonical_path } ")"
-          }
+      h1 { ^FA::GitSquare " " a href={ "/" ^requested_path } { ^requested_path } }
+      @if requested_path != canonical_path {
+        h2 {
+          "(alias of " a href={ "/" ^canonical_path } { ^canonical_path } ")"
+        }
+      }
+      @if let Some(origin) = context.origin_url() {
+        h2 {
+          "(fork of " ^super::MaybeLink(&origin, &origin) ")"
         }
       }
       .repository {

@@ -34,6 +34,7 @@ mod error;
 mod repository_tree;
 mod commit_tree;
 mod repository_context;
+mod repository_extension;
 
 use std::env;
 use std::path::Path;
@@ -43,6 +44,10 @@ use logger::*;
 use handler::Register;
 use time::Duration;
 use repository_context::inject_repository_context;
+
+pub use repository_tree::RepositoryTreeEntry;
+pub use repository_context::RepositoryContext;
+pub use repository_extension::RepositoryExtension;
 
 fn main() {
   let root = env::args().nth(1).unwrap();

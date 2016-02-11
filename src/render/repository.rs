@@ -3,8 +3,8 @@ use git2;
 use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::{ PreEscaped };
 use maud_pulldown_cmark::Markdown;
-use repository_tree::RepositoryTreeEntry;
 use super::fa::{ FA, FAM };
+use { RepositoryTreeEntry, RepositoryExtension };
 
 fn find_readme(repo: &git2::Repository) -> Option<String> {
   let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
@@ -48,6 +48,12 @@ renderers! {
       ^FAM::Li(FA::GitSquare)
       a href={ ^path "/" ^name } {
         ^name
+      }
+      @if let Some(origin) = repo.origin_url() {
+        " "
+        small {
+          "(fork of " ^super::MaybeLink(&origin, &origin) ")"
+        }
       }
       @if let Some(description) = description(repo) {
         blockquote {
