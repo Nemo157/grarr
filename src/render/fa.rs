@@ -1,6 +1,7 @@
 use std::fmt;
 use maud::RenderOnce;
 
+#[allow(dead_code)]
 pub enum FA {
   LevelUp,
   GitSquare,
@@ -8,6 +9,8 @@ pub enum FA {
   Tag,
   File,
   Question,
+  CodeFork,
+  Home,
 }
 
 pub enum FAM {
@@ -23,6 +26,8 @@ impl FA {
       FA::Tag => "fa fa-tag",
       FA::File => "fa fa-file",
       FA::Question => "fa fa-question",
+      FA::CodeFork => "fa fa-code-fork",
+      FA::Home => "fa fa-home",
     }
   }
 }

@@ -36,13 +36,20 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
     let canonical_path = context.canonical_path.to_string_lossy().into_owned();
     html!(w, {
       ^FA::LevelUp " " a href="/" { "Repositories" }
-      h1 { ^FA::GitSquare " " a href={ "/" ^requested_path } { ^requested_path } }
+      h1 {
+        @match context.repository.origin_url() {
+          Some(_) => ^FA::CodeFork,
+          None => ^FA::Home,
+        }
+        " "
+        a href={ "/" ^requested_path } { ^requested_path }
+      }
       @if requested_path != canonical_path {
         h2 {
           "(alias of " a href={ "/" ^canonical_path } { ^canonical_path } ")"
         }
       }
-      @if let Some(origin) = context.origin_url() {
+      @if let Some(origin) = context.repository.origin_url() {
         h2 {
           "(fork of " ^super::MaybeLink(&origin, &origin) ")"
         }

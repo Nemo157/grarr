@@ -45,7 +45,10 @@ renderers! {
 
   RepositoryStub(path: &'a str, name: &'a str, repo: &'a git2::Repository) {
     li.repo-stub {
-      ^FAM::Li(FA::GitSquare)
+      @match repo.origin_url() {
+        Some(_) => ^FAM::Li(FA::CodeFork),
+        None => ^FAM::Li(FA::Home),
+      }
       a href={ ^path "/" ^name } {
         ^name
       }
