@@ -9,6 +9,7 @@ impl<T: Render> Render for Wrapper<T> {
     html!(w, {
       html {
         head {
+          meta name="viewport" content="width=device-width, initial-scale=1" {}
           ^Style
         }
         body {
@@ -24,6 +25,7 @@ impl<T: RenderOnce> RenderOnce for Wrapper<T> {
     html!(w, {
       html {
         head {
+          meta name="viewport" content="width=device-width, initial-scale=1" {}
           ^Style
         }
         body {
