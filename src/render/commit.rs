@@ -36,8 +36,8 @@ renderers! {
   }
 
   CommitHeader(commit: &'a git2::Commit<'a>) {
-    .block-header {
-      .h2 {
+    div.block-header {
+      div.h2 {
         span.id ^short(commit.id())
         ^PreEscaped("&nbsp;")
         @match summary(commit) {
@@ -45,7 +45,7 @@ renderers! {
           None => "<No summary provided>",
         }
       }
-      .h3 {
+      div.h3 {
         ^super::Signature(&commit.committer())
         span {
           "committed at "
@@ -53,7 +53,7 @@ renderers! {
         }
       }
       @if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
-        .h3 {
+        div.h3 {
           ^super::Signature(&commit.author())
           span {
             "authored at "
@@ -65,10 +65,10 @@ renderers! {
   }
 
   CommitDetails(commit: &'a git2::Commit<'a>) {
-    .commit.block {
+    div.commit.block {
       ^CommitHeader(commit)
       @if let Some(non_summary) = non_summary(commit) {
-        .block-details.message {
+        div.block-details.message {
           ^Markdown::from_string(non_summary)
         }
       }

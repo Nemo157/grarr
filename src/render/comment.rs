@@ -4,8 +4,8 @@ use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
   CommentHeader(comment: &'a git_appraise::Comment) {
-    .block-header.comment-header {
-      .h3 {
+    div.block-header.comment-header {
+      div.h3 {
         ^super::Avatar(comment.author().unwrap_or("unknown@example.org"))
         span.rest {
           span.user
@@ -39,19 +39,19 @@ renderers! {
 
   CommentDetails(comment: &'a git_appraise::Comment) {
     @if let Some(location) = comment.location() {
-      .block-details.comment-details {
+      div.block-details.comment-details {
         pre { code { ^(format!("{:?}", location)) } }
       }
     }
     @if let Some(description) = comment.description() {
-      .block-details.comment-details {
+      div.block-details.comment-details {
         ^Markdown::from_string(description)
       }
     }
   }
 
   Comment(comment: &'a git_appraise::Comment) {
-    .block.comment {
+    div.block.comment {
       ^CommentHeader(comment)
       ^CommentDetails(comment)
     }

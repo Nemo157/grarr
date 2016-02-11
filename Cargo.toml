@@ -19,10 +19,10 @@ time = "*"
 
 chrono = "*"
 pulldown-cmark = "*"
-maud-pulldown-cmark = { git = "https://git.nemo157.com/rust/maud-pulldown-cmark.git", rev = "maud-consuming-render" }
+maud-pulldown-cmark = { git = "https://git.nemo157.com/rust/maud-pulldown-cmark.git", rev = "maud-update" }
 gravatar = { git = "https://github.com/Nemo157/rust-gravatar", rev = "fix-type-resolve-failure" }
 
-maud = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined2" }
-maud_macros = { git = "https://git.nemo157.com/forks/maud.git", rev = "combined2" }
+maud = { git = "https://github.com/lfairy/maud" }
+maud_macros = { git = "https://github.com/lfairy/maud" }
 
 clippy = { version = "*" }

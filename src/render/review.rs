@@ -12,7 +12,7 @@ renderers! {
   }
 
   Review(review: &'a git_appraise::Review<'a>) {
-    .review {
+    div.review {
       ^super::Events(review.events())
     }
   }

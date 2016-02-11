@@ -15,14 +15,14 @@ fn short(oid: Oid) -> String {
 
 renderers! {
   Request(request: &'a git_appraise::Request) {
-    .block.request {
+    div.block.request {
       ^RequestHeader(request)
       ^RequestDetails(request)
     }
   }
 
   RequestStub(request: &'a git_appraise::Request) {
-    .request-stub {
+    div.request-stub {
       a href={ "reviews/" ^request.commit_id() } {
         span.id
           ^short(request.commit_id())
@@ -36,26 +36,26 @@ renderers! {
   }
 
   RequestHeader(request: &'a git_appraise::Request) {
-    .block-header.request-header {
+    div.block-header.request-header {
       h2.float-right {
         a href={ ^request.commit_id() } {
           span.id
             ^short(request.commit_id())
         }
       }
-      .h4 {
+      div.h4 {
         @if let Some(timestamp) = request.timestamp() {
           span.timestamp
             ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
         }
       }
-      .h2 {
+      div.h2 {
         @match summary(request) {
           Some(summary) => ^summary,
           None => "<No summary provided>",
         }
       }
-      .h3 {
+      div.h3 {
         ^super::Avatar(request.requester().unwrap_or("unknown@example.org"))
         span.rest {
           span.user
@@ -72,7 +72,7 @@ renderers! {
   }
 
   RequestDetails(request: &'a git_appraise::Request) {
-    .block-details.request-details {
+    div.block-details.request-details {
       @match request.description() {
         Some(description) => ^Markdown::from_string(description),
         None => i "No description provided",

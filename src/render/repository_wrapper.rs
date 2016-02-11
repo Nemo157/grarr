@@ -54,7 +54,7 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
           "(fork of " ^super::MaybeLink(&origin, &origin) ")"
         }
       }
-      .repository {
+      div.repository {
         ^RepositoryWrapperTabs(tab, requested_path)
         div class={ "content " ^tab.css_class() } {
           ^content
@@ -66,7 +66,7 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
 
 renderers! {
   RepositoryWrapperTabs(tab: Tab, requested_path: String) {
-    .tabs {
+    div.tabs {
       div class={ "overview" @if tab == Tab::Overview { " selected" } } { a href={ "/" ^requested_path } { "Overview" } }
       div class={ "files" @if tab == Tab::Files { " selected" } } { a href={ "/" ^requested_path "/tree" } { "Files" } }
       div class={ "commits" @if tab == Tab::Commits { " selected" } } { a href={ "/" ^requested_path "/commits" } { "Commits" } }

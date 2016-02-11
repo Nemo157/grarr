@@ -11,9 +11,9 @@ dependencies = [
  "iron 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "logger 0.0.3 (git+https://github.com/iron/logger)",
  "lru_time_cache 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "maud 0.7.4 (git+https://git.nemo157.com/forks/maud.git?rev=combined2)",
- "maud-pulldown-cmark 0.0.7 (git+https://git.nemo157.com/rust/maud-pulldown-cmark.git?rev=maud-consuming-render)",
- "maud_macros 0.7.4 (git+https://git.nemo157.com/forks/maud.git?rev=combined2)",
+ "maud 0.7.4 (git+https://github.com/lfairy/maud)",
+ "maud-pulldown-cmark 0.0.7 (git+https://git.nemo157.com/rust/maud-pulldown-cmark.git?rev=maud-update)",
+ "maud_macros 0.7.4 (git+https://github.com/lfairy/maud)",
  "mime 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "pulldown-cmark 0.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "router 0.1.0 (git+https://github.com/Nemo157/router?rev=reverse_priority)",
@@ -311,23 +311,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "maud"
 version = "0.7.4"
-source = "git+https://git.nemo157.com/forks/maud.git?rev=combined2#ac5a6d48ac5b351ffe759496a841259da881b6da"
+source = "git+https://github.com/lfairy/maud#b738d9d533c093889dc557a14503d97a7db45993"
 
 [[package]]
 name = "maud-pulldown-cmark"
 version = "0.0.7"
-source = "git+https://git.nemo157.com/rust/maud-pulldown-cmark.git?rev=maud-consuming-render#00877eb7a06b22350f75c81fa88dfec723ffc309"
+source = "git+https://git.nemo157.com/rust/maud-pulldown-cmark.git?rev=maud-update#3ceba0ecdf8c0b86ea33a83b60385ffb95ad6daf"
 dependencies = [
- "maud 0.7.4 (git+https://git.nemo157.com/forks/maud.git?rev=combined2)",
+ "maud 0.7.4 (git+https://github.com/lfairy/maud)",
  "pulldown-cmark 0.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "maud_macros"
 version = "0.7.4"
-source = "git+https://git.nemo157.com/forks/maud.git?rev=combined2#ac5a6d48ac5b351ffe759496a841259da881b6da"
+source = "git+https://github.com/lfairy/maud#b738d9d533c093889dc557a14503d97a7db45993"
 dependencies = [
- "maud 0.7.4 (git+https://git.nemo157.com/forks/maud.git?rev=combined2)",
+ "maud 0.7.4 (git+https://github.com/lfairy/maud)",
 ]
 
 [[package]]
