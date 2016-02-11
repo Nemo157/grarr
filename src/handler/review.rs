@@ -1,6 +1,5 @@
 use super::base::*;
 
-use router::Router;
 use git2::Oid;
 use git_appraise::AppraisedRepository;
 

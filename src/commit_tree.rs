@@ -9,9 +9,9 @@ pub struct CommitTree<'repo> {
 }
 
 impl<'repo> CommitTree<'repo> {
-  pub fn new(repo: &'repo Repository) -> Result<CommitTree<'repo>, git2::Error> {
+  pub fn new(repo: &'repo Repository, commit: &Commit<'repo>) -> Result<CommitTree<'repo>, git2::Error> {
     let mut walker = try!(repo.revwalk());
-    try!(walker.push_head());
+    try!(walker.push(commit.id()));
     walker.simplify_first_parent();
     let commits = try!(walker.map(|id| repo.find_commit(id)).collect());
     Ok(CommitTree::create(repo, commits, Vec::new()))

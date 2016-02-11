@@ -6,9 +6,13 @@ pub struct Commits;
 
 impl Handler for Commits {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
+    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let commits = itry!(CommitTree::new(&context.repository), status::InternalServerError);
-    Ok(Html(Wrapper(RepositoryWrapper(&context, render::Commits(commits)))).into())
+    let reff = itry!(router.find("ref").ok_or(Error::MissingPathComponent), status::InternalServerError);
+    let object = itry!(context.repository.revparse_single(reff), status::NotFound);
+    let commit = itry!(object.as_commit().ok_or(Error::FromString("Object is not commit...")), status::InternalServerError);
+    let commits = itry!(CommitTree::new(&context.repository, &commit), status::InternalServerError);
+    Ok(Html(Wrapper(RepositoryWrapper(&context, render::Commits(&("/".to_owned() + context.requested_path.to_str().unwrap()), commits)))).into())
   }
 }
 
@@ -18,6 +22,6 @@ impl Route for Commits {
   }
 
   fn route() -> Cow<'static, str> {
-    "/commits".into()
+    "/commits/:ref".into()
   }
 }

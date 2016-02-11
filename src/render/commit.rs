@@ -21,9 +21,9 @@ fn non_summary<'a>(commit: &'a git2::Commit<'a>) -> Option<&'a str> {
 }
 
 renderers! {
-  CommitStub(commit: &'a git2::Commit<'a>) {
+  CommitStub(root: &'a str, commit: &'a git2::Commit<'a>) {
     li.commit-stub {
-      a href={ "commits/" ^commit.id() } {
+      a href={ ^root "/commit/" ^commit.id() } {
         span.id
           ^short(commit.id())
         " "
@@ -81,19 +81,19 @@ renderers! {
   }
 }
 
-pub struct Commits<'repo>(pub CommitTree<'repo>);
-impl<'repo> RenderOnce for Commits<'repo> {
+pub struct Commits<'repo, 'a>(pub &'a str, pub CommitTree<'repo>);
+impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let Commits(commits) = self;
+    let Commits(root, commits) = self;
     html!(w, {
       ul.no-dot {
         @for (commit, sub) in commits {
-          ^CommitStub(&commit)
+          ^CommitStub(root, &commit)
           @if !sub.is_empty() {
             li {
               input.expander type="checkbox" { }
               label { i.fa.fa-fw.chevron {} }
-              ^Commits(sub)
+              ^Commits(root, sub)
             }
           }
         }
@@ -106,6 +106,6 @@ impl<'a> super::repository_wrapper::RepositoryTab for &'a Commit<'a> {
   fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Commits }
 }
 
-impl<'a> super::repository_wrapper::RepositoryTab for Commits<'a> {
+impl<'a, 'b> super::repository_wrapper::RepositoryTab for Commits<'a, 'b> {
   fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Commits }
 }

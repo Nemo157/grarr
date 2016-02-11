@@ -1,7 +1,6 @@
 use super::base::*;
 
-use router::Router;
-use git2::{ Oid };
+use git2::Oid;
 
 pub struct Commit;
 
@@ -22,6 +21,6 @@ impl Route for Commit {
   }
 
   fn route() -> Cow<'static, str> {
-    "/commits/:commit".into()
+    "/commit/:commit".into()
   }
 }

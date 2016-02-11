@@ -69,7 +69,7 @@ renderers! {
     div.tabs {
       div class={ "overview" @if tab == Tab::Overview { " selected" } } { a href={ "/" ^requested_path } { "Overview" } }
       div class={ "files" @if tab == Tab::Files { " selected" } } { a href={ "/" ^requested_path "/tree/" ^head } { "Files" } }
-      div class={ "commits" @if tab == Tab::Commits { " selected" } } { a href={ "/" ^requested_path "/commits" } { "Commits" } }
+      div class={ "commits" @if tab == Tab::Commits { " selected" } } { a href={ "/" ^requested_path "/commits/" ^head } { "Commits" } }
       div class={ "reviews" @if tab == Tab::Reviews { " selected" } } { a href={ "/" ^requested_path "/reviews" } { "Reviews" } }
     }
   }

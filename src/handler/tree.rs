@@ -1,7 +1,5 @@
 use super::base::*;
 
-use router::Router;
-
 pub struct Tree;
 
 impl Handler for Tree {

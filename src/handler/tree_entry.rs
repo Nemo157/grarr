@@ -1,7 +1,6 @@
 use super::base::*;
 
 use std::path::Path;
-use router::Router;
 
 pub struct TreeEntry;
 
