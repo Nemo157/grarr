@@ -16,10 +16,9 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  margin: 20px auto;
-  max-width: 850px;
-  line-height: 1.4;
-  font-size: 18px;
+  margin: 1rem auto;
+  max-width: 50rem;
+  line-height: 1.2;
   padding: 0;
 }
 
@@ -38,19 +37,19 @@ a:hover {
 }
 
 .block-header {
-  padding: 10px 20px 5px 20px;
+  padding: 0.5rem 1rem 0.3rem 1rem;
   background-color: #073642;
 }
 
-.block-header .h2, .block-header .h3, .block-header .h4 {
-  margin: 0 0 5px 0;
+.block-header h1, .block-header h2, .block-header h3, .block-header h4, .block-header h5 {
+  margin: 0 0 0.2rem 0;
   padding: 0;
   display: flex;
   align-items: center;
 }
 
 .repository-header h1, .repository-header h4 {
-  margin: 5px 20px;
+  margin: 0.4rem 1.6rem;
 }
 
 .rest {
@@ -58,12 +57,12 @@ a:hover {
 }
 
 .block-details {
-  padding: 10px 20px;
+  padding: 0.8rem 1.6rem;
   border: 0px solid #073642;
   border-bottom-width: 1px;
 }
 
-@media (min-width: 850px) {
+@media (min-width: 50rem) {
   .block-details {
     border-width: 1px;
   }
@@ -95,7 +94,7 @@ a:hover {
 
 .ref, .id {
   font-family: monospace;
-  padding: 2px 4px;
+  padding: 0.1rem 0.3rem;
   background-color: #073642;
 }
 
@@ -117,9 +116,8 @@ a:hover {
 }
 
 pre {
-  padding: 5px 10px;
+  padding: 0.4rem 0.8rem;
   overflow: auto;
-  font-size: 0.8rem;
 }
 
 pre, pre code {
@@ -128,13 +126,13 @@ pre, pre code {
 }
 
 code {
-  padding: 0 1px;
+  padding: 0 0.1rem;
   color: #93a1a1;
   background-color: #073642;
 }
 
 .status {
-  padding: 2px 4px;
+  padding: 0.1rem 0.3rem;
   background-color: #002b36;
 }
 
@@ -151,7 +149,7 @@ code {
 }
 
 .review-stub {
-  margin: 5px;
+  margin: 0.4rem;
 }
 
 .float-left {
@@ -165,7 +163,7 @@ code {
 .avatar {
   height: 30px;
   width: 30px;
-  margin: 0px 10px 0px 0px;
+  margin: 0 0.8rem 0 0;
   flex-shrink: 0;
 }
 
@@ -182,7 +180,7 @@ blockquote {
 
 .repository-header {
   background-color: #073642;
-  margin-bottom: 10px;
+  margin-bottom: 0.8rem;
 }
 
 .tabs {
@@ -213,7 +211,7 @@ blockquote {
 }
 
 .content {
-  padding: 0 10px;
+  padding: 0 0.8rem;
 }
 
 .path {
@@ -252,15 +250,20 @@ ul.no-dot {
 .expander         + label > .chevron:before { content: "\f054"; }
 .expander:checked + label > .chevron:before { content: "\f078"; }
 
+pre .line {
+  margin: 0;
+  padding: 0.0625rem 0 0 0;
+}
+
 pre .line .text:before {
   content: " ";
 }
 
 pre .line:before {
   content: "      ";
-  padding: 3px 0;
+  padding: 0.2rem 0;
   border-right: 1px dotted #586e75;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
 }
 
 pre .line[data-line-num]:before {
@@ -287,18 +290,10 @@ pre .line[data-line-num]:before {
 
 .diff .line:before {
   content: "           ";
-  padding: 3px 0;
-  border-right: 1px dotted #586e75;
-  font-size: 0.7rem;
 }
 
 .diff .line[data-old-line-num][data-new-line-num]:before {
   content: " " attr(data-old-line-num) " " attr(data-new-line-num) " " ;
-}
-
-.diff .line {
-  margin: 0;
-  padding: 1px 0;
 }
 
 .diff .hunk-header {
