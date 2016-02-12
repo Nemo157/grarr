@@ -34,6 +34,8 @@ a:hover {
 
 .block {
   margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 .block-header {
@@ -259,8 +261,8 @@ blockquote {
 }
 
 .expander         ~ .commits > *             { display: none; }
-.expander         ~ .commits > *:first-child { display: block; }
-.expander:checked ~ .commits > *             { display: block; }
+.expander         ~ .commits > *:first-child { display: flex; }
+.expander:checked ~ .commits > *             { display: flex; }
 
 .expander         + label > .chevron:before { content: "\f142"; }
 .expander:checked + label > .chevron:before { content: " "; }
