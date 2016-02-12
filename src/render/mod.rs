@@ -19,6 +19,7 @@ mod wrapper;
 mod signature;
 mod diff;
 mod utils;
+mod highlight;
 
 pub use self::style::Style;
 pub use self::event::{ Event, Events };
@@ -37,3 +38,4 @@ pub use self::wrapper::Wrapper;
 pub use self::signature::Signature;
 pub use self::diff::DiffCommit;
 pub use self::utils::MaybeLink;
+pub use self::highlight::HighlightJS;

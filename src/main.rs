@@ -19,17 +19,21 @@ extern crate chrono;
 extern crate maud_pulldown_cmark;
 extern crate gravatar;
 extern crate hyper;
+#[macro_use]
 extern crate mime;
 extern crate lru_time_cache;
 extern crate time;
 extern crate pulldown_cmark;
+extern crate crypto;
+extern crate unicase;
 
 #[macro_use]
 mod macros;
 
 #[macro_use]
 pub mod render;
-mod handler;
+#[macro_use]
+pub mod handler;
 mod error;
 mod repository_tree;
 mod commit_tree;
@@ -63,6 +67,12 @@ fn main() {
     .register(handler::Repositories { root: root.clone().into() })
     .register(inject_repository_context(Path::new(&root), handler::Tree))
     .register(inject_repository_context(Path::new(&root), handler::TreeEntry))
+    .register(statics![
+      prefix: "./static/";
+      "./static/highlight.js",
+      "./static/highlight-solarized-light.css",
+      "./static/style.css",
+    ])
     .register(handler::Avatars::new(handler::avatar::Options {
       enable_gravatar: true,
       enable_cache: true,

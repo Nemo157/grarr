@@ -12,6 +12,8 @@ mod base;
 pub mod error;
 mod tree;
 mod tree_entry;
+#[macro_use]
+pub mod statics;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
@@ -24,3 +26,4 @@ pub use self::tree::Tree;
 pub use self::tree_entry::TreeEntry;
 
 pub use self::register::Register;
+pub use self::statics::Static;

@@ -80,7 +80,7 @@ renderers! {
       pre.block-details {
         @match blob.is_binary() {
           true => code { "Binary file" },
-          false => code {
+          false => code class={ "hljs lang-" ^path.extension().map(|s| s.to_string_lossy().into_owned()).unwrap_or("".to_owned()) } {
             @for (i, line) in str::from_utf8(blob.content()).unwrap().lines().enumerate() {
               div.line data-line-num=^(format!("{: >4}", i + 1)) {
                 span.text ^line
@@ -89,9 +89,7 @@ renderers! {
           },
         }
       }
-      link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
-      script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
-      script { "hljs.initHighlightingOnLoad()" }
+      ^super::HighlightJS
     }
   }
 }

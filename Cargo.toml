@@ -26,3 +26,5 @@ maud = { git = "https://github.com/lfairy/maud" }
 maud_macros = { git = "https://github.com/lfairy/maud" }
 
 clippy = { version = "*" }
+rust-crypto = { version = "*" }
+unicase = { version = "*" }

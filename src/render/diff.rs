@@ -16,9 +16,9 @@ renderers! {
     ^DiffCommits(repo, &commit.parents().nth(0).as_ref(), commit)
   }
 
-  DiffHeader(delta: DiffDelta) {
+  DiffHeader(delta: &'a DiffDelta) {
     div.block-header {
-      @match (delta.status.0, delta.new_file, delta.old_file) {
+      @match (delta.status.0, delta.new_file.as_ref(), delta.old_file.as_ref()) {
         (git2::Delta::Added, Some(ref new_file), _) => {
           h3 { span { "Added " span.filename ^new_file.to_string_lossy() } }
         },
@@ -42,8 +42,8 @@ renderers! {
     }
   }
 
-  DiffDetails(hunks: Vec<(DiffHunk, Vec<DiffLine>)>) {
-    pre.block-details code {
+  DiffDetails(extension: Option<String>, hunks: Vec<(DiffHunk, Vec<DiffLine>)>) {
+    pre.block-details code class={ "hljs lang-" ^extension.unwrap_or("".to_owned()) } {
       @if hunks.is_empty() {
         div.line.hunk-header span.text "No content"
       }
@@ -96,13 +96,11 @@ renderers! {
   Diff(diff: &'a git2::Diff<'a>) {
     @for (delta, hunks) in group(diff).unwrap() {
       div.diff.block {
-        ^DiffHeader(delta)
-        ^DiffDetails(hunks)
+        ^DiffHeader(&delta)
+        ^DiffDetails(delta.new_file.or(delta.old_file).and_then(|path| path.extension().map(|s| s.to_string_lossy().into_owned())), hunks)
       }
     }
-    link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/solarized-light.min.css" {}
-    script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" {}
-    script { "hljs.initHighlightingOnLoad()" }
+    ^super::HighlightJS
   }
 }
 
