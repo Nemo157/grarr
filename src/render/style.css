@@ -218,37 +218,41 @@ blockquote {
   font-family: monospace;
 }
 
-ul.no-dot {
-  list-style: none;
+.commits {
+  flex-grow: 1;
 }
 
-.commits li {
-  min-height: 28px;
+.subtree {
+  display: flex;
 }
 
 .expander {
-  display: inline-block;
-  margin: 3px 0px 3px 20px;
-  width: 18px;
-  height: 18px;
-  opacity: 0;
+  display: none;
 }
 
 .expander + label {
-  display: inline-block;
-  margin-left: -20px;
-  margin-top: 0px;
+  flex-shrink: 0;
+  margin: 0 0.5em 10px 0;
+  border-right: 1px dotted #002b36;
+  min-width: 1em;
+  min-height: 2em;
+  cursor: pointer;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  background-color: #073642;
 }
 
-.expander:checked ~ ul {
-  margin-top: -24px;
+.expander + label:hover {
+  border-color: #268bd2;
+  color: #268bd2;
 }
 
-.expander         ~ ul > li { display: none; }
-.expander:checked ~ ul > li { display: block; }
+.expander         ~ .commits { display: none; }
+.expander:checked ~ .commits { display: block; }
 
-.expander         + label > .chevron:before { content: "\f054"; }
-.expander:checked + label > .chevron:before { content: "\f078"; }
+.expander         + label > .chevron:before { content: "\f142"; }
+.expander:checked + label > .chevron:before { content: "\f142"; }
 
 pre .line {
   margin: 0;

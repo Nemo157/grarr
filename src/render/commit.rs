@@ -22,27 +22,21 @@ fn non_summary<'a>(commit: &'a git2::Commit<'a>) -> Option<&'a str> {
 
 renderers! {
   CommitStub(root: &'a str, commit: &'a git2::Commit<'a>) {
-    li.commit-stub {
-      a href={ ^root "/commit/" ^commit.id() } {
-        span.id
-          ^short(commit.id())
-        " "
-        @match summary(commit) {
-          Some(summary) => ^summary,
-          None => "<No summary provided>",
-        }
-      }
+    div.block {
+      ^CommitHeader(root, commit)
     }
   }
 
-  CommitHeader(commit: &'a git2::Commit<'a>) {
+  CommitHeader(root: &'a str, commit: &'a git2::Commit<'a>) {
     div.block-header {
       div.h2 {
-        span.id ^short(commit.id())
-        ^PreEscaped("&nbsp;")
-        @match summary(commit) {
-          Some(summary) => ^summary,
-          None => "<No summary provided>",
+        a href={ ^root "/commit/" ^commit.id() } {
+          span.id ^short(commit.id())
+          " "
+          @match summary(commit) {
+            Some(summary) => ^summary,
+            None => "<No summary provided>",
+          }
         }
       }
       div.h3 {
@@ -64,9 +58,9 @@ renderers! {
     }
   }
 
-  CommitDetails(commit: &'a git2::Commit<'a>) {
+  CommitDetails(root: &'a str, commit: &'a git2::Commit<'a>) {
     div.commit.block {
-      ^CommitHeader(commit)
+      ^CommitHeader(root, commit)
       @if let Some(non_summary) = non_summary(commit) {
         @if !non_summary.is_empty() {
           div.block-details.message {
@@ -77,8 +71,8 @@ renderers! {
     }
   }
 
-  Commit(repo: &'a git2::Repository, commit: &'a git2::Commit<'a>) {
-    ^CommitDetails(commit)
+  Commit(root: &'a str, repo: &'a git2::Repository, commit: &'a git2::Commit<'a>) {
+    ^CommitDetails(root, commit)
     ^super::DiffCommit(repo, commit)
   }
 }
@@ -92,27 +86,26 @@ impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
         div.block-header {
           h3 { "Commits for ref " span.ref { ^reff } }
         }
-        div.block-details {
-          ^CommitTree(root, commits)
-        }
       }
+      ^CommitTree(root, commits, &mut 0)
     })
   }
 }
 
-pub struct CommitTree<'repo, 'a>(pub &'a str, pub commit_tree::CommitTree<'repo>);
+pub struct CommitTree<'repo, 'a>(pub &'a str, pub commit_tree::CommitTree<'repo>, pub &'a mut u32);
 impl<'repo, 'a> RenderOnce for CommitTree<'repo, 'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let CommitTree(root, commits) = self;
+    let CommitTree(root, commits, id) = self;
+    *id = *id + 1;
     html!(w, {
-      ul.no-dot {
+      div.commits {
         @for (commit, sub) in commits {
           ^CommitStub(root, &commit)
           @if !sub.is_empty() {
-            li {
-              input.expander type="checkbox" { }
-              label { i.fa.fa-fw.chevron {} }
-              ^CommitTree(root, sub)
+            div.subtree {
+              input.expander id={ "commits-expander-" ^id } type="checkbox" checked? { }
+              label for={ "commits-expander-" ^id } { i.fa.fa-fw.chevron {} }
+              ^CommitTree(root, sub, id)
             }
           }
         }
