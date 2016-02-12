@@ -1,7 +1,7 @@
 renderers! {
   HighlightJS {
-    link rel="stylesheet" href="/-/static/highlight-solarized-light.css" {}
-    script src="/-/static/highlight.js" {}
+    link rel="stylesheet" href="/-/static/css/highlight-solarized-light.css" {}
+    script src="/-/static/js/highlight.js" {}
     script { "hljs.initHighlightingOnLoad()" }
   }
 }

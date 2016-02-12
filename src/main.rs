@@ -69,9 +69,16 @@ fn main() {
     .register(inject_repository_context(Path::new(&root), handler::TreeEntry))
     .register(statics![
       prefix: "./static/";
-      "./static/highlight.js",
-      "./static/highlight-solarized-light.css",
-      "./static/style.css",
+      "./static/js/highlight.js",
+      "./static/css/highlight-solarized-light.css",
+      "./static/css/style.css",
+      "./static/css/font-awesome.min.css",
+      "./static/fonts/FontAwesome.otf",
+      "./static/fonts/fontawesome-webfont.eot",
+      "./static/fonts/fontawesome-webfont.svg",
+      "./static/fonts/fontawesome-webfont.ttf",
+      "./static/fonts/fontawesome-webfont.woff",
+      "./static/fonts/fontawesome-webfont.woff2",
     ])
     .register(handler::Avatars::new(handler::avatar::Options {
       enable_gravatar: true,
