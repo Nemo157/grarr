@@ -14,6 +14,8 @@ mod tree;
 mod tree_entry;
 #[macro_use]
 pub mod statics;
+#[macro_use]
+pub mod utils;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;

@@ -3,11 +3,10 @@ use gravatar::{ self, Gravatar };
 use hyper;
 use hyper::client::Client;
 use iron::IronResult;
-use iron::headers::ContentType;
+use iron::headers::{ EntityTag, ETag, CacheControl, CacheDirective, Vary, IfNoneMatch, ContentType };
 use iron::middleware::Handler;
 use iron::request::Request;
 use iron::response::Response;
-use mime::Mime;
 use super::route::Route;
 use router::Router;
 use iron::status;
@@ -15,10 +14,13 @@ use iron::method::Method;
 use lru_time_cache::LruCache;
 use time::Duration;
 use std::sync::Mutex;
+use iron::modifiers::Header;
+use unicase::UniCase;
+use super::utils::File;
 
 pub struct Avatars {
   enable_gravatar: bool,
-  cache: Option<Mutex<LruCache<String, Image>>>,
+  cache: Option<Mutex<LruCache<String, File>>>,
 }
 
 pub struct Options {
@@ -27,9 +29,6 @@ pub struct Options {
   pub cache_capacity: usize,
   pub cache_time_to_live: Duration,
 }
-
-#[derive(Clone)]
-struct Image(Mime, Vec<u8>);
 
 impl Avatars {
   pub fn new(options: Options) -> Avatars {
@@ -43,7 +42,7 @@ impl Avatars {
     }
   }
 
-  fn find_image(&self, user: &str) -> Image {
+  fn find_image(&self, user: &str) -> File {
     self.find_cached(user)
       .unwrap_or_else(||
         self.cache(user,
@@ -52,18 +51,18 @@ impl Avatars {
               self.default())))
   }
 
-  fn cache(&self, user: &str, image: Image) -> Image {
+  fn cache(&self, user: &str, image: File) -> File {
     if let Some(ref cache) = self.cache {
       cache.lock().unwrap().insert(user.to_owned(), image.clone());
     }
     image
   }
 
-  fn find_cached(&self, user: &str) -> Option<Image> {
+  fn find_cached(&self, user: &str) -> Option<File> {
     self.cache.as_ref().and_then(|cache| cache.lock().unwrap().get(&user.to_owned()).cloned())
   }
 
-  fn find_gravatar(&self, user: &str) -> Option<Image> {
+  fn find_gravatar(&self, user: &str) -> Option<File> {
     if self.enable_gravatar {
       use std::io::Read;
       let mut gravatar = Gravatar::new(user);
@@ -75,13 +74,14 @@ impl Avatars {
       let mut buf = Vec::new();
       res.read_to_end(&mut buf).unwrap();
       let mime = res.headers.get::<ContentType>().unwrap().0.clone();
-      Some(Image(mime, buf))
+      let entity_tag = EntityTag::strong(super::utils::sha1(&buf));
+      Some(File(mime, entity_tag, buf.into()))
     } else {
       None
     }
   }
 
-  fn default(&self) -> Image {
+  fn default(&self) -> File {
     unimplemented!()
   }
 }
@@ -89,8 +89,23 @@ impl Avatars {
 impl Handler for Avatars {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let user = req.extensions.get::<Router>().unwrap().find("user").unwrap();
-    let Image(mime, buffer) = self.find_image(user);
-    Ok(Response::with((status::Ok, mime, buffer)))
+    let File(mime, entity_tag, buffer) = self.find_image(user);
+    let cache_headers = (
+      Header(CacheControl(vec![
+        CacheDirective::Public,
+        CacheDirective::MaxAge(86400),
+      ])),
+      Header(ETag(entity_tag.clone())),
+      Header(Vary::Items(vec![
+        UniCase("accept-encoding".to_owned()),
+      ])),
+    );
+    if let Some(&IfNoneMatch::Items(ref items)) = req.headers.get() {
+      if items.len() == 1 && items[0] == entity_tag {
+        return Ok(Response::with((status::NotModified, cache_headers)));
+      }
+    }
+    Ok(Response::with((status::Ok, mime, cache_headers, buffer.as_ref())))
   }
 }
 
