@@ -29,29 +29,49 @@ renderers! {
 
   CommitHeader(root: &'a str, commit: &'a git2::Commit<'a>) {
     div.block-header {
-      div.h2 {
-        a href={ ^root "/commit/" ^commit.id() } {
-          span.id ^short(commit.id())
-          " "
-          @match summary(commit) {
-            Some(summary) => ^summary,
-            None => "<No summary provided>",
+      div.row {
+        @if commit.author().email() == commit.committer().email() {
+          @if let Some(email) = commit.author().email() {
+            ^super::Avatar(email, &commit.author().name())
+          }
+        } @else {
+          div.column {
+            @if let Some(email) = commit.author().email() {
+              ^super::Avatar(email, &commit.author().name())
+            }
+            @if let Some(email) = commit.committer().email() {
+              ^super::Avatar(email, &commit.committer().name())
+            }
           }
         }
-      }
-      div.h3 {
-        ^super::Signature(&commit.committer())
-        span {
-          "committed at "
-          span.timestamp { ^NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
-        }
-      }
-      @if (commit.author().name(), commit.author().email()) != (commit.committer().name(), commit.committer().email()) {
-        div.h3 {
-          ^super::Signature(&commit.author())
-          span {
-            "authored at "
-            span.timestamp { ^NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
+        div.column {
+          div {
+            a href={ ^root "/commit/" ^commit.id() } {
+              span.id ^short(commit.id())
+              " "
+              @match summary(commit) {
+                Some(summary) => ^summary,
+                None => "<No summary provided>",
+              }
+            }
+          }
+          @if (commit.author().name(), commit.author().email()) == (commit.committer().name(), commit.committer().email()) {
+            small {
+              ^super::Signature(&commit.author(), &false)
+              "committed at" ^PreEscaped("&nbsp;")
+              span.timestamp { ^NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
+            }
+          } @else {
+            small {
+              ^super::Signature(&commit.author(), &false)
+              "authored at" ^PreEscaped("&nbsp;")
+              span.timestamp { ^NaiveDateTime::from_timestamp(commit.time().seconds(), 0) }
+            }
+            small {
+              ^super::Signature(&commit.committer(), &false)
+              "committed at" ^PreEscaped("&nbsp;")
+              span.timestamp { ^NaiveDateTime::from_timestamp(commit.author().when().seconds(), 0) }
+            }
           }
         }
       }
@@ -103,7 +123,7 @@ impl<'repo, 'a> RenderOnce for CommitTree<'repo, 'a> {
           ^CommitStub(root, &commit)
           @if !sub.is_empty() {
             div.subtree {
-              input.expander id={ "commits-expander-" ^id } type="checkbox" checked? { }
+              input.expander disabled?=(sub.len() == 1) id={ "commits-expander-" ^id } type="checkbox" checked? { }
               label for={ "commits-expander-" ^id } { i.fa.fa-fw.chevron {} }
               ^CommitTree(root, sub, id)
             }

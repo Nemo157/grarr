@@ -6,6 +6,7 @@ pub struct CommitTree<'repo> {
   next: Option<Commit<'repo>>,
   commits: IntoIter<Commit<'repo>>,
   ignored: Vec<Oid>,
+  len: usize,
 }
 
 impl<'repo> CommitTree<'repo> {
@@ -19,6 +20,10 @@ impl<'repo> CommitTree<'repo> {
 
   pub fn is_empty(&self) -> bool {
     self.next.is_none()
+  }
+
+  pub fn len(&self) -> usize {
+    self.len
   }
 
   fn between(repo: &'repo Repository, first: &Commit<'repo>, ignored: Vec<Oid>) -> CommitTree<'repo> {
@@ -35,12 +40,14 @@ impl<'repo> CommitTree<'repo> {
   }
 
   fn create(repo: &'repo Repository, commits: Vec<Commit<'repo>>, ignored: Vec<Oid>) -> CommitTree<'repo> {
+    let len = commits.len();
     let mut iter = commits.into_iter();
     CommitTree {
       repo: repo,
       next: iter.next(),
       commits: iter,
       ignored: ignored,
+      len: len,
     }
   }
 }
@@ -57,6 +64,7 @@ impl<'repo> Iterator for CommitTree<'repo> {
           ignored.push(self.next.as_ref().unwrap().id());
         }
         let sub = CommitTree::between(self.repo, &commit, ignored);
+        self.len = self.len - 1;
         Some((commit, sub))
       },
       None => None,

@@ -6,7 +6,7 @@ renderers! {
   CommentHeader(comment: &'a git_appraise::Comment) {
     div.block-header.comment-header {
       h4 {
-        ^super::Avatar(comment.author().unwrap_or("unknown@example.org"))
+        ^super::Avatar(comment.author().unwrap_or("unknown@example.org"), &None)
         span.rest {
           span.user
             ^comment.author().unwrap_or("<unknown author>")

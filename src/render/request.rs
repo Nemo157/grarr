@@ -56,7 +56,7 @@ renderers! {
         }
       }
       h4 {
-        ^super::Avatar(request.requester().unwrap_or("unknown@example.org"))
+        ^super::Avatar(request.requester().unwrap_or("unknown@example.org"), &None)
         span.rest {
           span.user
             ^request.requester().unwrap_or("<unknown requester>")

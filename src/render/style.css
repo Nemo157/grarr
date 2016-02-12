@@ -163,7 +163,7 @@ code {
 .avatar {
   height: 30px;
   width: 30px;
-  margin: 0 0.8rem 0 0;
+  margin: 0 0.8rem 0.2rem 0;
   flex-shrink: 0;
 }
 
@@ -243,16 +243,26 @@ blockquote {
   background-color: #073642;
 }
 
+.expander[disabled] + label {
+  cursor: default;
+}
+
 .expander + label:hover {
   border-color: #268bd2;
   color: #268bd2;
 }
 
-.expander         ~ .commits { display: none; }
-.expander:checked ~ .commits { display: block; }
+.expander[disabled] + label:hover {
+  border-color: #002b36;
+  color: #839496;
+}
+
+.expander         ~ .commits > *             { display: none; }
+.expander         ~ .commits > *:first-child { display: block; }
+.expander:checked ~ .commits > *             { display: block; }
 
 .expander         + label > .chevron:before { content: "\f142"; }
-.expander:checked + label > .chevron:before { content: "\f142"; }
+.expander:checked + label > .chevron:before { content: " "; }
 
 pre .line {
   margin: 0;
@@ -331,3 +341,5 @@ pre.block-details {
   border: none;
 }
 
+.row { display: flex; flex-direction: row; }
+.column { display: flex; flex-direction: column; }
