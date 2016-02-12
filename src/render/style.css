@@ -117,12 +117,13 @@ a:hover {
 
 pre {
   padding: 0.4rem 0.8rem;
-  overflow: auto;
 }
 
 pre, pre code {
   color: #657b83;
   background-color: #fdf6e3;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 code {
