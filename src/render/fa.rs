@@ -17,6 +17,7 @@ pub enum FA {
 pub enum FAM {
   Li(FA),
   FixedWidth(FA),
+  X(u8, FA),
 }
 
 impl FA {
@@ -37,8 +38,9 @@ impl FA {
 impl FAM {
   fn class(self) -> String {
     match self {
-      FAM::Li(fa) => "fa-li ".to_owned() + fa.class(),
-      FAM::FixedWidth(fa) => "fa-fw ".to_owned() + fa.class(),
+      FAM::Li(fa) => format!("fa-li {}", fa.class()),
+      FAM::FixedWidth(fa) => format!("fa-fw {}", fa.class()),
+      FAM::X(mul, fa) => format!("fa-fw fa-{}x {}", mul, fa.class()),
     }
   }
 }

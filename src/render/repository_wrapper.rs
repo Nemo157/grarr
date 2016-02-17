@@ -1,7 +1,7 @@
 use std::fmt;
 use maud::RenderOnce;
 use super::fa::{ FA };
-use { RepositoryContext, RepositoryExtension };
+use { RepositoryContext };
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Tab {
@@ -32,30 +32,12 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let tab = R::tab();
     let RepositoryWrapper(context, content) = self;
-    let requested_path = context.requested_path.to_string_lossy().into_owned();
-    let canonical_path = context.canonical_path.to_string_lossy().into_owned();
+    let path = context.requested_path.to_string_lossy().into_owned();
     html!(w, {
       ^FA::LevelUp " " a href="/" { "Repositories" }
-      div.repository-header {
-        h1 {
-          @match context.repository.origin_url() {
-            Some(_) => ^FA::CodeFork,
-            None => ^FA::Home,
-          }
-          " "
-          a href={ "/" ^requested_path } { ^requested_path }
-        }
-        @if requested_path != canonical_path {
-          h4 {
-            "(alias of " a href={ "/" ^canonical_path } { ^canonical_path } ")"
-          }
-        }
-        @if let Some(origin) = context.repository.origin_url() {
-          h4 {
-            "(fork of " ^super::MaybeLink(&origin, &origin) ")"
-          }
-        }
-        ^RepositoryWrapperTabs(tab, requested_path, context.repository.head().unwrap().shorthand().unwrap().to_owned())
+      div.block {
+        ^super::RepositoryHeader(&path, &context.repository)
+        ^RepositoryWrapperTabs(tab, path, context.repository.head().unwrap().shorthand().unwrap().to_owned())
       }
       ^content
     })

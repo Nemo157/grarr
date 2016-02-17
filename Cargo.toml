@@ -16,6 +16,7 @@ typemap = "*"
 mime = "*"
 lru_time_cache = "*"
 time = "*"
+walkdir = "*"
 
 chrono = "*"
 pulldown-cmark = "*"

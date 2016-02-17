@@ -26,6 +26,7 @@ extern crate time;
 extern crate pulldown_cmark;
 extern crate crypto;
 extern crate unicase;
+extern crate walkdir;
 
 #[macro_use]
 mod macros;
@@ -35,7 +36,6 @@ pub mod render;
 #[macro_use]
 pub mod handler;
 mod error;
-mod repository_tree;
 mod commit_tree;
 mod repository_context;
 mod repository_extension;
@@ -49,7 +49,6 @@ use handler::Register;
 use time::Duration;
 use repository_context::inject_repository_context;
 
-pub use repository_tree::RepositoryTreeEntry;
 pub use repository_context::RepositoryContext;
 pub use repository_extension::RepositoryExtension;
 

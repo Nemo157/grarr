@@ -46,8 +46,6 @@ a:hover {
 .block-header h1, .block-header h2, .block-header h3, .block-header h4, .block-header h5 {
   margin: 0 0 0.2rem 0;
   padding: 0;
-  display: flex;
-  align-items: center;
 }
 
 .repository-header h1, .repository-header h4 {
@@ -344,5 +342,6 @@ pre.block-details {
   border: none;
 }
 
-.row { display: flex; flex-direction: row; }
+.row    { display: flex; flex-direction: row; }
 .column { display: flex; flex-direction: column; }
+.center { align-items: center; }

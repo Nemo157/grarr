@@ -4,7 +4,7 @@ use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::{ PreEscaped };
 use maud_pulldown_cmark::Markdown;
 use super::fa::{ FA, FAM };
-use { RepositoryTreeEntry, RepositoryExtension };
+use { RepositoryExtension };
 
 fn find_readme(head_id: Oid, repo: &git2::Repository) -> Option<String> {
   let head = try_expect!(repo.find_commit(head_id));
@@ -47,62 +47,52 @@ renderers! {
     }
   }
 
-  RepositoryStub(path: &'a str, name: &'a str, repo: &'a git2::Repository) {
-    li.repo-stub {
-      @match repo.origin_url() {
-        Some(_) => ^FAM::Li(FA::CodeFork),
-        None => ^FAM::Li(FA::Home),
+  RepositoryIcon(mul: &'a u8, repo: &'a git2::Repository) {
+    @match repo.origin_url() {
+      Some(_) => ^FAM::X(*mul, FA::CodeFork),
+      None => ^FAM::X(*mul, FA::Home),
+    }
+  }
+
+  RepositoryHeader(path: &'a str, repo: &'a git2::Repository) {
+    div.block-header {
+      div.row.center {
+        ^RepositoryIcon(&3, repo)
+        div.column {
+          h1 { a href={ "/" ^path } { ^path } }
+          @if let Some(origin) = repo.origin_url() {
+            h4 { "(fork of " ^super::MaybeLink(&origin, &origin) ")" }
+          }
+        }
       }
-      a href={ ^path "/" ^name } {
-        ^name
-      }
-      @if let Some(origin) = repo.origin_url() {
-        " "
-        small {
-          "(fork of " ^super::MaybeLink(&origin, &origin) ")"
+    }
+  }
+
+  RepositoryStub(path: &'a str, repo: &'a git2::Repository) {
+    div.block {
+      div.block-header {
+        div.row.center {
+          ^RepositoryIcon(&2, repo)
+          div.column {
+            h3 { a href={ "/" ^path } { ^path } }
+            @if let Some(origin) = repo.origin_url() {
+              h6 { "(fork of " ^super::MaybeLink(&origin, &origin) ")" }
+            }
+          }
         }
       }
       @if let Some(description) = description(repo) {
-        blockquote {
+        div.block-details {
           ^PreEscaped(description)
         }
       }
     }
   }
 
-  Repositories(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
+  Repositories(repos: Vec<(String, git2::Repository)>) {
     h1 { "Repositories" }
-    ^RepositoriesList(path, repos)
-  }
-
-  RepositoriesList(path: &'a str, repos: &'a Vec<RepositoryTreeEntry>) {
-    ul.fa-ul {
-      @for entry in repos {
-        @match *entry {
-          RepositoryTreeEntry::Dir(ref name, ref repos) => {
-            li {
-              ^FAM::Li(FA::Sitemap)
-              ^name
-              ^RepositoriesList(&*(path.to_owned() + "/" + name), repos)
-            }
-          },
-          RepositoryTreeEntry::Alias(ref alias, ref actual) => {
-            li {
-              ^FAM::Li(FA::Tag)
-              a href={ ^path "/" ^alias } {
-                ^alias
-              }
-              " alias of "
-              a href=^actual {
-                ^actual
-              }
-            }
-          },
-          RepositoryTreeEntry::Repo(ref name, ref repo) => {
-            ^RepositoryStub(path, name, repo)
-          },
-        }
-      }
+    @for (path, repo) in repos {
+      ^RepositoryStub(&path, &repo)
     }
   }
 }
