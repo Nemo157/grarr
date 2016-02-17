@@ -5,7 +5,11 @@ pub struct Repository;
 impl Handler for Repository {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
-    Ok(Html(Wrapper(RepositoryWrapper(&context, &render::Repository(&context.repository)))).into())
+    Ok(Html {
+      render: Wrapper(RepositoryWrapper(&context, &render::Repository(&context.repository))),
+      etag: None,
+      req: req,
+    }.into())
   }
 }
 

@@ -12,7 +12,11 @@ impl Handler for Review {
     let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let id = itry!(Oid::from_str(commit), status::BadRequest);
     let review = itry!(context.repository.review_for(id), status::NotFound);
-    Ok(Html(Wrapper(RepositoryWrapper(&context, &render::Review(&review)))).into())
+    Ok(Html {
+      render: Wrapper(RepositoryWrapper(&context, &render::Review(&review))),
+      etag: None,
+      req: req,
+    }.into())
   }
 }
 

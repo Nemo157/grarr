@@ -43,3 +43,18 @@ pub fn sha1(file: &[u8]) -> String {
   hasher.result_str()
 }
 
+pub fn sha1_u8s(us: &[&[u8]]) -> String {
+  let mut hasher = Sha1::new();
+  for u in us {
+    hasher.input(u);
+  }
+  hasher.result_str()
+}
+
+pub fn sha1_strs(strs: &[&str]) -> String {
+  let mut hasher = Sha1::new();
+  for s in strs {
+    hasher.input_str(s);
+  }
+  hasher.result_str()
+}

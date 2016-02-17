@@ -6,9 +6,13 @@ macro_rules! error_handler {
   ($name:ident) => {
     pub struct $name;
     impl AfterMiddleware for $name {
-      fn catch(&self, _: &mut Request, err: IronError) -> IronResult<Response> {
+      fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
         if err.response.status == Some(status::$name) {
-          Ok(Response::with((status::$name, Html(&Wrapper(render::error::$name(&*err.error))))))
+          Ok(Response::with((status::$name, Html {
+            render: &Wrapper(render::error::$name(&*err.error)),
+            etag: None,
+            req: req,
+          })))
         } else {
           Err(err)
         }
