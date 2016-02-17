@@ -70,7 +70,8 @@ fn main() {
       prefix: "./static/";
       "./static/js/highlight.js",
       "./static/css/highlight-solarized-light.css",
-      "./static/css/style.css",
+      "./static/css/layout.css",
+      "./static/css/theme-solarized-dark.css",
       "./static/css/font-awesome.min.css",
       "./static/fonts/FontAwesome.otf",
       "./static/fonts/fontawesome-webfont.eot",

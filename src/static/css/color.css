@@ -1,0 +1,178 @@
+html * {
+  color-profile: sRGB;
+}
+
+body {
+  background-color: #002b36;
+  color: #839496;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #93a1a1;
+  border-color: #839496;
+}
+
+a {
+  color: #268bd2;
+}
+
+a:hover {
+  color: #3797db
+}
+
+.block-header {
+  background-color: #073642;
+}
+
+.block-details {
+  border: 0px solid #073642;
+}
+
+.email, .user {
+  color: #d33682;
+}
+
+.agent {
+  color: #6c71c4;
+}
+
+.ref {
+  color: #2aa198;
+}
+
+.id {
+  color: #cb4b16;
+}
+
+.ref, .id {
+  font-family: monospace;
+  background-color: #073642;
+}
+
+.block-header .ref, .block-header .id {
+  background-color: #002b36;
+}
+
+.timestamp {
+  color: #b58900;
+}
+
+.filename {
+  color: #6c71c4;
+  font-family: monospace;
+}
+
+.ci-status a {
+  color: #839496;
+}
+
+pre, pre code {
+  color: #657b83;
+  background-color: #fdf6e3;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+code {
+  color: #93a1a1;
+  background-color: #073642;
+}
+
+.status {
+  background-color: #002b36;
+}
+
+.status.success {
+  color: #859900;
+}
+
+.status.failure {
+  color: #dc322f;
+}
+
+.status.running {
+  color: #268bd2;
+}
+
+blockquote {
+  border-left: 1px dotted #839496;
+}
+
+.repository-header {
+  background-color: #073642;
+}
+
+.tabs {
+  background-color: #002b36;
+}
+
+.tabs > * {
+  border-top: 1px solid #073642;
+  border-bottom: 2px solid #073642;
+  border-right: 1px solid #073642;
+}
+
+.tabs > :first-child {
+  border-left: 2px solid #073642;
+}
+
+.tabs > :last-child {
+  border-right: 2px solid #073642;
+}
+
+.tabs .selected {
+  background-color: #073642;
+}
+
+.expander + label {
+  border-right: 1px dotted #002b36;
+  background-color: #073642;
+}
+
+.expander + label:hover {
+  border-color: #268bd2;
+  color: #268bd2;
+}
+
+.expander[disabled] + label:hover {
+  border-color: #002b36;
+  color: #839496;
+}
+
+
+
+pre .line:before {
+  border-right: 1px dotted #586e75;
+  font-size: 0.6rem;
+}
+
+.diff .addition .text:before {
+  color: #859900;
+}
+
+.diff .deletion .text:before {
+  color: #dc322f;
+}
+
+.diff .addition {
+  background-color: rgba(133, 153, 0, 0.2);
+}
+
+.diff .deletion {
+  background-color: rgba(220, 50, 47, 0.2);
+}
+
+.diff .hunk-header {
+  color: #93a1a1;
+  background-color: #eee8d5;
+}
+
+.diff .hunk-header * {
+  color: #93a1a1;
+}
+
+pre.block-details {
+  border: none;
+}
+
+.center { align-items: center; }

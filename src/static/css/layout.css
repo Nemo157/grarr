@@ -1,16 +1,8 @@
 html * {
-  color-profile: sRGB;
   rendering-intent: auto;
 }
 
-body {
-  background-color: #002b36;
-  color: #839496;
-}
-
 h1, h2, h3, h4, h5, h6 {
-  color: #93a1a1;
-  border-color: #839496;
   margin: 0;
 }
 
@@ -23,13 +15,8 @@ body {
 }
 
 a {
-  color: #268bd2;
   text-decoration: none;
   cursor: pointer;
-}
-
-a:hover {
-  color: #3797db
 }
 
 .block {
@@ -40,7 +27,6 @@ a:hover {
 
 .block-header {
   padding: 0.5rem 1rem 0.3rem 1rem;
-  background-color: #073642;
 }
 
 .block-header h1, .block-header h2, .block-header h3, .block-header h4, .block-header h5 {
@@ -58,18 +44,15 @@ a:hover {
 
 .block-details {
   padding: 0.8rem 1.6rem;
-  border: 0px solid #073642;
+  border-width: 0px;
   border-bottom-width: 1px;
+  border-style: solid;
 }
 
 @media (min-width: 50rem) {
   .block-details {
     border-width: 1px;
   }
-}
-
-.email, .user {
-  color: #d33682;
 }
 
 .email:before {
@@ -80,39 +63,13 @@ a:hover {
   content: ">";
 }
 
-.agent {
-  color: #6c71c4;
-}
-
-.ref {
-  color: #2aa198;
-}
-
-.id {
-  color: #cb4b16;
-}
-
 .ref, .id {
   font-family: monospace;
   padding: 0.1rem 0.3rem;
-  background-color: #073642;
-}
-
-.block-header .ref, .block-header .id {
-  background-color: #002b36;
-}
-
-.timestamp {
-  color: #b58900;
 }
 
 .filename {
-  color: #6c71c4;
   font-family: monospace;
-}
-
-.ci-status a {
-  color: #839496;
 }
 
 pre {
@@ -120,33 +77,16 @@ pre {
 }
 
 pre, pre code {
-  color: #657b83;
-  background-color: #fdf6e3;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
 code {
   padding: 0 0.1rem;
-  color: #93a1a1;
-  background-color: #073642;
 }
 
 .status {
   padding: 0.1rem 0.3rem;
-  background-color: #002b36;
-}
-
-.status.success {
-  color: #859900;
-}
-
-.status.failure {
-  color: #dc322f;
-}
-
-.status.running {
-  color: #268bd2;
 }
 
 .review-stub {
@@ -175,40 +115,38 @@ code {
 }
 
 blockquote {
-  border-left: 1px dotted #839496;
+  border-left-width: 1px;
+  border-left-style: dotted;
   padding-left: 1rem;
 }
 
 .repository-header {
-  background-color: #073642;
   margin-bottom: 0.8rem;
 }
 
 .tabs {
   display: flex;
   flex-direction: row;
-  background-color: #002b36;
 }
 
 .tabs > * {
   display: flex;
-  border-top: 1px solid #073642;
-  border-bottom: 2px solid #073642;
-  border-right: 1px solid #073642;
+  border-top-width: 1px;
+  border-bottom-width: 2px;
+  border-right-width: 1px;
+  border-style: solid;
   flex-grow: 1;
   justify-content: center;
 }
 
 .tabs > :first-child {
-  border-left: 2px solid #073642;
+  border-left-width: 2px;
+  border-style: solid;
 }
 
 .tabs > :last-child {
-  border-right: 2px solid #073642;
-}
-
-.tabs .selected {
-  background-color: #073642;
+  border-right-width: 2px;
+  border-style: solid;
 }
 
 .content {
@@ -234,28 +172,18 @@ blockquote {
 .expander + label {
   flex-shrink: 0;
   margin: 0 0.5em 10px 0;
-  border-right: 1px dotted #002b36;
+  border-right-width: 1px;
+  border-right-style: dotted;
   min-width: 1em;
   min-height: 2em;
   cursor: pointer;
   flex-direction: column;
   display: flex;
   justify-content: center;
-  background-color: #073642;
 }
 
 .expander[disabled] + label {
   cursor: default;
-}
-
-.expander + label:hover {
-  border-color: #268bd2;
-  color: #268bd2;
-}
-
-.expander[disabled] + label:hover {
-  border-color: #002b36;
-  color: #839496;
 }
 
 .expander         ~ .commits > *             { display: none; }
@@ -277,7 +205,8 @@ pre .line .text:before {
 pre .line:before {
   content: "      ";
   padding: 0.2rem 0;
-  border-right: 1px dotted #586e75;
+  border-right-width: 1px;
+  border-right-style: dotted;
   font-size: 0.6rem;
 }
 
@@ -290,12 +219,10 @@ pre .line[data-line-num]:before {
 }
 
 .diff .addition .text:before {
-  color: #859900;
   content: " + ";
 }
 
 .diff .deletion .text:before {
-  color: #dc322f;
   content: " - ";
 }
 
@@ -309,26 +236,6 @@ pre .line[data-line-num]:before {
 
 .diff .line[data-old-line-num][data-new-line-num]:before {
   content: " " attr(data-old-line-num) " " attr(data-new-line-num) " " ;
-}
-
-.diff .hunk-header {
-}
-
-.diff .addition {
-  background-color: rgba(133, 153, 0, 0.2);
-}
-
-.diff .deletion {
-  background-color: rgba(220, 50, 47, 0.2);
-}
-
-.diff .hunk-header {
-  color: #93a1a1;
-  background-color: #eee8d5;
-}
-
-.diff .hunk-header * {
-  color: #93a1a1;
 }
 
 .diff pre.block-details code {
