@@ -1,11 +1,13 @@
 use std::error;
 use std::fmt;
+use git2;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub enum Error {
   MissingExtension,
   MissingPathComponent,
-  FromString(&'static str),
+  String(&'static str),
+  Git(git2::Error),
 }
 
 impl error::Error for Error {
@@ -13,14 +15,29 @@ impl error::Error for Error {
     match *self {
       Error::MissingExtension => "Missing request extension",
       Error::MissingPathComponent => "Missing path component",
-      Error::FromString(s) => s,
+      Error::String(s) => s,
+      Error::Git(ref e) => e.description(),
     }
   }
 }
 
 impl fmt::Display for Error {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    use std::error::Error;
-    f.write_str(self.description())
+    match *self {
+      Error::Git(ref e) => e.fmt(f),
+      _ => f.write_str(error::Error::description(self)),
+    }
+  }
+}
+
+impl From<git2::Error> for Error {
+  fn from(e: git2::Error) -> Error {
+    Error::Git(e)
+  }
+}
+
+impl From<&'static str> for Error {
+  fn from(s: &'static str) -> Error {
+    Error::String(s)
   }
 }

@@ -25,17 +25,19 @@ impl Key for RepositoryContext {
 }
 
 impl RepositoryContext {
-  pub fn reference(&self) -> Option<git2::Reference> {
+  pub fn reference(&self) -> Result<git2::Reference, Error> {
     self.reference.as_ref()
-      .and_then(|r| self.repository.revparse_ext(r).ok())
-      .and_then(|(_, r)| r)
+      .ok_or("No reference specified".into())
+      .and_then(|r| self.repository.revparse_ext(r).map_err(From::from))
+      .and_then(|(_, r)| r.ok_or("Commit ref did not produce an intermediate reference".into()))
   }
 
-  pub fn commit(&self) -> Option<git2::Commit> {
+  pub fn commit(&self) -> Result<git2::Commit, Error> {
     self.reference.as_ref()
-      .and_then(|r| self.repository.revparse_single(r).ok())
+      .ok_or("No commit ref specified".into())
+      .and_then(|r| self.repository.revparse_single(r).map_err(From::from))
       .map(|obj| obj.id())
-      .and_then(|id| self.repository.find_commit(id).ok())
+      .and_then(|id| self.repository.find_commit(id).map_err(From::from))
   }
 }
 

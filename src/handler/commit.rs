@@ -7,11 +7,8 @@ pub struct Commit;
 
 impl Handler for Commit {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
-    let id = itry!(Oid::from_str(commit), status::BadRequest);
-    let commit = itry!(context.repository.find_commit(id), status::NotFound);
+    let commit = itry!(context.commit(), status::NotFound);
     Html {
       render: Wrapper(RepositoryWrapper(&context, &render::Commit(&("/".to_owned() + context.requested_path.to_str().unwrap()), &context.repository, &commit))),
       etag: Some(EntityTag::weak(versioned_sha1!())),
@@ -26,6 +23,6 @@ impl Route for Commit {
   }
 
   fn route() -> Cow<'static, str> {
-    "/commit/:commit".into()
+    "/commit/:ref".into()
   }
 }
