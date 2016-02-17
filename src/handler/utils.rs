@@ -28,6 +28,16 @@ macro_rules! sha1 {
   });
 }
 
+#[macro_export]
+macro_rules! versioned_sha1 {
+  () => ({
+    sha1!(env!("CARGO_PKG_VERSION"))
+  });
+  ($($x:expr),+) => ({
+    sha1!(env!("CARGO_PKG_VERSION"), $($x),*)
+  });
+}
+
 #[derive(Clone)]
 pub struct File(pub Mime, pub EntityTag, pub Cow<'static, [u8]>);
 

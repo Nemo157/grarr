@@ -17,7 +17,7 @@ impl Handler for TreeEntry {
     let parent = "/".to_owned() + context.requested_path.to_str().unwrap() + "/tree/" + reff;
     Html {
       render: Wrapper(RepositoryWrapper(&context, &render::TreeEntry(&context.repository, &parent, Path::new(&("/".to_owned() + entry_path)), &entry))),
-      etag: Some(EntityTag::weak(sha1!(reff, entry_path))),
+      etag: Some(EntityTag::weak(versioned_sha1!(commit.id().as_bytes()))),
       req: req,
     }.into()
   }

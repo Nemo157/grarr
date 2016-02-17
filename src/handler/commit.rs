@@ -13,7 +13,7 @@ impl Handler for Commit {
     let commit = itry!(context.repository.find_commit(id), status::NotFound);
     Html {
       render: Wrapper(RepositoryWrapper(&context, &render::Commit(&("/".to_owned() + context.requested_path.to_str().unwrap()), &context.repository, &commit))),
-      etag: Some(EntityTag::weak(sha1!())),
+      etag: Some(EntityTag::weak(versioned_sha1!())),
       req: req,
     }.into()
   }

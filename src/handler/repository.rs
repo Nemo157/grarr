@@ -10,7 +10,7 @@ impl Handler for Repository {
     let head_id = itry!(resolved_head.target().ok_or(Error::FromString("Couldn't resolve head")), status::InternalServerError);
     Html {
       render: Wrapper(RepositoryWrapper(&context, &render::Repository(&context.repository, &head_id))),
-      etag: Some(EntityTag::weak(sha1!(head_id.as_bytes()))),
+      etag: Some(EntityTag::weak(versioned_sha1!(head_id.as_bytes()))),
       req: req,
     }.into()
   }
