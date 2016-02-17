@@ -2,9 +2,9 @@ use std::fmt;
 use std::borrow::Cow;
 use std::path::Path;
 
-use mime::Mime;
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
+use mime::Mime;
 use iron::headers::{ EntityTag };
 
 #[macro_export]
@@ -13,9 +13,18 @@ macro_rules! file {
     let bytes = include_bytes!($x);
     $crate::handler::utils::File(
       $crate::handler::utils::mime($x),
-      ::iron::headers::EntityTag::strong(
-        $crate::handler::utils::sha1(bytes)),
+      ::iron::headers::EntityTag::strong(sha1!(bytes as &[u8])),
       ::std::borrow::Cow::Borrowed(bytes))
+  });
+}
+
+#[macro_export]
+macro_rules! sha1 {
+  ($($x:expr),*) => ({
+    use ::crypto::digest::Digest;
+    let mut hasher = ::crypto::sha1::Sha1::new();
+    $(hasher.input(::std::convert::AsRef::<[u8]>::as_ref($x));)*
+    hasher.result_str()
   });
 }
 
@@ -37,24 +46,8 @@ pub fn mime(path: &str) -> Mime {
   }
 }
 
-pub fn sha1(file: &[u8]) -> String {
+pub fn sha1<T: AsRef<[u8]>>(file: T) -> String {
   let mut hasher = Sha1::new();
-  hasher.input(file);
-  hasher.result_str()
-}
-
-pub fn sha1_u8s(us: &[&[u8]]) -> String {
-  let mut hasher = Sha1::new();
-  for u in us {
-    hasher.input(u);
-  }
-  hasher.result_str()
-}
-
-pub fn sha1_strs(strs: &[&str]) -> String {
-  let mut hasher = Sha1::new();
-  for s in strs {
-    hasher.input_str(s);
-  }
+  hasher.input(file.as_ref());
   hasher.result_str()
 }

@@ -16,7 +16,7 @@ use time::Duration;
 use std::sync::Mutex;
 use iron::modifiers::Header;
 use unicase::UniCase;
-use super::utils::File;
+use super::utils::{ sha1, File };
 
 pub struct Avatars {
   enable_gravatar: bool,
@@ -70,19 +70,19 @@ impl Avatars {
       gravatar.default = Some(gravatar::Default::Identicon);
       let client = Client::new();
       let mut res = client.get(&gravatar.image_url()).send().unwrap();
-      assert_eq!(res.status, hyper::Ok);
-      let mut buf = Vec::new();
-      res.read_to_end(&mut buf).unwrap();
-      let mime = res.headers.get::<ContentType>().unwrap().0.clone();
-      let entity_tag = EntityTag::strong(super::utils::sha1(&buf));
-      Some(File(mime, entity_tag, buf.into()))
-    } else {
-      None
+      if res.status == hyper::Ok {
+        let mut buf = Vec::new();
+        res.read_to_end(&mut buf).unwrap();
+        let mime = res.headers.get::<ContentType>().unwrap().0.clone();
+        let entity_tag = EntityTag::strong(sha1(&buf));
+        return Some(File(mime, entity_tag, buf.into()));
+      }
     }
+    None
   }
 
   fn default(&self) -> File {
-    unimplemented!()
+    file!("../static/images/default_avatar.png")
   }
 }
 
