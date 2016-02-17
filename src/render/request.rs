@@ -14,31 +14,23 @@ fn short(oid: Oid) -> String {
 }
 
 renderers! {
-  Request(request: &'a git_appraise::Request) {
+  Request(root: &'a str, request: &'a git_appraise::Request) {
     div.block.request {
-      ^RequestHeader(request)
+      ^RequestHeader(root, request)
       ^RequestDetails(request)
     }
   }
 
-  RequestStub(request: &'a git_appraise::Request) {
-    div.request-stub {
-      a href={ "reviews/" ^request.commit_id() } {
-        span.id
-          ^short(request.commit_id())
-        " "
-        @match summary(request) {
-          Some(summary) => ^summary,
-          None => "<No summary provided>",
-        }
-      }
+  RequestStub(root: &'a str, request: &'a git_appraise::Request) {
+    div.block.request {
+      ^RequestHeader(root, request)
     }
   }
 
-  RequestHeader(request: &'a git_appraise::Request) {
+  RequestHeader(root: &'a str, request: &'a git_appraise::Request) {
     div.block-header.request-header {
       h3.float-right {
-        a href={ ^request.commit_id() } {
+        a href={ ^root "/commit/" ^request.commit_id() } {
           span.id
             ^short(request.commit_id())
         }
@@ -50,9 +42,11 @@ renderers! {
         }
       }
       h3 {
-        @match summary(request) {
-          Some(summary) => ^summary,
-          None => "<No summary provided>",
+        a href={ ^root "/review/" ^request.commit_id() } {
+          @match summary(request) {
+            Some(summary) => ^summary,
+            None => "<No summary provided>",
+          }
         }
       }
       h4 {

@@ -1,23 +1,19 @@
 use git_appraise;
 
 renderers! {
-  Reviews(reviews: &'a Vec<git_appraise::Review<'a>>) {
-    div.block {
-      div.block-details {
-        @for review in reviews {
-          ^ReviewStub(review)
-        }
-      }
+  Reviews(root: &'a str, reviews: &'a Vec<git_appraise::Review<'a>>) {
+    @for review in reviews {
+      ^ReviewStub(root, review)
     }
   }
 
-  ReviewStub(review: &'a git_appraise::Review<'a>) {
-    ^super::RequestStub(review.request())
+  ReviewStub(root: &'a str, review: &'a git_appraise::Review<'a>) {
+    ^super::RequestStub(root, review.request())
   }
 
-  Review(review: &'a git_appraise::Review<'a>) {
+  Review(root: &'a str, review: &'a git_appraise::Review<'a>) {
     div.review {
-      ^super::Events(review.events())
+      ^super::Events(root.to_owned(), review.events())
     }
   }
 }

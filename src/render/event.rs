@@ -1,15 +1,15 @@
 use git_appraise;
 
 renderers! {
-  Events(events: git_appraise::Events) {
+  Events(root: String, events: git_appraise::Events) {
     @for event in events {
-      ^Event(event)
+      ^Event(root.clone(), event)
     }
   }
 
-  Event(event: Box<git_appraise::Event>) {
+  Event(root: String, event: Box<git_appraise::Event>) {
     @if let Some(request) = event.as_request() {
-      ^super::Request(request)
+      ^super::Request(&root, request)
     }
     @if let Some(comment) = event.as_comment() {
       ^super::Comment(comment)
