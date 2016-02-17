@@ -1,13 +1,12 @@
 use std::str;
-use git2;
+use git2::{ self, Oid };
 use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::{ PreEscaped };
 use maud_pulldown_cmark::Markdown;
 use super::fa::{ FA, FAM };
 use { RepositoryTreeEntry, RepositoryExtension };
 
-fn find_readme(repo: &git2::Repository) -> Option<String> {
-  let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
+fn find_readme(head_id: Oid, repo: &git2::Repository) -> Option<String> {
   let head = try_expect!(repo.find_commit(head_id));
   let tree = try_expect!(head.tree());
   let entry = expect!(tree.get_name("README").or_else(|| tree.get_name("README.md")));
@@ -17,8 +16,9 @@ fn find_readme(repo: &git2::Repository) -> Option<String> {
 }
 
 fn description(repo: &git2::Repository) -> Option<String> {
+  let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
   // Render the readme and grab the first <p> element from it.
-  find_readme(repo)
+  find_readme(head_id, repo)
     .map(|readme| {
       let mut s = String::new();
       html::push_html(
@@ -37,8 +37,8 @@ fn description(repo: &git2::Repository) -> Option<String> {
 }
 
 renderers! {
-  Repository(repo: &'a git2::Repository) {
-    @if let Some(readme) = find_readme(repo) {
+  Repository(repo: &'a git2::Repository, head_id: &'a Oid) {
+    @if let Some(readme) = find_readme(*head_id, repo) {
       div.block {
         div.block-details {
           ^Markdown::from_string(&*readme)
