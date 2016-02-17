@@ -3,7 +3,7 @@ use std::cmp::{ Ord, PartialOrd, Ordering };
 use std::fmt;
 use super::fa::{ FA, FAM };
 use git2::{ self, ObjectType };
-use std::path::{ self, Path, PathBuf, Component };
+use std::path::{ self, Path, Component };
 
 renderers! {
   TreeEntryStub(root: &'a str, entry: &'a git2::TreeEntry<'a>) {
@@ -19,33 +19,15 @@ renderers! {
     }
   }
 
-  TreeEntry(repo: &'a git2::Repository, root: &'a str, path: &'a Path, entry: &'a git2::TreeEntry<'a>) {
+  TreeEntry(root: &'a str, path: &'a Path, entry: &'a git2::Object<'a>) {
     div {
       @match entry.kind() {
-        Some(ObjectType::Tree) => ^Tree(root, path, entry.to_object(repo).unwrap().as_tree().unwrap()),
-        Some(ObjectType::Blob) => ^Blob(root, path, entry.to_object(repo).unwrap().as_blob().unwrap()),
+        Some(ObjectType::Tree) => ^Tree(root, path, entry.as_tree().unwrap()),
+        Some(ObjectType::Blob) => ^Blob(root, path, entry.as_blob().unwrap()),
         Some(ObjectType::Tag) => "Can't render ObjectType::Tag yet",
         Some(ObjectType::Commit) => "Can't render ObjectType::Commit yet",
         Some(ObjectType::Any) => "Can't render ObjectType::Any yet",
         None => "Can't render without an ObjectType",
-      }
-    }
-  }
-
-  RootTree(root: &'a str, tree: &'a git2::Tree<'a>) {
-    div.block {
-      div.block-header {
-        h2.path span {
-          ^FAM::FixedWidth(FA::Sitemap) " "
-          ^Components(root, PathBuf::from("/").components())
-        }
-      }
-      div.block-details {
-        ul.fa-ul {
-          @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-            ^TreeEntryStub(root, &entry)
-          }
-        }
       }
     }
   }
@@ -60,9 +42,11 @@ renderers! {
       }
       div.block-details {
         ul.fa-ul {
-          li { ^FAM::Li(FA::LevelUp) a href=^((root.to_owned() + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+          @if path != Path::new("") {
+            li { ^FAM::Li(FA::LevelUp) a href=^((root.to_owned() + "/" + path.parent().and_then(|p| p.to_str()).unwrap_or("")).trim_right_matches('/')) ".." }
+          }
           @for entry in tree.iter().collect::<Vec<_>>().tap(|v| v.sort_by_key(|e| Sorter(e.kind()))) {
-            ^TreeEntryStub(&(root.to_owned() + path.to_str().unwrap()), &entry)
+            ^TreeEntryStub(&(root.to_owned() + "/" + path.to_str().unwrap()).trim_right_matches('/'), &entry)
           }
         }
       }
@@ -99,17 +83,11 @@ pub struct Components<'a>(&'a str, pub path::Components<'a>);
 impl<'a> ::maud::RenderOnce for Components<'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
     let mut root = self.0.to_owned();
+    try!(html!(w, { a.path-component href={ ^root } "<root>" }));
     for component in self.1 {
-      match component {
-        Component::RootDir => {
-          try!(html!(w, { a.path-component href={ ^root } "<root>" }));
-        },
-        Component::Normal(component) => {
-          try!(html!(w, { "/" a.path-component href={ ^root "/" ^component.to_str().unwrap() } ^component.to_str().unwrap() }));
-          root = root + "/" + component.to_str().unwrap();
-        },
-        _ => {
-        },
+      if let Component::Normal(component) = component {
+        try!(html!(w, { "/" a.path-component href={ ^root "/" ^component.to_str().unwrap() } ^component.to_str().unwrap() }));
+        root = root + "/" + component.to_str().unwrap();
       }
     }
     Ok(())
@@ -160,9 +138,5 @@ impl<'a> super::repository_wrapper::RepositoryTab for &'a TreeEntry<'a> {
 }
 
 impl<'a> super::repository_wrapper::RepositoryTab for &'a Tree<'a> {
-  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
-}
-
-impl<'a> super::repository_wrapper::RepositoryTab for &'a RootTree<'a> {
   fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
 }

@@ -2,6 +2,7 @@ use super::base::*;
 
 use git2::Oid;
 
+#[derive(Clone)]
 pub struct Commit;
 
 impl Handler for Commit {

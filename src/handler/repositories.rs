@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use git2::Repository;
 use repository_tree::RepositoryTreeEntry;
 
+#[derive(Clone)]
 pub struct Repositories {
   pub root: PathBuf,
 }

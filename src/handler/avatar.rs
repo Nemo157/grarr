@@ -21,8 +21,16 @@ use super::utils::{ sha1, File };
 pub struct Avatars {
   enable_gravatar: bool,
   cache: Option<Mutex<LruCache<String, File>>>,
+  options: Options,
 }
 
+impl Clone for Avatars {
+  fn clone(&self) -> Avatars {
+    Avatars::new(self.options.clone())
+  }
+}
+
+#[derive(Clone)]
 pub struct Options {
   pub enable_gravatar: bool,
   pub enable_cache: bool,
@@ -38,7 +46,8 @@ impl Avatars {
         Some(Mutex::new(LruCache::with_expiry_duration_and_capacity(options.cache_time_to_live, options.cache_capacity)))
       } else {
         None
-      }
+      },
+      options: options,
     }
   }
 

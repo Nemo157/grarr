@@ -15,7 +15,6 @@ mod repositories;
 mod html;
 mod base;
 pub mod error;
-mod tree;
 mod tree_entry;
 
 pub use self::avatar::Avatars;
@@ -25,7 +24,6 @@ pub use self::commit::Commit;
 pub use self::commits::Commits;
 pub use self::repository::Repository;
 pub use self::repositories::Repositories;
-pub use self::tree::Tree;
 pub use self::tree_entry::TreeEntry;
 
 pub use self::register::Register;

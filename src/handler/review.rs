@@ -3,6 +3,7 @@ use super::base::*;
 use git2::Oid;
 use git_appraise::AppraisedRepository;
 
+#[derive(Clone)]
 pub struct Review;
 
 impl Handler for Review {

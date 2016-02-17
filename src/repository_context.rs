@@ -30,6 +30,7 @@ pub fn inject_repository_context<H: Handler>(root: &Path, handler: H) -> Reposit
   }
 }
 
+#[derive(Clone)]
 pub struct RepositoryContextHandler<H: Handler> {
   canonical_root: PathBuf,
   handler: H,
@@ -56,5 +57,5 @@ impl<H: Handler> Handler for RepositoryContextHandler<H> {
 
 impl<'a, H: Handler + Route> Route for RepositoryContextHandler<H> {
   fn method() -> Method { H::method() }
-  fn route() -> Cow<'static, str> { ("/*repo".to_owned() + &H::route()).into() }
+  fn routes() -> Vec<Cow<'static, str>> { H::routes().into_iter().map(|r| ("/*repo".to_owned() + &r).into()).collect() }
 }

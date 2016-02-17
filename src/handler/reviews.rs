@@ -1,6 +1,7 @@
 use super::base::*;
 use git_appraise::AppraisedRepository;
 
+#[derive(Clone)]
 pub struct Reviews;
 
 impl Handler for Reviews {

@@ -2,6 +2,7 @@ use super::base::*;
 
 use std::path::Path;
 
+#[derive(Clone)]
 pub struct TreeEntry;
 
 impl Handler for TreeEntry {
@@ -9,14 +10,23 @@ impl Handler for TreeEntry {
     let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
     let reff = itry!(router.find("ref").ok_or(Error::MissingPathComponent), status::InternalServerError);
-    let entry_path = itry!(router.find("path").ok_or(Error::MissingPathComponent), status::InternalServerError);
+    let entry_path = router.find("path").unwrap_or("");
     let object = itry!(context.repository.revparse_single(reff), status::NotFound);
     let commit = itry!(object.as_commit().ok_or(Error::FromString("Object is not commit...")), status::InternalServerError);
     let tree = itry!(commit.tree(), status::InternalServerError);
-    let entry = itry!(tree.get_path(Path::new(entry_path)), status::NotFound);
+    let obj;
+    let entry;
+    if entry_path == "" {
+      entry = tree.as_object();
+    } else {
+      let tree_entry = itry!(tree.get_path(Path::new(entry_path)), status::NotFound);
+      obj = itry!(tree_entry.to_object(&context.repository), status::InternalServerError);
+      entry = &obj;
+    }
     let parent = "/".to_owned() + context.requested_path.to_str().unwrap() + "/tree/" + reff;
+    println!("{:?}", (&parent, &entry_path));
     Html {
-      render: Wrapper(RepositoryWrapper(&context, &render::TreeEntry(&context.repository, &parent, Path::new(&("/".to_owned() + entry_path)), &entry))),
+      render: Wrapper(RepositoryWrapper(&context, &render::TreeEntry(&parent, Path::new(entry_path), entry))),
       etag: Some(EntityTag::weak(versioned_sha1!(commit.id().as_bytes()))),
       req: req,
     }.into()
@@ -28,7 +38,10 @@ impl Route for TreeEntry {
     Method::Get
   }
 
-  fn route() -> Cow<'static, str> {
-    "/tree/:ref/*path".into()
+  fn routes() -> Vec<Cow<'static, str>> {
+    vec![
+      "/tree/:ref".into(),
+      "/tree/:ref/*path".into(),
+    ]
   }
 }

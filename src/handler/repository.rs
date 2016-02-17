@@ -1,5 +1,6 @@
 use super::base::*;
 
+#[derive(Clone)]
 pub struct Repository;
 
 impl Handler for Repository {

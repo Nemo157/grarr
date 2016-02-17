@@ -65,7 +65,7 @@ fn main() {
     .register(inject_repository_context(Path::new(&root), handler::Commits))
     .register(inject_repository_context(Path::new(&root), handler::Repository))
     .register(handler::Repositories { root: root.clone().into() })
-    .register(inject_repository_context(Path::new(&root), handler::Tree))
+    // .register(inject_repository_context(Path::new(&root), handler::Tree))
     .register(inject_repository_context(Path::new(&root), handler::TreeEntry))
     .register(statics![
       prefix: "./static/";

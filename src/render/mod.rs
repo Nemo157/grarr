@@ -33,7 +33,7 @@ pub use self::commit::{ Commit, Commits };
 pub use self::repository::{ Repository, Repositories };
 pub use self::repository_wrapper::{ RepositoryWrapper };
 pub use self::error::{ Error };
-pub use self::tree::{ RootTree, TreeEntry };
+pub use self::tree::{ TreeEntry };
 pub use self::wrapper::Wrapper;
 pub use self::signature::Signature;
 pub use self::diff::DiffCommit;

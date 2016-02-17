@@ -2,6 +2,7 @@ use super::base::*;
 
 use commit_tree::CommitTree;
 
+#[derive(Clone)]
 pub struct Commits;
 
 impl Handler for Commits {

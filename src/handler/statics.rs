@@ -21,6 +21,12 @@ pub struct Static {
   files: Mutex<HashMap<PathBuf, File>>,
 }
 
+impl Clone for Static {
+  fn clone(&self) -> Static {
+    Static::new(self.files.lock().unwrap().clone())
+  }
+}
+
 #[macro_export]
 macro_rules! statics {
   (prefix: $prefix:expr; $($x:expr),*) => (
