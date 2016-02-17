@@ -11,11 +11,11 @@ impl Handler for Commit {
     let commit = itry!(router.find("commit").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let id = itry!(Oid::from_str(commit), status::BadRequest);
     let commit = itry!(context.repository.find_commit(id), status::NotFound);
-    Ok(Html {
+    Html {
       render: Wrapper(RepositoryWrapper(&context, &render::Commit(&("/".to_owned() + context.requested_path.to_str().unwrap()), &context.repository, &commit))),
       etag: None,
       req: req,
-    }.into())
+    }.into()
   }
 }
 

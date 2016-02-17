@@ -50,11 +50,11 @@ impl Handler for Repositories {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let root = fs::canonicalize(&self.root).unwrap_or(self.root.clone());
     let repos = get_repos(&root, &root).unwrap_or_default();
-    Ok(Html {
+    Html {
       render: Wrapper(&render::Repositories("", &repos)),
       etag: None,
       req: req,
-    }.into())
+    }.into()
   }
 }
 

@@ -10,11 +10,11 @@ impl Handler for Tree {
     let object = itry!(context.repository.revparse_single(reff), status::NotFound);
     let commit = itry!(object.as_commit().ok_or(Error::FromString("Object is not commit...")), status::InternalServerError);
     let tree = itry!(commit.tree(), status::InternalServerError);
-    Ok(Html {
+    Html {
       render: Wrapper(RepositoryWrapper(&context, &render::RootTree(&("/".to_owned() + context.requested_path.to_str().unwrap() + "/tree/" + reff), &tree))),
       etag: None,
       req: req,
-    }.into())
+    }.into()
   }
 }
 

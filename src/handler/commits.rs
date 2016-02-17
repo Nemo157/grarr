@@ -12,11 +12,11 @@ impl Handler for Commits {
     let object = itry!(context.repository.revparse_single(reff), status::NotFound);
     let commit = itry!(object.as_commit().ok_or(Error::FromString("Object is not commit...")), status::InternalServerError);
     let commits = itry!(CommitTree::new(&context.repository, &commit), status::InternalServerError);
-    Ok(Html {
+    Html {
       render: Wrapper(RepositoryWrapper(&context, render::Commits(&("/".to_owned() + context.requested_path.to_str().unwrap()), &reff, commits))),
-      etag: Some(utils::sha1_u8s(&[reff.as_bytes(), commit.id().as_bytes()])),
+      etag: Some(EntityTag::weak(utils::sha1_u8s(&[reff.as_bytes(), commit.id().as_bytes()]))),
       req: req,
-    }.into())
+    }.into()
   }
 }
 
