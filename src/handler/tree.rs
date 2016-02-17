@@ -12,7 +12,7 @@ impl Handler for Tree {
     let tree = itry!(commit.tree(), status::InternalServerError);
     Html {
       render: Wrapper(RepositoryWrapper(&context, &render::RootTree(&("/".to_owned() + context.requested_path.to_str().unwrap() + "/tree/" + reff), &tree))),
-      etag: None,
+      etag: Some(EntityTag::weak(versioned_sha1!(commit.id().as_bytes()))),
       req: req,
     }.into()
   }
