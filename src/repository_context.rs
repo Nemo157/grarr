@@ -17,10 +17,26 @@ pub struct RepositoryContext {
   pub requested_path: PathBuf,
   pub canonical_path: PathBuf,
   pub repository: git2::Repository,
+  reference: Option<String>,
 }
 
 impl Key for RepositoryContext {
   type Value = RepositoryContext;
+}
+
+impl RepositoryContext {
+  pub fn reference(&self) -> Option<git2::Reference> {
+    self.reference.as_ref()
+      .and_then(|r| self.repository.revparse_ext(r).ok())
+      .and_then(|(_, r)| r)
+  }
+
+  pub fn commit(&self) -> Option<git2::Commit> {
+    self.reference.as_ref()
+      .and_then(|r| self.repository.revparse_single(r).ok())
+      .map(|obj| obj.id())
+      .and_then(|id| self.repository.find_commit(id).ok())
+  }
 }
 
 pub fn inject_repository_context<H: Handler>(root: &Path, handler: H) -> RepositoryContextHandler<H> {
@@ -38,10 +54,11 @@ pub struct RepositoryContextHandler<H: Handler> {
 
 impl<H: Handler> Handler for RepositoryContextHandler<H> {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let requested_path = {
+    let (requested_path, reference) = {
       let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-      PathBuf::from(itry!(router.find("repo").ok_or(Error::MissingPathComponent), status::InternalServerError))
+      (router.find("repo").map(ToOwned::to_owned), router.find("ref").map(ToOwned::to_owned))
     };
+    let requested_path = PathBuf::from(itry!(requested_path.ok_or(Error::MissingPathComponent), status::InternalServerError));
     let full_path = self.canonical_root.join(&requested_path);
     let full_canonical_path = itry!(fs::canonicalize(&full_path), status::NotFound);
     let canonical_path = itry!(full_canonical_path.strip_prefix(&self.canonical_root), status::InternalServerError).to_owned();
@@ -50,6 +67,7 @@ impl<H: Handler> Handler for RepositoryContextHandler<H> {
       requested_path: requested_path,
       canonical_path: canonical_path,
       repository: repository,
+      reference: reference,
     });
     self.handler.handle(req)
   }
