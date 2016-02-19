@@ -30,7 +30,7 @@ pub use self::ci_status::{ CIStatus };
 pub use self::analysis::{ Analysis };
 pub use self::avatar::{ Avatar };
 pub use self::commit::{ Commit, Commits };
-pub use self::repository::{ Repository, Repositories, RepositoryHeader };
+pub use self::repository::{ Repository, Repositories, RepositoryHeader, RepositoriesHeader };
 pub use self::repository_wrapper::{ RepositoryWrapper };
 pub use self::error::{ Error };
 pub use self::tree::{ TreeEntry };

@@ -90,9 +90,17 @@ renderers! {
   }
 
   Repositories(repos: Vec<(String, git2::Repository)>) {
-    h1 { "Repositories" }
+    ^RepositoriesHeader
     @for (path, repo) in repos {
       ^RepositoryStub(&path, &repo)
+    }
+  }
+
+  RepositoriesHeader {
+    div.block {
+      div.block-header {
+        h1 { a href="/" { "Repositories" } }
+      }
     }
   }
 }

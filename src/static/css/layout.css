@@ -8,7 +8,7 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  margin: 1rem auto;
+  margin: 0 auto;
   max-width: 50rem;
   line-height: 1.2;
   padding: 0;

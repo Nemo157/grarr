@@ -1,6 +1,5 @@
 use std::fmt;
 use maud::RenderOnce;
-use super::fa::{ FA };
 use { RepositoryContext };
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -9,17 +8,6 @@ pub enum Tab {
   Files,
   Commits,
   Reviews,
-}
-
-impl Tab {
-  fn css_class(&self) -> &'static str {
-    match *self {
-      Tab::Overview => "overview",
-      Tab::Files => "files",
-      Tab::Commits => "commits",
-      Tab::Reviews => "reviews",
-    }
-  }
 }
 
 pub trait RepositoryTab {
@@ -34,7 +22,7 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
     let RepositoryWrapper(context, content) = self;
     let path = context.requested_path.to_string_lossy().into_owned();
     html!(w, {
-      ^FA::LevelUp " " a href="/" { "Repositories" }
+      ^super::RepositoriesHeader
       div.block {
         ^super::RepositoryHeader(&path, &context.repository)
         ^RepositoryWrapperTabs(tab, path, context.repository.head().unwrap().shorthand().unwrap().to_owned())
