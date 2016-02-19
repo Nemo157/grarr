@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::time::Duration;
 use iron::IronResult;
 use iron::middleware::Handler;
 use iron::request::Request;
@@ -11,10 +12,7 @@ use std::sync::Mutex;
 use error::Error;
 use std::collections::HashMap;
 use std::path::{ Path, PathBuf };
-use iron::modifiers::Header;
-use iron::headers::{ ETag, CacheControl, CacheDirective, Vary, IfNoneMatch };
-use unicase::UniCase;
-use super::utils::File;
+use super::utils::{ self, File, CacheMatches };
 
 #[derive(Debug)]
 pub struct Static {
@@ -54,20 +52,9 @@ impl Handler for Static {
     let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
     let path = Path::new(itry!(router.find("path").ok_or(Error::MissingPathComponent), status::InternalServerError));
     let File(mime, entity_tag, buffer) = itry!(self.find_file(path).ok_or(Error::String("Static file not found")), status::NotFound);
-    let cache_headers = (
-      Header(CacheControl(vec![
-        CacheDirective::Public,
-        CacheDirective::MaxAge(86400),
-      ])),
-      Header(ETag(entity_tag.clone())),
-      Header(Vary::Items(vec![
-        UniCase("accept-encoding".to_owned()),
-      ])),
-    );
-    if let Some(&IfNoneMatch::Items(ref items)) = req.headers.get() {
-      if items.len() == 1 && items[0] == entity_tag {
-        return Ok(Response::with((status::NotModified, cache_headers)));
-      }
+    let cache_headers = utils::cache_headers_for(&entity_tag, Duration::from_secs(86400));
+    if req.cache_matches(&entity_tag) {
+      return Ok(Response::with((status::NotModified, cache_headers)));
     }
     Ok(Response::with((status::Ok, mime, cache_headers, &*buffer)))
   }

@@ -1,9 +1,10 @@
 use std::borrow::Cow;
+use std::time::Duration;
 use gravatar::{ self, Gravatar };
 use hyper;
 use hyper::client::Client;
 use iron::IronResult;
-use iron::headers::{ EntityTag, ETag, CacheControl, CacheDirective, Vary, IfNoneMatch, ContentType };
+use iron::headers::{ EntityTag, ContentType };
 use iron::middleware::Handler;
 use iron::request::Request;
 use iron::response::Response;
@@ -12,11 +13,9 @@ use router::Router;
 use iron::status;
 use iron::method::Method;
 use lru_time_cache::LruCache;
-use time::Duration;
+use time::Duration as Duration2;
 use std::sync::Mutex;
-use iron::modifiers::Header;
-use unicase::UniCase;
-use super::utils::{ sha1, File };
+use super::utils::{ self, sha1, File, CacheMatches };
 
 pub struct Avatars {
   enable_gravatar: bool,
@@ -35,7 +34,7 @@ pub struct Options {
   pub enable_gravatar: bool,
   pub enable_cache: bool,
   pub cache_capacity: usize,
-  pub cache_time_to_live: Duration,
+  pub cache_time_to_live: Duration2,
 }
 
 impl Avatars {
@@ -99,20 +98,9 @@ impl Handler for Avatars {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let user = req.extensions.get::<Router>().unwrap().find("user").unwrap();
     let File(mime, entity_tag, buffer) = self.find_image(user);
-    let cache_headers = (
-      Header(CacheControl(vec![
-        CacheDirective::Public,
-        CacheDirective::MaxAge(86400),
-      ])),
-      Header(ETag(entity_tag.clone())),
-      Header(Vary::Items(vec![
-        UniCase("accept-encoding".to_owned()),
-      ])),
-    );
-    if let Some(&IfNoneMatch::Items(ref items)) = req.headers.get() {
-      if items.len() == 1 && items[0] == entity_tag {
-        return Ok(Response::with((status::NotModified, cache_headers)));
-      }
+    let cache_headers = utils::cache_headers_for(&entity_tag, Duration::from_secs(86400));
+    if req.cache_matches(&entity_tag) {
+      return Ok(Response::with((status::NotModified, cache_headers)));
     }
     Ok(Response::with((status::Ok, mime, cache_headers, buffer.as_ref())))
   }
