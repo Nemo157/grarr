@@ -10,6 +10,7 @@ impl<T: Render> Render for Wrapper<T> {
       html {
         head {
           meta name="viewport" content="width=device-width, initial-scale=1" {}
+          meta name="referrer" content="none-when-downgrade" {}
           ^Style
         }
         body {
