@@ -16,6 +16,7 @@ mod html;
 mod base;
 pub mod error;
 mod tree_entry;
+mod settings;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
@@ -28,3 +29,4 @@ pub use self::tree_entry::TreeEntry;
 
 pub use self::register::Register;
 pub use self::statics::Static;
+pub use self::settings::{ Settings, SettingsPost };

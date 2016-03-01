@@ -24,7 +24,7 @@ impl Handler for TreeEntry {
     }
     let parent = "/".to_owned() + &context.requested_path.to_string_lossy()  + "/tree/" + itry!(reference.shorthand().ok_or(Error::String("Could not get ref shorthand")), status::InternalServerError);
     Html {
-      render: Wrapper(RepositoryWrapper(&context, &render::TreeEntry(&parent, Path::new(entry_path), entry))),
+      render: RepositoryWrapper(&context, &render::TreeEntry(&parent, Path::new(entry_path), entry)),
       etag: Some(EntityTag::weak(versioned_sha1!(commit.id().as_bytes()))),
       req: req,
     }.into()

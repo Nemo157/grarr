@@ -9,7 +9,7 @@ impl Handler for Commit {
     let commit = itry!(context.commit(), status::NotFound);
     let root = "/".to_owned() + &context.requested_path.to_string_lossy();
     Html {
-      render: Wrapper(RepositoryWrapper(&context, &render::Commit(&root, &context.repository, &commit))),
+      render: RepositoryWrapper(&context, &render::Commit(&root, &context.repository, &commit)),
       etag: Some(EntityTag::weak(versioned_sha1!())),
       req: req,
     }.into()

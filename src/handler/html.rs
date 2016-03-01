@@ -6,6 +6,8 @@ use iron::response::Response;
 use iron::{ status, IronResult };
 use maud::RenderOnce;
 use super::utils::{ self, CacheMatches };
+use render::Wrapper;
+use settings::Settings;
 
 pub struct Html<'a, 'b: 'a, 'c: 'b, R: RenderOnce> {
   pub req: &'a Request<'b, 'c>,
@@ -35,7 +37,8 @@ impl<'a, 'b, 'c, R: RenderOnce> Modifier<Response> for Html<'a, 'b, 'c, R> {
         return;
       }
     }
-    let buffer = to_string!(^self.render);
+    let settings = self.req.extensions.get::<Settings>().cloned().unwrap_or_default();
+    let buffer = to_string!(^Wrapper(self.render, settings));
     let mime = mime!(Text/Html; Charset=Utf8);
     (mime, buffer).modify(response)
   }

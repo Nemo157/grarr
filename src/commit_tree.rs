@@ -14,7 +14,7 @@ impl<'repo> CommitTree<'repo> {
     let mut walker = try!(repo.revwalk());
     try!(walker.push(commit.id()));
     walker.simplify_first_parent();
-    let commits = try!(walker.map(|id| repo.find_commit(id)).collect());
+    let commits = try!(walker.map(|id| id.and_then(|id| repo.find_commit(id))).collect());
     Ok(CommitTree::create(repo, commits, Vec::new()))
   }
 
@@ -35,7 +35,7 @@ impl<'repo> CommitTree<'repo> {
       walker.hide(ignored).unwrap();
     }
     walker.simplify_first_parent();
-    let commits = walker.map(|id| repo.find_commit(id).unwrap()).collect();
+    let commits = walker.map(|id| id.and_then(|id| repo.find_commit(id)).unwrap()).collect();
     CommitTree::create(repo, commits, ignored)
   }
 

@@ -6,17 +6,18 @@ authors = ["Wim Looman <wim@nemo157.com>"]
 [dependencies]
 
 git-appraise = { git = "https://github.com/Nemo157/git-appraise-rs" }
-git2 = { git = "https://github.com/alexcrichton/git2-rs" }
+git2 = "0.4.2"
 
 hyper = "*"
 iron = "*"
 router = { git = "https://github.com/Nemo157/router", rev = "reverse_priority" }
-logger = { git = "https://github.com/iron/logger" }
+logger = { git = "https://github.com/Nemo157/logger", rev = "allow-no-status" }
 typemap = "*"
 mime = "*"
 lru_time_cache = "*"
 time = "*"
 walkdir = "*"
+params = "*"
 
 chrono = "*"
 pulldown-cmark = "*"

@@ -41,7 +41,7 @@ impl Handler for Repositories {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let repos = get_repos(&self.root);
     Html {
-      render: Wrapper(render::Repositories(repos)),
+      render: render::Repositories(repos),
       etag: None,
       req: req,
     }.into()

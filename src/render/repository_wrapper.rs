@@ -22,7 +22,6 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
     let RepositoryWrapper(context, content) = self;
     let path = context.requested_path.to_string_lossy().into_owned();
     html!(w, {
-      ^super::RepositoriesHeader
       div.block {
         ^super::RepositoryHeader(&path, &context.repository)
         ^RepositoryWrapperTabs(tab, path, context.repository.head().unwrap().shorthand().unwrap().to_owned())

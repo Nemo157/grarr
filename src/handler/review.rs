@@ -15,7 +15,7 @@ impl Handler for Review {
     let review = itry!(context.repository.review_for(id), status::NotFound);
     let root = "/".to_owned() + &context.requested_path.to_string_lossy();
     Html {
-      render: Wrapper(RepositoryWrapper(&context, &render::Review(&root, &review))),
+      render: RepositoryWrapper(&context, &render::Review(&root, &review)),
       etag: None,
       req: req,
     }.into()

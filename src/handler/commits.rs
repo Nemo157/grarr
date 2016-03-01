@@ -12,7 +12,7 @@ impl Handler for Commits {
     let reference = context.reference().ok().and_then(|r| r.shorthand().map(ToOwned::to_owned)).unwrap_or_else(|| format!("{}", commit.id()));
     let commits = itry!(CommitTree::new(&context.repository, &commit), status::InternalServerError);
     Html {
-      render: Wrapper(RepositoryWrapper(&context, render::Commits(&("/".to_owned() + context.requested_path.to_str().unwrap()), &reference, commits))),
+      render: RepositoryWrapper(&context, render::Commits(&("/".to_owned() + context.requested_path.to_str().unwrap()), &reference, commits)),
       etag: Some(EntityTag::weak(versioned_sha1!(commit.id().as_bytes()))),
       req: req,
     }.into()

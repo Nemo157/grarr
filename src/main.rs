@@ -27,6 +27,7 @@ extern crate pulldown_cmark;
 extern crate crypto;
 extern crate unicase;
 extern crate walkdir;
+extern crate params;
 
 #[macro_use]
 mod macros;
@@ -39,6 +40,7 @@ mod error;
 mod commit_tree;
 mod repository_context;
 mod repository_extension;
+mod settings;
 
 use std::env;
 use std::path::Path;
@@ -64,6 +66,8 @@ fn main() {
     .register(inject_repository_context(Path::new(&root), handler::Commits))
     .register(inject_repository_context(Path::new(&root), handler::Repository))
     .register(handler::Repositories { root: root.clone().into() })
+    .register(handler::Settings)
+    .register(handler::SettingsPost)
     // .register(inject_repository_context(Path::new(&root), handler::Tree))
     .register(inject_repository_context(Path::new(&root), handler::TreeEntry))
     .register(statics![
@@ -72,6 +76,7 @@ fn main() {
       "./static/css/highlight-solarized-light.css",
       "./static/css/layout.css",
       "./static/css/theme-solarized-dark.css",
+      "./static/css/theme-solarized-light.css",
       "./static/css/font-awesome.min.css",
       "./static/fonts/FontAwesome.otf",
       "./static/fonts/fontawesome-webfont.eot",
@@ -92,6 +97,7 @@ fn main() {
   let mut chain = Chain::new(router);
 
   chain.link_before(logger_before);
+  chain.link_before(settings::Settings::default());
   chain.link_after(handler::error::NotFound);
   chain.link_after(handler::error::BadRequest);
   chain.link_after(handler::error::InternalServerError);

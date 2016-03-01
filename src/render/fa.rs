@@ -11,6 +11,8 @@ pub enum FA {
   Question,
   CodeFork,
   Home,
+  Info,
+  Cog,
 }
 
 #[allow(dead_code)]
@@ -31,6 +33,8 @@ impl FA {
       FA::Question => "fa fa-question",
       FA::CodeFork => "fa fa-code-fork",
       FA::Home => "fa fa-home",
+      FA::Info => "fa fa-info",
+      FA::Cog => "fa fa-cog",
     }
   }
 }

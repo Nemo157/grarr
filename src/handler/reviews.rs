@@ -7,12 +7,12 @@ pub struct Reviews;
 impl Handler for Reviews {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let mut reviews: Vec<_> = context.repository.all_reviews().map(|revs| revs.collect()).ok().unwrap_or_default();
+    let mut reviews: Vec<_> = context.repository.all_reviews().and_then(|revs| revs.collect()).ok().unwrap_or_default();
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
     reviews.reverse();
     let root = "/".to_owned() + &context.requested_path.to_string_lossy();
     Html {
-      render: Wrapper(RepositoryWrapper(&context, &render::Reviews(&root, &reviews))),
+      render: RepositoryWrapper(&context, &render::Reviews(&root, &reviews)),
       etag: None,
       req: req,
     }.into()
