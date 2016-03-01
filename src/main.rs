@@ -68,6 +68,7 @@ fn main() {
     .register(handler::Repositories { root: root.clone().into() })
     .register(handler::Settings)
     .register(handler::SettingsPost)
+    .register(handler::About)
     // .register(inject_repository_context(Path::new(&root), handler::Tree))
     .register(inject_repository_context(Path::new(&root), handler::TreeEntry))
     .register(statics![
