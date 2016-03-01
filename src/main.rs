@@ -1,5 +1,5 @@
 #![feature(plugin)]
-#![plugin(clippy)]
+#![cfg_attr(feature = "clippy", plugin(clippy))]
 #![plugin(maud_macros)]
 #![warn(trivial_numeric_casts)]
 #![warn(unsafe_code)]

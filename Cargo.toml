@@ -3,6 +3,9 @@ name = "grarr"
 version = "0.0.3"
 authors = ["Wim Looman <wim@nemo157.com>"]
 
+[features]
+default = ["clippy"]
+
 [dependencies]
 
 git-appraise = { git = "https://github.com/Nemo157/git-appraise-rs" }
@@ -27,6 +30,6 @@ gravatar = { git = "https://github.com/Nemo157/rust-gravatar", rev = "fix-type-r
 maud = { git = "https://github.com/lfairy/maud" }
 maud_macros = { git = "https://github.com/lfairy/maud" }
 
-clippy = { version = "*" }
+clippy = { version = "*", optional = true }
 rust-crypto = { version = "*" }
 unicase = { version = "*" }

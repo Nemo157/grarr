@@ -53,7 +53,7 @@ impl Key for Settings {
 }
 
 impl Settings {
-  #[allow(single_match)] // Will have more in the future
+  #[cfg_attr(feature = "clippy", allow(single_match))] // Will have more in the future
   pub fn with<'a, 'b, I: Iterator<Item=(&'a str, &'b str)>>(&self, settings: I) -> Settings {
     let mut result = self.clone();
     for (key, value) in settings {
