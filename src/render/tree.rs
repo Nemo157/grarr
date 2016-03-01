@@ -109,6 +109,7 @@ impl<T: Sized> Tapable for T {
 struct Sorter(Option<ObjectType>);
 
 impl Ord for Sorter {
+  #[cfg_attr(feature = "clippy", allow(match_same_arms))]
   fn cmp(&self, other: &Self) -> Ordering {
     match (self.0, other.0) {
       (x, y) if x == y => Ordering::Equal,

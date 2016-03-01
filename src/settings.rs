@@ -10,6 +10,7 @@ use iron::modifier::Modifier;
 use typemap::Key;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "clippy", allow(enum_variant_names))] // Co-inkidink
 pub enum Theme {
   SolarizedDark,
   SolarizedLight,

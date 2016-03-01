@@ -245,6 +245,7 @@ fn group(diff: &git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLin
 
 impl Eq for Delta { }
 impl PartialEq<Delta> for Delta {
+  #[cfg_attr(feature = "clippy", allow(match_same_arms))]
   fn eq(&self, other: &Delta) -> bool {
     match (self.0, other.0) {
       (git2::Delta::Unmodified, git2::Delta::Unmodified) => true,
