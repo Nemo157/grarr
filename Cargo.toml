@@ -2,9 +2,13 @@
 name = "grarr"
 version = "0.0.3"
 authors = ["Wim Looman <wim@nemo157.com>"]
+build = "build.rs"
 
 [features]
-default = ["clippy"]
+# "maybe_cache" enables "cache" when building in release profile
+default = ["clippy", "maybe_cache"]
+cache = ["maybe_cache"]
+maybe_cache = []
 
 [dependencies]
 

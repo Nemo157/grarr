@@ -1,5 +1,4 @@
 use std::fmt;
-use std::time::Duration;
 use std::borrow::Cow;
 use std::path::Path;
 
@@ -7,7 +6,6 @@ use crypto::digest::Digest;
 use crypto::sha1::Sha1;
 use mime::Mime;
 use iron::headers::EntityTag;
-use iron::request::Request;
 
 #[macro_export]
 macro_rules! file {
@@ -68,56 +66,69 @@ pub trait CacheMatches {
   fn cache_matches(&self, etag: &EntityTag) -> bool;
 }
 
-// In debug mode assume the etag never matches so we
-// don't have to bump version numbers for dynamic content
-// (hacky detection, see https://users.rust-lang.org/t/1098)
-#[cfg(debug_assertions)]
-impl<'a, 'b> CacheMatches for Request<'a, 'b> {
-  fn cache_matches(&self, _etag: &EntityTag) -> bool {
-    false
-  }
-}
+#[cfg(not(all(feature = "maybe_cache", feature = "cache")))]
+mod caching {
+  use std::time::Duration;
+  use iron::headers::EntityTag;
+  use iron::headers::Vary;
+  use iron::modifiers::Header;
+  use iron::request::Request;
+  use unicase::UniCase;
+  use super::CacheMatches;
 
-#[cfg(not(debug_assertions))]
-impl<'a, 'b> CacheMatches for Request<'a, 'b> {
-  fn cache_matches(&self, etag: &EntityTag) -> bool {
-    use iron::headers::IfNoneMatch;
-    if let Some(&IfNoneMatch::Items(ref items)) = self.headers.get() {
-      if items.len() == 1 && items[0] == *etag {
-        return true;
-      }
+  // In debug mode assume the etag never matches so we
+  // don't have to bump version numbers for dynamic content
+  impl<'a, 'b> CacheMatches for Request<'a, 'b> {
+    fn cache_matches(&self, _etag: &EntityTag) -> bool {
+      false
     }
-    false
   }
-}
 
-#[cfg(debug_assertions)] use iron::modifiers::Header;
-#[cfg(debug_assertions)] use iron::headers::Vary;
-#[cfg(debug_assertions)] use unicase::UniCase;
-// Should return () once https://github.com/reem/rust-modifier/pull/19 is merged
-#[cfg(debug_assertions)]
-pub fn cache_headers_for(_entity_tag: &EntityTag, _duration: Duration) -> Header<Vary> {
-  Header(Vary::Items(vec![
-    UniCase("accept-encoding".to_owned()),
-  ]))
-}
-
-#[cfg(not(debug_assertions))] use iron::modifiers::Header;
-#[cfg(not(debug_assertions))] use iron::headers::{ ETag, CacheControl, CacheDirective, Vary };
-#[cfg(not(debug_assertions))] use unicase::UniCase;
-// Where's my abstract return types....
-#[cfg(not(debug_assertions))]
-pub fn cache_headers_for(entity_tag: &EntityTag, duration: Duration)
-  -> (Header<CacheControl>, Header<ETag>, Header<Vary>)
-{
-  (
-    Header(CacheControl(vec![
-      CacheDirective::Public,
-      CacheDirective::MaxAge(duration.as_secs() as u32),
-    ])),
-    Header(ETag(entity_tag.clone())),
+  // Should return () once https://github.com/reem/rust-modifier/pull/19 is merged
+  pub fn cache_headers_for(_entity_tag: &EntityTag, _duration: Duration) -> Header<Vary> {
     Header(Vary::Items(vec![
       UniCase("accept-encoding".to_owned()),
-    ])),
-  )
+    ]))
+  }
 }
+
+#[cfg(all(feature = "maybe_cache", feature = "cache"))]
+mod caching {
+  use std::time::Duration;
+  use iron::headers::EntityTag;
+  use iron::headers::{ ETag, CacheControl, CacheDirective, Vary };
+  use iron::modifiers::Header;
+  use iron::request::Request;
+  use unicase::UniCase;
+  use super::CacheMatches;
+
+  impl<'a, 'b> CacheMatches for Request<'a, 'b> {
+    fn cache_matches(&self, etag: &EntityTag) -> bool {
+      use iron::headers::IfNoneMatch;
+      if let Some(&IfNoneMatch::Items(ref items)) = self.headers.get() {
+        if items.len() == 1 && items[0] == *etag {
+          return true;
+        }
+      }
+      false
+    }
+  }
+
+  // Where's my abstract return types....
+  pub fn cache_headers_for(entity_tag: &EntityTag, duration: Duration)
+    -> (Header<CacheControl>, Header<ETag>, Header<Vary>)
+  {
+    (
+      Header(CacheControl(vec![
+        CacheDirective::Public,
+        CacheDirective::MaxAge(duration.as_secs() as u32),
+      ])),
+      Header(ETag(entity_tag.clone())),
+      Header(Vary::Items(vec![
+        UniCase("accept-encoding".to_owned()),
+      ])),
+    )
+  }
+}
+
+pub use self::caching::*;
