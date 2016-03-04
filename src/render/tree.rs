@@ -4,6 +4,7 @@ use std::fmt;
 use super::fa::{ FA, FAM };
 use git2::{ self, ObjectType };
 use std::path::{ self, Path, Component };
+use referenced_commit::ReferencedCommit;
 
 renderers! {
   TreeEntryStub(root: &'a str, entry: &'a git2::TreeEntry<'a>) {
@@ -19,10 +20,10 @@ renderers! {
     }
   }
 
-  TreeEntry(root: &'a str, path: &'a Path, entry: &'a git2::Object<'a>) {
+  TreeEntry(root: &'a str, path: &'a Path, entry: &'a git2::Object<'a>, commit: &'a ReferencedCommit<'a>) {
     div {
       @match entry.kind() {
-        Some(ObjectType::Tree) => ^Tree(root, path, entry.as_tree().unwrap()),
+        Some(ObjectType::Tree) => ^Tree(root, path, entry.as_tree().unwrap(), commit),
         Some(ObjectType::Blob) => ^Blob(root, path, entry.as_blob().unwrap()),
         Some(ObjectType::Tag) => "Can't render ObjectType::Tag yet",
         Some(ObjectType::Commit) => "Can't render ObjectType::Commit yet",
@@ -32,12 +33,14 @@ renderers! {
     }
   }
 
-  Tree(root: &'a str, path: &'a Path, tree: &'a git2::Tree<'a>) {
+  Tree(root: &'a str, path: &'a Path, tree: &'a git2::Tree<'a>, commit: &'a ReferencedCommit<'a>) {
     div.block {
       div.block-header {
         h2.path span {
           ^FAM::FixedWidth(FA::Sitemap) " "
           ^Components(root, path.components())
+          " at "
+          ^super::Reference(commit)
         }
       }
       div.block-details {

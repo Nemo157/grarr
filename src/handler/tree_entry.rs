@@ -10,9 +10,8 @@ impl Handler for TreeEntry {
     let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
     let entry_path = router.find("path").unwrap_or("");
-    let commit = itry!(context.commit(), status::NotFound);
-    let reference = itry!(context.reference(), status::NotFound);
-    let tree = itry!(commit.tree(), status::InternalServerError);
+    let referenced_commit = itry!(context.referenced_commit(), status::NotFound);
+    let tree = itry!(referenced_commit.commit.tree(), status::InternalServerError);
     let obj;
     let entry;
     if entry_path == "" {
@@ -22,10 +21,13 @@ impl Handler for TreeEntry {
       obj = itry!(tree_entry.to_object(&context.repository), status::InternalServerError);
       entry = &obj;
     }
-    let parent = "/".to_owned() + &context.requested_path.to_string_lossy()  + "/tree/" + itry!(reference.shorthand().ok_or(Error::String("Could not get ref shorthand")), status::InternalServerError);
+    let id = referenced_commit.commit.id();
+    let idstr = format!("{}", id);
+    let reff = referenced_commit.reference.as_ref().and_then(|r| r.shorthand()).unwrap_or(&*idstr);
+    let parent = "/".to_owned() + &context.requested_path.to_string_lossy()  + "/tree/" + reff;
     Html {
-      render: RepositoryWrapper(&context, &render::TreeEntry(&parent, Path::new(entry_path), entry)),
-      etag: Some(EntityTag::weak(versioned_sha1!(commit.id().as_bytes()))),
+      render: RepositoryWrapper(&context, &render::TreeEntry(&parent, Path::new(entry_path), entry, &referenced_commit)),
+      etag: Some(EntityTag::weak(versioned_sha1!(&id))),
       req: req,
     }.into()
   }

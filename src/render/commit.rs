@@ -1,14 +1,10 @@
 use std::fmt;
-use git2::{ self, Oid };
+use git2;
 use maud::{ RenderOnce, PreEscaped };
 use maud_pulldown_cmark::Markdown;
 use commit_tree;
 use chrono::naive::datetime::NaiveDateTime;
-
-const HEX: &'static [u8; 0x10] = b"0123456789abcdef";
-fn short(oid: Oid) -> String {
-  oid.as_bytes().iter().take(3).flat_map(|b| vec![HEX[((b >> 4) & 0xFu8) as usize] as char, HEX[(b & 0xFu8) as usize] as char]).collect()
-}
+use referenced_commit::ReferencedCommit;
 
 fn summary<'a>(commit: &'a git2::Commit<'a>) -> Option<&'a str> {
   commit.message()
@@ -47,7 +43,7 @@ renderers! {
         div.column {
           div {
             a href={ ^root "/commit/" ^commit.id() } {
-              span.id ^short(commit.id())
+              ^(super::reference::Commit(commit))
               " "
               @match summary(commit) {
                 Some(summary) => ^summary,
@@ -97,14 +93,14 @@ renderers! {
   }
 }
 
-pub struct Commits<'repo, 'a>(pub &'a str, pub &'a str, pub commit_tree::CommitTree<'repo>);
+pub struct Commits<'repo, 'a>(pub &'a str, pub &'a ReferencedCommit<'a>, pub commit_tree::CommitTree<'repo>);
 impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let Commits(root, reff, commits) = self;
+    let Commits(root, commit, commits) = self;
     html!(w, {
       div.block {
         div.block-header {
-          h3 { "Commits for ref " span.ref { ^reff } }
+          h3 { "Commits for ref " ^super::Reference(commit) }
         }
       }
       ^CommitTree(root, commits, &mut 0)

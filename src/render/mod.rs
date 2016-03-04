@@ -22,6 +22,7 @@ mod utils;
 mod highlight;
 mod settings;
 mod about;
+mod reference;
 
 pub use self::style::Style;
 pub use self::event::{ Event, Events };
@@ -43,3 +44,4 @@ pub use self::utils::MaybeLink;
 pub use self::highlight::HighlightJS;
 pub use self::settings::Settings;
 pub use self::about::About;
+pub use self::reference::Reference;

@@ -12,6 +12,7 @@ use iron::status;
 use hyper::method::Method;
 use handler::route::Route;
 use error::Error;
+use referenced_commit::ReferencedCommit;
 
 pub struct RepositoryContext {
   pub requested_path: PathBuf,
@@ -38,6 +39,14 @@ impl RepositoryContext {
       .and_then(|r| self.repository.revparse_single(r).map_err(From::from))
       .map(|obj| obj.id())
       .and_then(|id| self.repository.find_commit(id).map_err(From::from))
+  }
+
+  pub fn referenced_commit(&self) -> Result<ReferencedCommit, Error> {
+    self.commit().map(|commit|
+      ReferencedCommit {
+        commit: commit,
+        reference: self.reference().ok(),
+      })
   }
 }
 

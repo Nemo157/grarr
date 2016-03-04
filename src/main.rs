@@ -41,6 +41,7 @@ mod commit_tree;
 mod repository_context;
 mod repository_extension;
 mod settings;
+mod referenced_commit;
 
 use std::env;
 use std::path::Path;
