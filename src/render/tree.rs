@@ -24,7 +24,7 @@ renderers! {
     div {
       @match entry.kind() {
         Some(ObjectType::Tree) => ^Tree(root, path, entry.as_tree().unwrap(), commit),
-        Some(ObjectType::Blob) => ^Blob(root, path, entry.as_blob().unwrap()),
+        Some(ObjectType::Blob) => ^Blob(root, path, entry.as_blob().unwrap(), commit),
         Some(ObjectType::Tag) => "Can't render ObjectType::Tag yet",
         Some(ObjectType::Commit) => "Can't render ObjectType::Commit yet",
         Some(ObjectType::Any) => "Can't render ObjectType::Any yet",
@@ -56,12 +56,14 @@ renderers! {
     }
   }
 
-  Blob(root: &'a str, path: &'a Path, blob: &'a git2::Blob<'a>) {
+  Blob(root: &'a str, path: &'a Path, blob: &'a git2::Blob<'a>, commit: &'a ReferencedCommit<'a>) {
     div.block {
       div.block-header {
         h2.path span {
           ^FAM::FixedWidth(FA::File) " "
           ^Components(root, path.components())
+          " at "
+          ^super::Reference(commit)
         }
       }
       pre.block-details {
