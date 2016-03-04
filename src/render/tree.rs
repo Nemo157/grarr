@@ -36,9 +36,9 @@ renderers! {
   Tree(root: &'a str, path: &'a Path, tree: &'a git2::Tree<'a>, commit: &'a ReferencedCommit<'a>) {
     div.block {
       div.block-header {
-        h2.path span {
-          ^FAM::FixedWidth(FA::Sitemap) " "
-          ^Components(root, path.components())
+        h2 {
+          ^FAM::FixedWidth(FA::File) " "
+          span.path ^Components(root, path.components())
           " at "
           ^super::Reference(commit)
         }
@@ -59,9 +59,9 @@ renderers! {
   Blob(root: &'a str, path: &'a Path, blob: &'a git2::Blob<'a>, commit: &'a ReferencedCommit<'a>) {
     div.block {
       div.block-header {
-        h2.path span {
+        h2 {
           ^FAM::FixedWidth(FA::File) " "
-          ^Components(root, path.components())
+          span.path ^Components(root, path.components())
           " at "
           ^super::Reference(commit)
         }

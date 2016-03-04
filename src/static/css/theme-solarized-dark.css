@@ -16,7 +16,8 @@ a:hover { color: #3797db }
 .expander + label:hover { color: #268bd2; }
 
 .email, .user { color: #d33682; }
-.agent, .filename { color: #6c71c4; }
+.agent, .path { color: #6c71c4; }
+.path a { color: #497ecb }
 .ref { color: #2aa198; }
 .id { color: #cb4b16; }
 .timestamp { color: #b58900; }

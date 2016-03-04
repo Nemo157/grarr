@@ -20,22 +20,22 @@ renderers! {
     div.block-header {
       @match (delta.status.0, delta.new_file.as_ref(), delta.old_file.as_ref()) {
         (git2::Delta::Added, Some(ref new_file), _) => {
-          h3 { span { "Added " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Added " span.path ^new_file.to_string_lossy() } }
         },
         (git2::Delta::Deleted, _, Some(ref old_file)) => {
-          h3 { span { "Deleted " span.filename ^old_file.to_string_lossy() } }
+          h3 { span { "Deleted " span.path ^old_file.to_string_lossy() } }
         },
         (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file == new_file => {
-          h3 { span { "Modified " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Modified " span.path ^new_file.to_string_lossy() } }
         },
         (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file != new_file => {
-          h3 { span { "Modified " span.filename ^new_file.to_string_lossy() "(Previously " span.filename ^old_file.to_string_lossy() ")" } }
+          h3 { span { "Modified " span.path ^new_file.to_string_lossy() "(Previously " span.path ^old_file.to_string_lossy() ")" } }
         },
         (git2::Delta::Renamed, Some(ref new_file), Some(ref old_file)) => {
-          h3 { span { "Renamed " span.filename ^old_file.to_string_lossy() " to " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Renamed " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
         },
         (git2::Delta::Copied, Some(ref new_file), Some(ref old_file)) => {
-          h3 { span { "Copied " span.filename ^old_file.to_string_lossy() " to " span.filename ^new_file.to_string_lossy() } }
+          h3 { span { "Copied " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
         },
         (status, ref new_file, ref old_file) =>  ^(format!("{:?} ({:?} -> {:?}) (should not happen)", status, old_file, new_file))
       }

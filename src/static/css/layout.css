@@ -74,7 +74,7 @@ a {
   padding: 0.1rem 0.3rem;
 }
 
-.filename {
+.path {
   font-family: monospace;
 }
 
@@ -157,10 +157,6 @@ blockquote {
 
 .content {
   padding: 0 0.8rem;
-}
-
-.path {
-  font-family: monospace;
 }
 
 .commits {
