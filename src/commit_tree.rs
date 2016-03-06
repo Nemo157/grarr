@@ -3,6 +3,7 @@ use git2::{ self, Oid, Repository, Commit };
 
 pub struct CommitTree<'repo> {
   repo: &'repo Repository,
+  next_after: Option<Commit<'repo>>,
   next: Option<Commit<'repo>>,
   commits: IntoIter<Commit<'repo>>,
   ignored: Vec<Oid>,
@@ -10,12 +11,14 @@ pub struct CommitTree<'repo> {
 }
 
 impl<'repo> CommitTree<'repo> {
-  pub fn new(repo: &'repo Repository, commit: &Commit<'repo>) -> Result<CommitTree<'repo>, git2::Error> {
+  pub fn new(repo: &'repo Repository, commit: &Commit<'repo>, limit: usize) -> Result<CommitTree<'repo>, git2::Error> {
     let mut walker = try!(repo.revwalk());
     try!(walker.push(commit.id()));
     walker.simplify_first_parent();
-    let commits = try!(walker.map(|id| id.and_then(|id| repo.find_commit(id))).collect());
-    Ok(CommitTree::create(repo, commits, Vec::new()))
+    let mut all_commits = walker.map(|id| id.and_then(|id| repo.find_commit(id)));
+    let commits = try!((&mut all_commits).take(limit).collect());
+    let next_after = all_commits.next().and_then(|c| c.ok());
+    Ok(CommitTree::create(repo, commits, next_after, Vec::new()))
   }
 
   pub fn is_empty(&self) -> bool {
@@ -24,6 +27,10 @@ impl<'repo> CommitTree<'repo> {
 
   pub fn len(&self) -> usize {
     self.len
+  }
+
+  pub fn next_after(&self) -> Option<&Commit<'repo>> {
+    self.next_after.as_ref()
   }
 
   fn between(repo: &'repo Repository, first: &Commit<'repo>, ignored: Vec<Oid>) -> CommitTree<'repo> {
@@ -36,14 +43,15 @@ impl<'repo> CommitTree<'repo> {
     }
     walker.simplify_first_parent();
     let commits = walker.map(|id| id.and_then(|id| repo.find_commit(id)).unwrap()).collect();
-    CommitTree::create(repo, commits, ignored)
+    CommitTree::create(repo, commits, None, ignored)
   }
 
-  fn create(repo: &'repo Repository, commits: Vec<Commit<'repo>>, ignored: Vec<Oid>) -> CommitTree<'repo> {
+  fn create(repo: &'repo Repository, commits: Vec<Commit<'repo>>, next_after: Option<Commit<'repo>>, ignored: Vec<Oid>) -> CommitTree<'repo> {
     let len = commits.len();
     let mut iter = commits.into_iter();
     CommitTree {
       repo: repo,
+      next_after: next_after,
       next: iter.next(),
       commits: iter,
       ignored: ignored,
