@@ -8,7 +8,8 @@ use iron::IronResult;
 use iron::request::Request;
 use iron::response::Response;
 use iron::middleware::{ Handler };
-use iron::status;
+use iron::{ status, Url };
+use iron::modifiers::Redirect;
 use hyper::method::Method;
 use handler::route::Route;
 use error::Error;
@@ -16,7 +17,6 @@ use referenced_commit::ReferencedCommit;
 
 pub struct RepositoryContext {
   pub requested_path: PathBuf,
-  pub canonical_path: PathBuf,
   pub repository: git2::Repository,
   reference: Option<String>,
 }
@@ -72,15 +72,21 @@ impl<H: Handler> Handler for RepositoryContextHandler<H> {
     let requested_path = PathBuf::from(itry!(requested_path.ok_or(Error::MissingPathComponent), status::InternalServerError));
     let full_path = self.canonical_root.join(&requested_path);
     let full_canonical_path = itry!(fs::canonicalize(&full_path), status::NotFound);
-    let canonical_path = itry!(full_canonical_path.strip_prefix(&self.canonical_root), status::InternalServerError).to_owned();
-    let repository = itry!(git2::Repository::open(self.canonical_root.join(&requested_path)), status::NotFound);
-    req.extensions.insert::<RepositoryContext>(RepositoryContext {
-      requested_path: requested_path,
-      canonical_path: canonical_path,
-      repository: repository,
-      reference: reference,
-    });
-    self.handler.handle(req)
+    if full_path == full_canonical_path {
+      let repository = itry!(git2::Repository::open(full_canonical_path), status::NotFound);
+      req.extensions.insert::<RepositoryContext>(RepositoryContext {
+        requested_path: requested_path,
+        repository: repository,
+        reference: reference,
+      });
+      self.handler.handle(req)
+    } else {
+      let canonical_path = itry!(full_canonical_path.strip_prefix(&self.canonical_root), status::InternalServerError).to_owned();
+      let old_path = requested_path.to_string_lossy();
+      let new_path = canonical_path.to_string_lossy();
+      let new_url = Url::parse(&*req.url.to_string().replace(&*old_path, &*new_path)).unwrap();
+      Ok(Response::with((status::TemporaryRedirect, Redirect(new_url))))
+    }
   }
 }
 
