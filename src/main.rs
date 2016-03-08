@@ -55,6 +55,8 @@ use repository_context::inject_repository_context;
 pub use repository_context::RepositoryContext;
 pub use repository_extension::RepositoryExtension;
 
+include!(concat!(env!("OUT_DIR"), "/version.rs"));
+
 fn main() {
   let root = env::args().nth(1).unwrap();
 
