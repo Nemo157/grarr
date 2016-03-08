@@ -28,7 +28,7 @@ params = "*"
 
 chrono = "*"
 pulldown-cmark = "*"
-maud-pulldown-cmark = { git = "https://git.nemo157.com/rust/maud-pulldown-cmark.git", rev = "maud-update" }
+maud-pulldown-cmark = { git = "https://github.com/Nemo157/maud-pulldown-cmark", rev = "maud-update" }
 gravatar = { git = "https://github.com/Nemo157/rust-gravatar", rev = "fix-type-resolve-failure" }
 
 maud = { git = "https://github.com/lfairy/maud" }

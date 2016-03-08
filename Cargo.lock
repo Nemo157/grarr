@@ -12,7 +12,7 @@ dependencies = [
  "logger 0.0.3 (git+https://github.com/Nemo157/logger?rev=allow-no-status)",
  "lru_time_cache 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "maud 0.8.0 (git+https://github.com/lfairy/maud)",
- "maud-pulldown-cmark 0.0.7 (git+https://git.nemo157.com/rust/maud-pulldown-cmark.git?rev=maud-update)",
+ "maud-pulldown-cmark 0.0.7 (git+https://github.com/Nemo157/maud-pulldown-cmark?rev=maud-update)",
  "maud_macros 0.8.0 (git+https://github.com/lfairy/maud)",
  "mime 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "params 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -409,7 +409,7 @@ source = "git+https://github.com/lfairy/maud#ab0ef991b932baa36ccbf8bf730dc197f48
 [[package]]
 name = "maud-pulldown-cmark"
 version = "0.0.7"
-source = "git+https://git.nemo157.com/rust/maud-pulldown-cmark.git?rev=maud-update#3ceba0ecdf8c0b86ea33a83b60385ffb95ad6daf"
+source = "git+https://github.com/Nemo157/maud-pulldown-cmark?rev=maud-update#3ceba0ecdf8c0b86ea33a83b60385ffb95ad6daf"
 dependencies = [
  "maud 0.8.0 (git+https://github.com/lfairy/maud)",
  "pulldown-cmark 0.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
