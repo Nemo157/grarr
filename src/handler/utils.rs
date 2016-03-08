@@ -31,10 +31,10 @@ macro_rules! sha1 {
 #[macro_export]
 macro_rules! versioned_sha1 {
   () => ({
-    sha1!(env!("CARGO_PKG_VERSION"))
+    sha1!(env!("CARGO_PKG_VERSION"), ::REVISION.unwrap_or_default())
   });
   ($($x:expr),+) => ({
-    sha1!(env!("CARGO_PKG_VERSION"), $($x),*)
+    sha1!(env!("CARGO_PKG_VERSION"), ::REVISION.unwrap_or_default(), $($x),*)
   });
 }
 
