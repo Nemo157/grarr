@@ -12,7 +12,7 @@ maybe_cache = []
 
 [dependencies]
 
-git-appraise = { git = "https://github.com/Nemo157/git-appraise-rs" }
+git-appraise = "0.1.0"
 git2 = "0.4.2"
 
 hyper = "*"
