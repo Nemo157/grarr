@@ -63,6 +63,15 @@ renderers! {
           @if let Some(origin) = repo.origin_url() {
             h4 { "(fork of " ^super::MaybeLink(&origin, &origin) ")" }
           }
+          @if let Some(mirrors) = repo.mirrors() {
+            h4 {
+              "(mirrored on"
+              @for (name, url) in mirrors {
+                " " a href=^url { ^name }
+              }
+              ")"
+            }
+          }
         }
       }
     }
