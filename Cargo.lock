@@ -6,7 +6,7 @@ dependencies = [
  "clippy 0.0.48 (registry+https://github.com/rust-lang/crates.io-index)",
  "git-appraise 0.1.0 (git+https://github.com/Nemo157/git-appraise-rs)",
  "git2 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "gravatar 0.1.3 (git+https://github.com/Nemo157/rust-gravatar?rev=fix-type-resolve-failure)",
+ "gravatar 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "iron 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "logger 0.0.3 (git+https://github.com/Nemo157/logger?rev=allow-no-status)",
@@ -239,11 +239,11 @@ dependencies = [
 
 [[package]]
 name = "gravatar"
-version = "0.1.3"
-source = "git+https://github.com/Nemo157/rust-gravatar?rev=fix-type-resolve-failure#1128c92419bd9e3458aad04e8dd8e4152b467890"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "rust-crypto 0.2.34 (registry+https://github.com/rust-lang/crates.io-index)",
- "url 0.2.38 (registry+https://github.com/rust-lang/crates.io-index)",
+ "url 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

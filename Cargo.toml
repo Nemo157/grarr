@@ -29,7 +29,7 @@ params = "*"
 chrono = "*"
 pulldown-cmark = "*"
 maud-pulldown-cmark = { git = "https://github.com/Nemo157/maud-pulldown-cmark", rev = "maud-update" }
-gravatar = { git = "https://github.com/Nemo157/rust-gravatar", rev = "fix-type-resolve-failure" }
+gravatar = "0.1.4"
 
 maud = { git = "https://github.com/lfairy/maud" }
 maud_macros = { git = "https://github.com/lfairy/maud" }
