@@ -2,15 +2,15 @@
 name = "grarr"
 version = "0.0.3"
 dependencies = [
- "chrono 0.2.19 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy 0.0.44 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy 0.0.48 (registry+https://github.com/rust-lang/crates.io-index)",
  "git-appraise 0.1.0 (git+https://github.com/Nemo157/git-appraise-rs)",
  "git2 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "gravatar 0.1.3 (git+https://github.com/Nemo157/rust-gravatar?rev=fix-type-resolve-failure)",
  "hyper 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "iron 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "logger 0.0.3 (git+https://github.com/Nemo157/logger?rev=allow-no-status)",
- "lru_time_cache 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lru_time_cache 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "maud 0.8.0 (git+https://github.com/lfairy/maud)",
  "maud-pulldown-cmark 0.0.7 (git+https://git.nemo157.com/rust/maud-pulldown-cmark.git?rev=maud-update)",
  "maud_macros 0.8.0 (git+https://github.com/lfairy/maud)",
@@ -56,8 +56,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "bodyparser"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "iron 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "persistent 0.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "plugin 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "chrono"
-version = "0.2.19"
+version = "0.2.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "num 0.1.31 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -66,7 +78,7 @@ dependencies = [
 
 [[package]]
 name = "clippy"
-version = "0.0.44"
+version = "0.0.48"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "regex-syntax 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -76,7 +88,7 @@ dependencies = [
 
 [[package]]
 name = "cmake"
-version = "0.1.13"
+version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.3.25 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -220,7 +232,7 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bitflags 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "libgit2-sys 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -311,7 +323,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "libc"
-version = "0.2.7"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -319,9 +331,9 @@ name = "libgit2-sys"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "cmake 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cmake 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "gcc 0.3.25 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "libssh2-sys 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
  "libz-sys 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl-sys 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -341,8 +353,8 @@ name = "libssh2-sys"
 version = "0.1.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "cmake 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cmake 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "libz-sys 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl-sys 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pkg-config 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -354,7 +366,7 @@ version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.3.25 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "pkg-config 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -363,7 +375,7 @@ name = "log"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -378,7 +390,7 @@ dependencies = [
 
 [[package]]
 name = "lru_time_cache"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "time 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -392,7 +404,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "maud"
 version = "0.8.0"
-source = "git+https://github.com/lfairy/maud#9949933d41dc62959194437048a1960b8426b648"
+source = "git+https://github.com/lfairy/maud#ab0ef991b932baa36ccbf8bf730dc197f486d6c5"
 
 [[package]]
 name = "maud-pulldown-cmark"
@@ -406,7 +418,7 @@ dependencies = [
 [[package]]
 name = "maud_macros"
 version = "0.8.0"
-source = "git+https://github.com/lfairy/maud#9949933d41dc62959194437048a1960b8426b648"
+source = "git+https://github.com/lfairy/maud#ab0ef991b932baa36ccbf8bf730dc197f486d6c5"
 dependencies = [
  "maud 0.8.0 (git+https://github.com/lfairy/maud)",
 ]
@@ -444,7 +456,7 @@ name = "num_cpus"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -455,7 +467,7 @@ dependencies = [
  "bitflags 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "gcc 0.3.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl-sys 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl-sys-extras 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -466,7 +478,7 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gdi32-sys 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "libressl-pnacl-sys 2.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pkg-config 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "user32-sys 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -478,7 +490,7 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.3.25 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl-sys 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -568,7 +580,7 @@ name = "rand"
 version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -706,7 +718,7 @@ version = "0.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bitflags 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.18 (registry+https://github.com/rust-lang/crates.io-index)",
  "term 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -749,7 +761,7 @@ version = "0.1.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "kernel32-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -837,7 +849,7 @@ name = "urlencoded"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "bodyparser 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bodyparser 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "iron 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "plugin 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 0.2.38 (registry+https://github.com/rust-lang/crates.io-index)",
