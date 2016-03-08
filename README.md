@@ -18,5 +18,5 @@ OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include \
 cargo build
 ```
 
-[grarr]: https://grarr.nemo157.com/grarr
+[grarr]: https://git.nemo157.com/grarr
 [GitLab]: https://gitlab.com
