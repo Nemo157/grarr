@@ -11,9 +11,9 @@ dependencies = [
  "iron 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "logger 0.0.3 (git+https://github.com/Nemo157/logger?rev=allow-no-status)",
  "lru_time_cache 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "maud 0.8.0 (git+https://github.com/lfairy/maud)",
- "maud-pulldown-cmark 0.0.7 (git+https://github.com/Nemo157/maud-pulldown-cmark?rev=maud-update)",
- "maud_macros 0.8.0 (git+https://github.com/lfairy/maud)",
+ "maud 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "maud-pulldown-cmark 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "maud_macros 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "mime 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "params 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "pulldown-cmark 0.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -90,7 +90,7 @@ dependencies = [
 
 [[package]]
 name = "cmake"
-version = "0.1.14"
+version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.3.25 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -333,7 +333,7 @@ name = "libgit2-sys"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "cmake 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cmake 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "gcc 0.3.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "libssh2-sys 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -355,7 +355,7 @@ name = "libssh2-sys"
 version = "0.1.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "cmake 0.1.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cmake 0.1.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "libz-sys 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl-sys 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -406,23 +406,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "maud"
 version = "0.8.0"
-source = "git+https://github.com/lfairy/maud#ab0ef991b932baa36ccbf8bf730dc197f486d6c5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "maud-pulldown-cmark"
-version = "0.0.7"
-source = "git+https://github.com/Nemo157/maud-pulldown-cmark?rev=maud-update#3ceba0ecdf8c0b86ea33a83b60385ffb95ad6daf"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "maud 0.8.0 (git+https://github.com/lfairy/maud)",
+ "maud 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "pulldown-cmark 0.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "maud_macros"
 version = "0.8.0"
-source = "git+https://github.com/lfairy/maud#ab0ef991b932baa36ccbf8bf730dc197f486d6c5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "maud 0.8.0 (git+https://github.com/lfairy/maud)",
+ "maud 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

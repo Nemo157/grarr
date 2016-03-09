@@ -41,7 +41,7 @@ renderers! {
     @if let Some(readme) = find_readme(*head_id, repo) {
       div.block {
         div.block-details {
-          ^Markdown::from_string(&*readme)
+          ^Markdown::from_string(&*readme).with_header_ids()
         }
       }
     }

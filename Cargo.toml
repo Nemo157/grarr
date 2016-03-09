@@ -20,21 +20,21 @@ iron = "*"
 router = { git = "https://github.com/Nemo157/router", rev = "reverse_priority" }
 logger = { git = "https://github.com/Nemo157/logger", rev = "allow-no-status" }
 typemap = "*"
-mime = "*"
+mime = "0.1.3"
 lru_time_cache = "*"
 time = "*"
 walkdir = "*"
 params = "*"
 
 chrono = "*"
-pulldown-cmark = "*"
-maud-pulldown-cmark = { git = "https://github.com/Nemo157/maud-pulldown-cmark", rev = "maud-update" }
+pulldown-cmark = "0.0.7"
+maud-pulldown-cmark = "0.1.0"
 gravatar = "0.1.4"
 
-maud = { git = "https://github.com/lfairy/maud" }
-maud_macros = { git = "https://github.com/lfairy/maud" }
+maud = "0.8.0"
+maud_macros = "0.8.0"
 
-clippy = { version = "*", optional = true }
+clippy = { version = "=0.0.48", optional = true }
 rust-crypto = { version = "*" }
 unicase = { version = "*" }
 toml = "0.1.27"
