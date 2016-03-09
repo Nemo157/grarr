@@ -1,0 +1,9 @@
+language: rust
+rust:
+  - nightly
+sudo: false
+
+script:
+  - cargo test --verbose
+  - cargo build --release --verbose
+  - cargo rustc --release -- -D warnings
