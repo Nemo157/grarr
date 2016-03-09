@@ -93,8 +93,9 @@ renderers! {
     ^super::DiffCommit(repo, commit)
   }
 
-  NextPage(root: &'a str, commit: &'a ReferencedCommit<'a>, start: &'a git2::Commit<'a>) {
-    div.block div.block-header {
+  NextPage(root: &'a str, commit: &'a ReferencedCommit<'a>, next: &'a Option<&'a git2::Commit<'a>>) {
+    div.block div.block-header.row {
+      div.column.fixed {
       a href={
         ^root
         "/commits/"
@@ -105,16 +106,22 @@ renderers! {
       } {
         "Back to beginning (" ^reference::Commit(&commit.commit) ")"
       }
-      a.float-right href={
-        ^root
-        "/commits/"
-        @match commit.reference.as_ref().and_then(|r| r.shorthand()) {
-          Some(ref reff) => ^reff,
-          None => ^commit.commit.id()
+      }
+      div.column {}
+      @if let Some(ref next) = *next {
+        div.column.fixed {
+          a.float-right href={
+            ^root
+            "/commits/"
+            @match commit.reference.as_ref().and_then(|r| r.shorthand()) {
+              Some(ref reff) => ^reff,
+              None => ^commit.commit.id()
+            }
+            "?start=" ^next.id()
+          } {
+            "Next page (" ^reference::Commit(next) ")"
+          }
         }
-        "?start=" ^start.id()
-      } {
-        "Next page (" ^reference::Commit(start) ")"
       }
     }
   }
@@ -147,9 +154,7 @@ impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
           }
         }
         ^CommitTree(root, &mut commits, &mut id)
-        @if let Some(next) = commits.next_after() {
-          ^NextPage(root, commit, next)
-        }
+        ^NextPage(root, commit, &commits.next_after())
       }
     })
   }
