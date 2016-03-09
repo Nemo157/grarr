@@ -1,0 +1,10 @@
+[repos]
+root = "."
+
+[avatars.gravatar]
+enable = true
+
+[avatars.cache]
+enable = true
+capacity = 100
+ttl_seconds = 60

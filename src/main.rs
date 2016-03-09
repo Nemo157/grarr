@@ -28,6 +28,8 @@ extern crate crypto;
 extern crate unicase;
 extern crate walkdir;
 extern crate params;
+extern crate toml;
+extern crate rustc_serialize;
 
 #[macro_use]
 mod macros;
@@ -42,9 +44,9 @@ mod repository_context;
 mod repository_extension;
 mod settings;
 mod referenced_commit;
+mod config;
 
 use std::env;
-use std::path::Path;
 use iron::prelude::*;
 use router::*;
 use logger::*;
@@ -58,22 +60,33 @@ pub use repository_extension::RepositoryExtension;
 include!(concat!(env!("OUT_DIR"), "/version.rs"));
 
 fn main() {
-  let root = env::args().nth(1).unwrap();
+  let config = match config::load(env::args_os().nth(1).as_ref()) {
+    Ok(config) => config,
+    Err(err) => {
+      println!("Failed to load config:\n{}", err);
+      std::process::exit(1)
+    },
+  };
+
+  println!("Running with config");
+  println!("===================");
+  println!("{}", toml::encode_str(&config));
+  println!("===================");
 
   let mut router = Router::new();
 
   router
-    .register(inject_repository_context(Path::new(&root), handler::Review))
-    .register(inject_repository_context(Path::new(&root), handler::Reviews))
-    .register(inject_repository_context(Path::new(&root), handler::Commit))
-    .register(inject_repository_context(Path::new(&root), handler::Commits))
-    .register(inject_repository_context(Path::new(&root), handler::Repository))
-    .register(handler::Repositories { root: root.clone().into() })
+    .register(inject_repository_context(&config.repos.root, handler::Review))
+    .register(inject_repository_context(&config.repos.root, handler::Reviews))
+    .register(inject_repository_context(&config.repos.root, handler::Commit))
+    .register(inject_repository_context(&config.repos.root, handler::Commits))
+    .register(inject_repository_context(&config.repos.root, handler::Repository))
+    .register(handler::Repositories { root: config.repos.root.clone() })
     .register(handler::Settings)
     .register(handler::SettingsPost)
     .register(handler::About)
-    // .register(inject_repository_context(Path::new(&root), handler::Tree))
-    .register(inject_repository_context(Path::new(&root), handler::TreeEntry))
+    // .register(inject_repository_context(&config.repos.root, handler::Tree))
+    .register(inject_repository_context(&config.repos.root, handler::TreeEntry))
     .register(statics![
       prefix: "./static/";
       "./static/js/highlight.js",
@@ -90,10 +103,10 @@ fn main() {
       "./static/fonts/fontawesome-webfont.woff2",
     ])
     .register(handler::Avatars::new(handler::avatar::Options {
-      enable_gravatar: true,
-      enable_cache: true,
-      cache_capacity: 100,
-      cache_time_to_live: Duration::minutes(1),
+      enable_gravatar: config.avatars.gravatar.enable,
+      enable_cache: config.avatars.cache.enable,
+      cache_capacity: config.avatars.cache.capacity,
+      cache_time_to_live: Duration::seconds(config.avatars.cache.ttl_seconds),
     }));
 
   let (logger_before, logger_after) = Logger::new(None);

@@ -37,3 +37,5 @@ maud_macros = { git = "https://github.com/lfairy/maud" }
 clippy = { version = "*", optional = true }
 rust-crypto = { version = "*" }
 unicase = { version = "*" }
+toml = "0.1.27"
+rustc-serialize = "0.3"
