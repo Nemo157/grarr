@@ -35,7 +35,7 @@ maud = "0.8.0"
 maud_macros = "0.8.0"
 
 clippy = { version = "=0.0.48", optional = true }
-rust-crypto = { version = "*" }
-unicase = { version = "*" }
+rust-crypto = "*"
+unicase = "*"
 toml = "0.1.27"
 rustc-serialize = "0.3"
