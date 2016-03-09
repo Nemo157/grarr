@@ -4,10 +4,10 @@ use chrono::naive::datetime::NaiveDateTime;
 
 renderers! {
   CommentHeader(comment: &'a git_appraise::Comment) {
-    div.block-header.comment-header {
-      h4 {
-        ^super::Avatar(comment.author().unwrap_or("unknown@example.org"), &None)
-        span.rest {
+    div.block-header.row.center {
+      ^super::Avatar(comment.author().unwrap_or("unknown@example.org"), &None)
+      div.column {
+        div {
           span.user
             ^comment.author().unwrap_or("<unknown author>")
           " commented "

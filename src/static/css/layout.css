@@ -32,12 +32,16 @@ a {
 }
 
 .block-header {
-  padding: 0.5rem 1rem 0.3rem 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .block-header h1, .block-header h2, .block-header h3, .block-header h4, .block-header h5 {
   margin: 0 0 0.2rem 0;
   padding: 0;
+}
+
+.block-header h1:last-child, .block-header h2:last-child, .block-header h3:last-child, .block-header h4:last-child, .block-header h5:last-child {
+  margin-bottom: 0;
 }
 
 .repository-header h1, .repository-header h4 {
@@ -110,8 +114,16 @@ code {
 .avatar {
   height: 30px;
   width: 30px;
-  margin: 0 0.8rem 0.2rem 0;
+  margin: 0 0.8rem 0rem 0;
   flex-shrink: 0;
+}
+
+.column .avatar {
+  margin-bottom: 0.2rem;
+}
+
+.column .avatar:last-child {
+  margin-bottom: 0rem;
 }
 
 .cf:after {
@@ -252,5 +264,6 @@ pre.block-details {
 }
 
 .row    { display: flex; flex-direction: row; }
-.column { display: flex; flex-direction: column; }
+.column { display: flex; flex-direction: column; flex-grow: 1; }
+.column.fixed { flex-grow: 0; flex-shrink: 0; }
 .center { align-items: center; }

@@ -32,7 +32,7 @@ renderers! {
             ^super::Avatar(email, &commit.author().name())
           }
         } @else {
-          div.column {
+          div.column.fixed {
             @if let Some(email) = commit.author().email() {
               ^super::Avatar(email, &commit.author().name())
             }

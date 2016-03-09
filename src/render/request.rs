@@ -28,38 +28,36 @@ renderers! {
   }
 
   RequestHeader(root: &'a str, request: &'a git_appraise::Request) {
-    div.block-header.request-header {
-      h3.float-right {
-        a href={ ^root "/commit/" ^request.commit_id() } {
-          span.id
-            ^short(request.commit_id())
-        }
-      }
-      h5 {
-        @if let Some(timestamp) = request.timestamp() {
-          span.timestamp
-            ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
-        }
-      }
-      h3 {
-        a href={ ^root "/review/" ^request.commit_id() } {
-          @match summary(request) {
-            Some(summary) => ^summary,
-            None => "<No summary provided>",
+    div.block-header {
+      div.row {
+        ^super::Avatar(request.requester().unwrap_or("unknown@example.org"), &None)
+        div.column {
+          div {
+            a href={ ^root "/review/" ^request.commit_id() } {
+              span.id ^short(request.commit_id())
+              " "
+              @match summary(request) {
+                Some(summary) => ^summary,
+                None => "<No summary provided>",
+              }
+            }
+          }
+          small {
+            span.user
+              ^request.requester().unwrap_or("<unknown requester>")
+            " wants to merge "
+            span.ref
+              ^request.review_ref().unwrap_or("<unknown ref>")
+            " into "
+            span.ref
+              ^request.target_ref().unwrap_or("<unknown ref>")
           }
         }
-      }
-      h4 {
-        ^super::Avatar(request.requester().unwrap_or("unknown@example.org"), &None)
-        span.rest {
-          span.user
-            ^request.requester().unwrap_or("<unknown requester>")
-          " wants to merge "
-          span.ref
-            ^request.review_ref().unwrap_or("<unknown ref>")
-          " into "
-          span.ref
-            ^request.target_ref().unwrap_or("<unknown ref>")
+        div.column.fixed {
+          @if let Some(timestamp) = request.timestamp() {
+            small.timestamp
+              ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
+          }
         }
       }
     }
