@@ -228,15 +228,15 @@ pre .line[data-line-num]:before {
   content: " " attr(data-line-num) " " ;
 }
 
-.diff .text:before {
+.diff pre .line .text:before {
   content: "   ";
 }
 
-.diff .addition .text:before {
+.diff pre .line.addition .text:before {
   content: " + ";
 }
 
-.diff .deletion .text:before {
+.diff pre .line.deletion .text:before {
   content: " - ";
 }
 
