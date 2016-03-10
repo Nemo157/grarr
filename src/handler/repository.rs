@@ -8,7 +8,7 @@ impl Handler for Repository {
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
     let head_ref = itry!(context.repository.head(), status::InternalServerError);
     let resolved_head = itry!(head_ref.resolve(), status::InternalServerError);
-    let head_id = itry!(resolved_head.target().ok_or(Error::String("Couldn't resolve head")), status::InternalServerError);
+    let head_id = itry!(resolved_head.target().ok_or(Error::from("Couldn't resolve head")), status::InternalServerError);
     Html {
       render: RepositoryWrapper(&context, &render::Repository(&context.repository, &head_id)),
       etag: Some(EntityTag::weak(versioned_sha1!(head_id.as_bytes()))),

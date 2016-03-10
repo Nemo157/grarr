@@ -1,12 +1,13 @@
 use std::error;
 use std::fmt;
+use std::borrow::{ Cow, Borrow };
 use git2;
 
 #[derive(Debug)]
 pub enum Error {
   MissingExtension,
   MissingPathComponent,
-  String(&'static str),
+  String(Cow<'static, str>),
   Git(git2::Error),
 }
 
@@ -15,7 +16,7 @@ impl error::Error for Error {
     match *self {
       Error::MissingExtension => "Missing request extension",
       Error::MissingPathComponent => "Missing path component",
-      Error::String(s) => s,
+      Error::String(ref s) => s.borrow(),
       Error::Git(ref e) => e.description(),
     }
   }
@@ -38,6 +39,12 @@ impl From<git2::Error> for Error {
 
 impl From<&'static str> for Error {
   fn from(s: &'static str) -> Error {
-    Error::String(s)
+    Error::String(s.into())
+  }
+}
+
+impl From<String> for Error {
+  fn from(s: String) -> Error {
+    Error::String(s.into())
   }
 }

@@ -18,6 +18,8 @@ pub mod error;
 mod tree_entry;
 mod settings;
 mod about;
+mod tree;
+mod blob;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
@@ -26,7 +28,8 @@ pub use self::commit::Commit;
 pub use self::commits::Commits;
 pub use self::repository::Repository;
 pub use self::repositories::Repositories;
-pub use self::tree_entry::TreeEntry;
+pub use self::tree::Tree;
+pub use self::blob::Blob;
 
 pub use self::register::Register;
 pub use self::statics::Static;

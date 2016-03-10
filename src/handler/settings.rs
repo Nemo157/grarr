@@ -1,7 +1,6 @@
 use super::base::*;
 use settings;
 use iron::Plugin;
-use iron::modifiers::Redirect;
 use params::{ Map, Params, Value };
 
 #[derive(Clone)]
