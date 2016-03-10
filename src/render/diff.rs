@@ -1,3 +1,5 @@
+use std::ascii::AsciiExt;
+use std::string::ToString;
 use std::mem;
 use std::path::PathBuf;
 use std::cell::RefCell;
@@ -42,61 +44,72 @@ renderers! {
     }
   }
 
-  DiffDetails(extension: Option<String>, hunks: Vec<(DiffHunk, Vec<DiffLine>)>) {
+  DiffLineNums(id: &'a str, old_lineno: &'a Option<u32>, new_lineno: &'a Option<u32>) {
+    @if let Some(num) = *old_lineno {
+      a.line-num
+        id={ ^id "L" ^num }
+        href={ "#" ^id "L" ^num }
+        data-line-num={ ^(format!("{: >4}", num)) }
+        { }
+    } @else {
+      span.line-num { }
+    }
+    @if let Some(num) = *new_lineno {
+      a.line-num
+        id={ ^id "R" ^num }
+        href={ "#" ^id "R" ^num }
+        data-line-num={ ^(format!("{: >4}", num)) }
+        { " " }
+    } @else {
+      span.line-num { " " }
+    }
+  }
+
+  DiffDetails(id: String, extension: Option<String>, hunks: Vec<(DiffHunk, Vec<DiffLine>)>) {
     pre.block-details code class={ "hljs lang-" ^extension.unwrap_or("".to_owned()) } {
       @if hunks.is_empty() {
         div.line.hunk-header span.text "No content"
       }
       @for (hunk, lines) in hunks {
         div.line.hunk-header {
-          span.line-num
-            { }
+          ^DiffLineNums(&*id, &None, &None)
           span.text ^hunk.header.unwrap()
         }
         @for line in lines {
           @match (line.origin, line.content) {
             (Origin::LineContext, Some(ref content)) => {
               div.line.context {
-                span.line-num
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  { }
+                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
                 span.text ^content
               }
             },
             (Origin::LineAddition, Some(ref content)) => {
               div.line.addition {
-                span.line-num
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  { }
+                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
                 span.text ^content
               }
             },
             (Origin::LineDeletion, Some(ref content)) => {
               div.line.deletion {
-                span.line-num
-                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                  { }
+                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
                 span.text ^content
               }
             },
             (Origin::AddEOF, _) => {
               div.line.add-eof {
-                span.line-num { }
+                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
                 span.text "Added EOF"
               }
             },
             (Origin::RemoveEOF, _) => {
               div.line.remove-eof {
-                span.line-num { }
+                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
                 span.text "Removed EOF"
               }
             },
             (Origin::LineBinary, _) => {
               div.line.binary {
-                span.line-num { }
+                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
                 span.text "Binary file changed"
               }
             },
@@ -115,7 +128,7 @@ renderers! {
     @for (delta, hunks) in group(diff).unwrap() {
       div.diff.block {
         ^DiffHeader(&delta)
-        ^DiffDetails(delta.new_file.or(delta.old_file).and_then(|path| path.extension().map(|s| s.to_string_lossy().into_owned())), hunks)
+        ^DiffDetails(delta.id(), delta.new_file.or(delta.old_file).and_then(|path| path.extension().map(|s| s.to_string_lossy().into_owned())), hunks)
       }
     }
     ^super::HighlightJS
@@ -181,8 +194,22 @@ pub struct DiffLine {
   pub origin: Origin,
 }
 
+impl DiffDelta {
+  fn id(&self) -> String {
+    self.new_file.as_ref()
+      .or(self.old_file.as_ref())
+      .map(|f| f.to_string_lossy())
+      .map(|s|
+        s.chars()
+        .map(|c| if c.is_whitespace() || c == '/' || !c.is_ascii() { '-' } else { c.to_ascii_lowercase() })
+        .collect())
+      .unwrap_or("".to_owned())
+  }
+}
+
 impl<'a> From<git2::DiffDelta<'a>> for DiffDelta {
   fn from(delta: git2::DiffDelta<'a>) -> DiffDelta {
+    println!("old: {}, new: {}", delta.old_file().id(), delta.new_file().id());
     DiffDelta {
       status: Delta(delta.status()),
       old_file: delta.old_file().path().map(|p| p.to_owned()),

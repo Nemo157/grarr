@@ -212,20 +212,23 @@ pre .line {
   padding: 0.0625rem 0 0 0;
 }
 
+pre .line .text {
+  border-left-width: 1px;
+  border-left-style: dotted;
+}
+
 pre .line .text:before {
   content: " ";
 }
 
 pre .line-num:before {
-  content: "      ";
+  content: "     ";
   padding: 0.2rem 0;
-  border-right-width: 1px;
-  border-right-style: dotted;
   font-size: 0.6rem;
 }
 
 pre .line-num[data-line-num]:before {
-  content: " " attr(data-line-num) " " ;
+  content: " " attr(data-line-num) ;
 }
 
 .diff pre .line .text:before {
@@ -242,14 +245,6 @@ pre .line-num[data-line-num]:before {
 
 .diff .hunk-header .text:before {
   content: " ";
-}
-
-.diff .line-num:before {
-  content: "           ";
-}
-
-.diff .line-num[data-old-line-num][data-new-line-num]:before {
-  content: " " attr(data-old-line-num) " " attr(data-new-line-num) " " ;
 }
 
 .diff pre.block-details code {

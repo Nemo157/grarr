@@ -81,7 +81,7 @@ renderers! {
           false => code class={ "hljs lang-" ^context.extension().unwrap_or("") } {
             @for (i, line) in str::from_utf8(blob.content()).unwrap().lines().enumerate() {
               div.line {
-                a.line-num id={ "L" ^(i + 1) } href={ "#L" ^(i + 1) } data-line-num=^(format!("{: >4}", i + 1)) { }
+                a.line-num id={ "L" ^(i + 1) } href={ "#L" ^(i + 1) } data-line-num=^(format!("{: >4}", i + 1)) { " " }
                 span.text ^line
               }
             }
