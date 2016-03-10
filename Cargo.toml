@@ -34,7 +34,7 @@ gravatar = "0.1.4"
 maud = "0.8.0"
 maud_macros = "0.8.0"
 
-clippy = { version = "=0.0.48", optional = true }
+clippy = { version = "0", optional = true }
 rust-crypto = "*"
 unicase = "*"
 toml = "0.1.27"
