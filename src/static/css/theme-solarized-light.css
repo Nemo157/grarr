@@ -1,6 +1,7 @@
 html * { color-profile: sRGB; }
 
 body { color: #657b83; }
+a.line-num { color: #657b83; }
 .ci-status a { color: #657b83; }
 .expander[disabled] + label:hover { color: #657b83; }
 

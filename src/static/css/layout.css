@@ -216,7 +216,7 @@ pre .line .text:before {
   content: " ";
 }
 
-pre .line:before {
+pre .line-num:before {
   content: "      ";
   padding: 0.2rem 0;
   border-right-width: 1px;
@@ -224,7 +224,7 @@ pre .line:before {
   font-size: 0.6rem;
 }
 
-pre .line[data-line-num]:before {
+pre .line-num[data-line-num]:before {
   content: " " attr(data-line-num) " " ;
 }
 
@@ -244,11 +244,11 @@ pre .line[data-line-num]:before {
   content: " ";
 }
 
-.diff .line:before {
+.diff .line-num:before {
   content: "           ";
 }
 
-.diff .line[data-old-line-num][data-new-line-num]:before {
+.diff .line-num[data-old-line-num][data-new-line-num]:before {
   content: " " attr(data-old-line-num) " " attr(data-new-line-num) " " ;
 }
 

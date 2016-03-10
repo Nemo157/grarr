@@ -48,39 +48,57 @@ renderers! {
         div.line.hunk-header span.text "No content"
       }
       @for (hunk, lines) in hunks {
-        div.line.hunk-header
+        div.line.hunk-header {
+          span.line-num
+            { }
           span.text ^hunk.header.unwrap()
+        }
         @for line in lines {
           @match (line.origin, line.content) {
             (Origin::LineContext, Some(ref content)) => {
-              div.line.context
-                data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+              div.line.context {
+                span.line-num
+                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                  { }
                 span.text ^content
+              }
             },
             (Origin::LineAddition, Some(ref content)) => {
-              div.line.addition
-                data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+              div.line.addition {
+                span.line-num
+                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                  { }
                 span.text ^content
+              }
             },
             (Origin::LineDeletion, Some(ref content)) => {
-              div.line.deletion
-                data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
-                data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+              div.line.deletion {
+                span.line-num
+                  data-old-line-num={ @if let Some(num) = line.old_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                  data-new-line-num={ @if let Some(num) = line.new_lineno { ^(format!("{: >4}", num)) } @else { "    " } }
+                  { }
                 span.text ^content
+              }
             },
             (Origin::AddEOF, _) => {
-              div.line.add-eof
+              div.line.add-eof {
+                span.line-num { }
                 span.text "Added EOF"
+              }
             },
             (Origin::RemoveEOF, _) => {
-              div.line.remove-eof
+              div.line.remove-eof {
+                span.line-num { }
                 span.text "Removed EOF"
+              }
             },
             (Origin::LineBinary, _) => {
-              div.line.binary
+              div.line.binary {
+                span.line-num { }
                 span.text "Binary file changed"
+              }
             },
             (Origin::ContextEOF, _) | (Origin::FileHeader, _) | (Origin::HunkHeader, _) => {
             },
