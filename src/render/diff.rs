@@ -126,7 +126,7 @@ renderers! {
 
   Diff(diff: &'a git2::Diff<'a>) {
     @for (delta, hunks) in group(diff).unwrap() {
-      div.diff.block {
+      div.diff.block id=^delta.id() {
         ^DiffHeader(&delta)
         ^DiffDetails(delta.id(), delta.new_file.or(delta.old_file).and_then(|path| path.extension().map(|s| s.to_string_lossy().into_owned())), hunks)
       }
