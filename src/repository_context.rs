@@ -16,7 +16,7 @@ use error::Error;
 use referenced_commit::ReferencedCommit;
 
 pub struct RepositoryContext {
-  pub requested_path: PathBuf,
+  pub path: String,
   pub repository: git2::Repository,
   reference: Option<String>,
 }
@@ -65,26 +65,25 @@ pub struct RepositoryContextHandler<H: Handler> {
 
 impl<H: Handler> Handler for RepositoryContextHandler<H> {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let (requested_path, reference) = {
+    let (path, reference) = {
       let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
       (router.find("repo").map(ToOwned::to_owned), router.find("ref").map(ToOwned::to_owned))
     };
-    let requested_path = PathBuf::from(itry!(requested_path.ok_or(Error::MissingPathComponent), status::InternalServerError));
-    let full_path = self.canonical_root.join(&requested_path);
+    let path = itry!(path.ok_or(Error::MissingPathComponent), status::InternalServerError);
+    let full_path = self.canonical_root.join(&path);
     let full_canonical_path = itry!(fs::canonicalize(&full_path), status::NotFound);
     if full_path == full_canonical_path {
       let repository = itry!(git2::Repository::open(full_canonical_path), status::NotFound);
       req.extensions.insert::<RepositoryContext>(RepositoryContext {
-        requested_path: requested_path,
+        path: path,
         repository: repository,
         reference: reference,
       });
       self.handler.handle(req)
     } else {
       let canonical_path = itry!(full_canonical_path.strip_prefix(&self.canonical_root), status::InternalServerError).to_owned();
-      let old_path = requested_path.to_string_lossy();
       let new_path = canonical_path.to_string_lossy();
-      let new_url = Url::parse(&*req.url.to_string().replace(&*old_path, &*new_path)).unwrap();
+      let new_url = Url::parse(&*req.url.to_string().replace(&*path, &*new_path)).unwrap();
       Ok(Response::with((status::TemporaryRedirect, Redirect(new_url))))
     }
   }

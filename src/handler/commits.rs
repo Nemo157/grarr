@@ -24,7 +24,7 @@ impl Handler for Commits {
     };
     let commits = itry!(CommitTree::new(&context.repository, &initial_commit, 50), status::InternalServerError);
     Html {
-      render: RepositoryWrapper(&context, render::Commits(&("/".to_owned() + context.requested_path.to_str().unwrap()), &referenced_commit, commits)),
+      render: RepositoryWrapper(&context, render::Commits(&format!("/{}", context.path), &referenced_commit, commits)),
       etag: Some(EntityTag::weak(versioned_sha1!(referenced_commit.commit.id().as_bytes()))),
       req: req,
     }.into()

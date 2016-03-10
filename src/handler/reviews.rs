@@ -10,7 +10,7 @@ impl Handler for Reviews {
     let mut reviews: Vec<_> = context.repository.all_reviews().and_then(|revs| revs.collect()).ok().unwrap_or_default();
     reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
     reviews.reverse();
-    let root = "/".to_owned() + &context.requested_path.to_string_lossy();
+    let root = format!("/{}", context.path);
     Html {
       render: RepositoryWrapper(&context, &render::Reviews(&root, &reviews)),
       etag: None,

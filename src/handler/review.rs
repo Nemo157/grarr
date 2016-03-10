@@ -13,7 +13,7 @@ impl Handler for Review {
     let commit = itry!(router.find("ref").ok_or(Error::MissingPathComponent), status::InternalServerError);
     let id = itry!(Oid::from_str(commit), status::BadRequest);
     let review = itry!(context.repository.review_for(id), status::NotFound);
-    let root = "/".to_owned() + &context.requested_path.to_string_lossy();
+    let root = format!("/{}", context.path);
     Html {
       render: RepositoryWrapper(&context, &render::Review(&root, &review)),
       etag: None,

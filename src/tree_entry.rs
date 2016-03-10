@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use iron::{ status, IronResult };
 use std::path::Path;
 use repository_context::RepositoryContext;
@@ -7,7 +6,7 @@ use referenced_commit::ReferencedCommit;
 
 pub struct TreeEntryContext<'a> {
   pub entry: git2::Object<'a>,
-  pub repo_path: Cow<'a, str>,
+  pub repo_path: &'a str,
   pub entry_path: String,
   pub reff: String,
   pub commit: ReferencedCommit<'a>,
@@ -48,7 +47,7 @@ pub fn get_tree_entry<'a>(context: &'a RepositoryContext, path: &'a str) -> Iron
   let reff = referenced_commit.reference.as_ref().and_then(|r| r.shorthand()).unwrap_or(&*idstr).to_owned();
   Ok(TreeEntryContext {
     entry: entry,
-    repo_path: context.requested_path.to_string_lossy(),
+    repo_path: &context.path,
     entry_path: "/".to_owned() + path,
     reff: reff,
     commit: referenced_commit,
