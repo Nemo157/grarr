@@ -1,5 +1,5 @@
 use super::base::*;
-use super::tree_entry;
+use tree_entry;
 
 use git2;
 use std::path::Path;
@@ -18,13 +18,7 @@ impl Handler for Blob {
     match entry.entry.kind() {
       Some(git2::ObjectType::Blob) => {
         Html {
-          render: RepositoryWrapper(
-            &context,
-            &render::Blob(
-              &entry.parent,
-              Path::new(path),
-              itry!(entry.entry.as_blob().ok_or(Error::from("Wat?")), status::InternalServerError),
-              &referenced_commit)),
+          render: RepositoryWrapper(&context, &render::Blob(entry.entry.as_blob().unwrap(), &entry)),
           etag: Some(EntityTag::weak(versioned_sha1!(&id))),
           req: req,
         }.into()

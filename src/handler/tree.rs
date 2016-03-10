@@ -1,5 +1,5 @@
 use super::base::*;
-use super::tree_entry;
+use tree_entry;
 
 use git2;
 use std::path::Path;
@@ -11,21 +11,12 @@ impl Handler for Tree {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let path = router.find("path").unwrap_or("");
-    let entry = try!(tree_entry::get_tree_entry(&context, path));
-    let referenced_commit = itry!(context.referenced_commit(), status::NotFound);
-    let id = referenced_commit.commit.id();
+    let entry = try!(tree_entry::get_tree_entry(&context, router.find("path").unwrap_or("")));
     match entry.entry.kind() {
       Some(git2::ObjectType::Tree) => {
         Html {
-          render: RepositoryWrapper(
-            &context,
-            &render::Tree(
-              &entry.parent,
-              Path::new(path),
-              itry!(entry.entry.as_tree().ok_or(Error::from("Wat?")), status::InternalServerError),
-              &referenced_commit)),
-          etag: Some(EntityTag::weak(versioned_sha1!(&id))),
+          render: RepositoryWrapper(&context, &render::Tree(entry.entry.as_tree().unwrap(), &entry)),
+          etag: Some(EntityTag::weak(versioned_sha1!(&entry.commit.commit.id()))),
           req: req,
         }.into()
       },

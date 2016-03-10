@@ -15,7 +15,6 @@ mod repositories;
 mod html;
 mod base;
 pub mod error;
-mod tree_entry;
 mod settings;
 mod about;
 mod tree;

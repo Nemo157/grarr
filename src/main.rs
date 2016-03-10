@@ -45,6 +45,7 @@ mod repository_extension;
 mod settings;
 mod referenced_commit;
 mod config;
+mod tree_entry;
 
 use std::env;
 use iron::prelude::*;
