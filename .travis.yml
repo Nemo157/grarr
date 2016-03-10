@@ -7,3 +7,10 @@ script:
   - cargo test --verbose
   - cargo build --release --verbose
   - cargo rustc --release -- -D warnings
+
+addons:
+  apt:
+    sources:
+      - kalakris-cmake
+    packages:
+      - cmake
