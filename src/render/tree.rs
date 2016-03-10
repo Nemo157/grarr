@@ -3,8 +3,6 @@ use std::cmp::{ Ord, PartialOrd, Ordering };
 use std::fmt;
 use super::fa::{ FA, FAM };
 use git2::{ self, ObjectType };
-use std::path::{ self, Path, Component };
-use referenced_commit::ReferencedCommit;
 use tree_entry::TreeEntryContext;
 
 renderers! {
@@ -47,7 +45,7 @@ renderers! {
       div.block-header {
         h2 {
           ^FAM::FixedWidth(FA::File) " "
-          span.path ^Components(context, false)
+          span.path ^Components(context)
           " at "
           ^super::Reference(&context.commit)
         }
@@ -70,7 +68,7 @@ renderers! {
       div.block-header {
         h2 {
           ^FAM::FixedWidth(FA::File) " "
-          span.path ^Components(context, true)
+          span.path ^Components(context)
           " at "
           ^super::Reference(&context.commit)
         }
@@ -93,17 +91,18 @@ renderers! {
   }
 }
 
-pub struct Components<'a>(pub &'a TreeEntryContext<'a>, pub bool);
+pub struct Components<'a>(pub &'a TreeEntryContext<'a>);
 
 impl<'a> ::maud::RenderOnce for Components<'a> {
+  #[cfg_attr(feature = "clippy", allow(cyclomatic_complexity))]
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let Components(context, is_blob) = self;
+    let context = self.0;
+    let is_blob = context.entry.kind() == Some(ObjectType::Blob);
     try!(html!(w, { a.path-component href={ "/" ^context.repo_path "/tree/" ^context.reff } ^context.repo_path }));
     let mut parent = "/".to_owned();
     let components: Vec<_> = context.entry_path.split_terminator('/').collect();
-    for i in 0..components.len() {
-      let component = components[i];
-      if component == "" {
+    for (i, component) in components.iter().enumerate() {
+      if *component == "" {
         continue;
       } else if is_blob && i == components.len() - 1 {
         try!(html!(w, { "/" a.path-component href={ "/" ^context.repo_path "/blob/" ^context.reff ^parent ^component } ^component }));

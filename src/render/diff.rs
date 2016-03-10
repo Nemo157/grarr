@@ -1,5 +1,4 @@
 use std::ascii::AsciiExt;
-use std::string::ToString;
 use std::mem;
 use std::path::PathBuf;
 use std::cell::RefCell;
@@ -198,12 +197,12 @@ impl DiffDelta {
   fn id(&self) -> String {
     self.new_file.as_ref()
       .or(self.old_file.as_ref())
-      .map(|f| f.to_string_lossy())
-      .map(|s|
-        s.chars()
-        .map(|c| if c.is_whitespace() || c == '/' || !c.is_ascii() { '-' } else { c.to_ascii_lowercase() })
-        .collect())
-      .unwrap_or("".to_owned())
+      .map_or(
+        "".to_owned(),
+        |f| f.to_string_lossy()
+          .chars()
+          .map(|c| if c.is_whitespace() || c == '/' || !c.is_ascii() { '-' } else { c.to_ascii_lowercase() })
+          .collect())
   }
 }
 

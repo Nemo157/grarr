@@ -2,7 +2,6 @@ use super::base::*;
 use tree_entry;
 
 use git2;
-use std::path::Path;
 
 #[derive(Clone)]
 pub struct Blob;
