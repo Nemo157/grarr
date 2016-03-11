@@ -14,27 +14,18 @@ impl Handler for Pages {
     }
     let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
     let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let path = router.find("path").unwrap_or("");
-    let tree_entry::TreeEntryContext {
-      entry,
-      entry_path: mut path,
-      ..
-    } = try!(tree_entry::get_tree_entry(&context, path));
 
-    let mut new_entry = None;
-    if path.ends_with('/') {
-      if let Some(git2::ObjectType::Tree) = entry.kind() {
-        if let Some(tree_entry) = entry.as_tree().unwrap().get_name("index.html") {
-          new_entry = Some(itry!(tree_entry.to_object(&context.repository), status::InternalServerError));
-          path = path + "index.html";
-        }
-      }
+    let mut path = router.find("path").unwrap_or("").to_owned();
+    if path == "" || path.ends_with('/') {
+      path = path + "index.html";
     }
-    let entry = new_entry.unwrap_or(entry);
+
+    let entry = try!(tree_entry::get_tree_entry(&context, &path)).entry;
 
     match entry.kind() {
       Some(git2::ObjectType::Blob) => {
-        Ok(Response::with((status::Ok, utils::mime(&*path), entry.as_blob().unwrap().content())))
+        let blob = entry.as_blob().unwrap();
+        Ok(Response::with((status::Ok, utils::blob_mime(blob, &path), blob.content())))
       },
       _ => {
         Err(IronError::new(Error::from("Not found"), status::NotFound))

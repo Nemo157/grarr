@@ -6,6 +6,7 @@ use crypto::digest::Digest;
 use crypto::sha1::Sha1;
 use mime::Mime;
 use iron::headers::EntityTag;
+use git2;
 
 #[macro_export]
 macro_rules! file {
@@ -54,6 +55,21 @@ pub fn mime(path: &str) -> Mime {
     Some("html") => mime!(Text/Html),
     Some("js") => mime!(Text/Javascript),
     None | Some(_) => mime!(Application/("octet-stream")),
+  }
+}
+
+pub fn blob_mime(blob: &git2::Blob, path: &str) -> Mime {
+  match Path::new(path).extension().and_then(|s| s.to_str()) {
+    Some("css") => mime!(Text/Css),
+    Some("html") => mime!(Text/Html),
+    Some("js") => mime!(Text/Javascript),
+    None | Some(_) => {
+      if blob.is_binary() {
+        mime!(Application/("octet-stream"))
+      } else {
+        mime!(Text/Plain)
+      }
+    },
   }
 }
 
