@@ -18,7 +18,7 @@ use referenced_commit::ReferencedCommit;
 pub struct RepositoryContext {
   pub path: String,
   pub repository: git2::Repository,
-  reference: Option<String>,
+  pub reference: Option<String>,
 }
 
 impl Key for RepositoryContext {

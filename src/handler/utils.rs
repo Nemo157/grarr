@@ -51,6 +51,7 @@ impl fmt::Debug for File {
 pub fn mime(path: &str) -> Mime {
   match Path::new(path).extension().and_then(|s| s.to_str()) {
     Some("css") => mime!(Text/Css),
+    Some("html") => mime!(Text/Html),
     Some("js") => mime!(Text/Javascript),
     None | Some(_) => mime!(Application/("octet-stream")),
   }

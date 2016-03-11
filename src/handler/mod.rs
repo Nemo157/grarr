@@ -19,6 +19,7 @@ mod settings;
 mod about;
 mod tree;
 mod blob;
+mod pages;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
@@ -29,6 +30,7 @@ pub use self::repository::Repository;
 pub use self::repositories::Repositories;
 pub use self::tree::Tree;
 pub use self::blob::Blob;
+pub use self::pages::Pages;
 
 pub use self::register::Register;
 pub use self::statics::Static;
