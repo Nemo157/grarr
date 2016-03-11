@@ -89,6 +89,7 @@ fn main() {
     .register(inject_repository_context(&config.repos.root, handler::Tree))
     .register(inject_repository_context(&config.repos.root, handler::Blob))
     .register(inject_repository_context(&config.repos.root, handler::Pages))
+    .register(inject_repository_context(&config.repos.root, handler::Compare))
     .register(statics![
       prefix: "./static/";
       "./static/js/highlight.js",

@@ -183,9 +183,9 @@ impl<'repo, 'a> RenderOnce for CommitTree<'repo, 'a> {
 }
 
 impl<'a> super::repository_wrapper::RepositoryTab for &'a Commit<'a> {
-  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Commits }
+  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Commits) }
 }
 
 impl<'a, 'b> super::repository_wrapper::RepositoryTab for Commits<'a, 'b> {
-  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Commits }
+  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Commits) }
 }

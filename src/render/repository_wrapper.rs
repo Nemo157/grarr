@@ -11,7 +11,7 @@ pub enum Tab {
 }
 
 pub trait RepositoryTab {
-  fn tab() -> Tab;
+  fn tab() -> Option<Tab>;
 }
 
 pub struct RepositoryWrapper<'a, R: RepositoryTab>(pub &'a RepositoryContext, pub R);
@@ -31,12 +31,12 @@ impl<'a, R: RenderOnce + RepositoryTab> RenderOnce for RepositoryWrapper<'a, R> 
 }
 
 renderers! {
-  RepositoryWrapperTabs(tab: &'a Tab, path: &'a str, head: &'a str) {
+  RepositoryWrapperTabs(tab: &'a Option<Tab>, path: &'a str, head: &'a str) {
     div.tabs {
-      div class={ "overview" @if *tab == Tab::Overview { " selected" } } { a href={ "/" ^path } { "Overview" } }
-      div class={ "files" @if *tab == Tab::Files { " selected" } } { a href={ "/" ^path "/tree/" ^head } { "Files" } }
-      div class={ "commits" @if *tab == Tab::Commits { " selected" } } { a href={ "/" ^path "/commits/" ^head } { "Commits" } }
-      div class={ "reviews" @if *tab == Tab::Reviews { " selected" } } { a href={ "/" ^path "/reviews" } { "Reviews" } }
+      div class={ "overview" @if *tab == Some(Tab::Overview) { " selected" } } { a href={ "/" ^path } { "Overview" } }
+      div class={ "files" @if *tab == Some(Tab::Files) { " selected" } } { a href={ "/" ^path "/tree/" ^head } { "Files" } }
+      div class={ "commits" @if *tab == Some(Tab::Commits) { " selected" } } { a href={ "/" ^path "/commits/" ^head } { "Commits" } }
+      div class={ "reviews" @if *tab == Some(Tab::Reviews) { " selected" } } { a href={ "/" ^path "/reviews" } { "Reviews" } }
     }
   }
 }

@@ -157,13 +157,13 @@ impl PartialOrd for Sorter {
 }
 
 impl<'a> super::repository_wrapper::RepositoryTab for &'a TreeEntry<'a> {
-  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
+  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Files) }
 }
 
 impl<'a> super::repository_wrapper::RepositoryTab for &'a Tree<'a> {
-  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
+  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Files) }
 }
 
 impl<'a> super::repository_wrapper::RepositoryTab for &'a Blob<'a> {
-  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Files }
+  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Files) }
 }

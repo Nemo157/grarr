@@ -20,6 +20,7 @@ mod about;
 mod tree;
 mod blob;
 mod pages;
+mod compare;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
@@ -31,6 +32,7 @@ pub use self::repositories::Repositories;
 pub use self::tree::Tree;
 pub use self::blob::Blob;
 pub use self::pages::Pages;
+pub use self::compare::Compare;
 
 pub use self::register::Register;
 pub use self::statics::Static;

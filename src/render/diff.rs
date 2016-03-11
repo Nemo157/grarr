@@ -208,7 +208,6 @@ impl DiffDelta {
 
 impl<'a> From<git2::DiffDelta<'a>> for DiffDelta {
   fn from(delta: git2::DiffDelta<'a>) -> DiffDelta {
-    println!("old: {}, new: {}", delta.old_file().id(), delta.new_file().id());
     DiffDelta {
       status: Delta(delta.status()),
       old_file: delta.old_file().path().map(|p| p.to_owned()),

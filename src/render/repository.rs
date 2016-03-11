@@ -116,5 +116,5 @@ renderers! {
 }
 
 impl<'a> super::repository_wrapper::RepositoryTab for &'a Repository<'a> {
-  fn tab() -> super::repository_wrapper::Tab { super::repository_wrapper::Tab::Overview }
+  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Overview) }
 }
