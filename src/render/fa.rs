@@ -1,49 +1,48 @@
 use std::fmt;
 use maud::RenderOnce;
 
-#[allow(dead_code)]
-pub enum FA {
-  LevelUp,
-  GitSquare,
-  Sitemap,
-  Tag,
-  File,
-  Question,
-  CodeFork,
-  Home,
-  Info,
-  Cog,
+macro_rules! fa {
+  ($($e:ident => $v:expr,)*) => {
+    #[allow(dead_code)]
+    pub enum FA { $($e,)* }
+    impl FA {
+      fn class(self) -> &'static str {
+        match self {
+          $(FA::$e => concat!("fa fa-", $v),)*
+        }
+      }
+    }
+  };
+}
+
+fa! {
+  Book      => "book",
+  CodeFork  => "code-fork",
+  Cog       => "cog",
+  File      => "file",
+  GitSquare => "git-square",
+  Home      => "home",
+  Info      => "info",
+  LevelUp   => "level-up",
+  Question  => "question",
+  Sitemap   => "sitemap",
+  Tag       => "tag",
 }
 
 #[allow(dead_code)]
 pub enum FAM {
-  Li(FA),
   FixedWidth(FA),
+  Lg(FA),
+  Li(FA),
   X(u8, FA),
-}
-
-impl FA {
-  fn class(self) -> &'static str {
-    match self {
-      FA::LevelUp => "fa fa-level-up",
-      FA::GitSquare => "fa fa-git-square",
-      FA::Sitemap => "fa fa-sitemap",
-      FA::Tag => "fa fa-tag",
-      FA::File => "fa fa-file",
-      FA::Question => "fa fa-question",
-      FA::CodeFork => "fa fa-code-fork",
-      FA::Home => "fa fa-home",
-      FA::Info => "fa fa-info",
-      FA::Cog => "fa fa-cog",
-    }
-  }
 }
 
 impl FAM {
   fn class(self) -> String {
     match self {
-      FAM::Li(fa) => format!("fa-li {}", fa.class()),
       FAM::FixedWidth(fa) => format!("fa-fw {}", fa.class()),
+      FAM::Lg(fa) => format!("fa-fw fa-lg {}", fa.class()),
+      FAM::Li(fa) => format!("fa-li {}", fa.class()),
       FAM::X(mul, fa) => format!("fa-fw fa-{}x {}", mul, fa.class()),
     }
   }

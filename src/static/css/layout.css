@@ -261,4 +261,5 @@ pre.block-details {
 .row    { display: flex; flex-direction: row; }
 .column { display: flex; flex-direction: column; flex-grow: 1; }
 .column.fixed { flex-grow: 0; flex-shrink: 0; }
+.column.align-top { align-self: flex-start; }
 .center { align-items: center; }

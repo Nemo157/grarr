@@ -73,6 +73,16 @@ renderers! {
             }
           }
         }
+        @if repo.find_branch("gh-pages", git2::BranchType::Local).is_ok() {
+          div.column.fixed {
+            h3 {
+              a href={ "/" ^path "/pages/" } {
+                ^FAM::Lg(FA::Book)
+                " Pages"
+              }
+            }
+          }
+        }
       }
     }
   }
