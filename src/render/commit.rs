@@ -5,6 +5,7 @@ use maud_pulldown_cmark::Markdown;
 use commit_tree;
 use chrono::naive::datetime::NaiveDateTime;
 use referenced_commit::ReferencedCommit;
+use repository_context::RepositoryContext;
 use super::reference;
 
 fn summary<'a>(commit: &'a git2::Commit<'a>) -> Option<&'a str> {
@@ -18,13 +19,13 @@ fn non_summary<'a>(commit: &'a git2::Commit<'a>) -> Option<&'a str> {
 }
 
 renderers! {
-  CommitStub(root: &'a str, commit: &'a git2::Commit<'a>) {
+  CommitStub(context: &'a RepositoryContext, commit: &'a git2::Commit<'a>) {
     div.block {
-      ^CommitHeader(root, commit)
+      ^CommitHeader(context, commit)
     }
   }
 
-  CommitHeader(root: &'a str, commit: &'a git2::Commit<'a>) {
+  CommitHeader(context: &'a RepositoryContext, commit: &'a git2::Commit<'a>) {
     div.block-header {
       div.row {
         @if commit.author().email() == commit.committer().email() {
@@ -43,7 +44,7 @@ renderers! {
         }
         div.column {
           div {
-            a href={ ^root "/commit/" ^commit.id() } {
+            a href={ "/" ^context.path "/commit/" ^commit.id() } {
               ^(super::reference::Commit(commit))
               " "
               @match summary(commit) {
@@ -75,9 +76,9 @@ renderers! {
     }
   }
 
-  CommitDetails(root: &'a str, commit: &'a git2::Commit<'a>) {
+  CommitDetails(context: &'a RepositoryContext, commit: &'a git2::Commit<'a>) {
     div.commit.block {
-      ^CommitHeader(root, commit)
+      ^CommitHeader(context, commit)
       @if let Some(non_summary) = non_summary(commit) {
         @if !non_summary.is_empty() {
           div.block-details.message {
@@ -88,21 +89,19 @@ renderers! {
     }
   }
 
-  Commit(root: &'a str, repo: &'a git2::Repository, commit: &'a git2::Commit<'a>) {
-    ^CommitDetails(root, commit)
-    ^super::DiffCommit(repo, commit)
+  Commit(context: &'a RepositoryContext, commit: &'a git2::Commit<'a>) {
+    ^CommitDetails(context, commit)
+    ^super::DiffCommit(context, commit)
   }
 
-  NextPage(root: &'a str, commit: &'a ReferencedCommit<'a>, next: &'a Option<&'a git2::Commit<'a>>) {
+  NextPage(context: &'a RepositoryContext, commit: &'a ReferencedCommit<'a>, next: &'a Option<&'a git2::Commit<'a>>) {
     div.block div.block-header.row {
       div.column.fixed {
       a href={
-        ^root
+        "/"
+        ^context.path
         "/commits/"
-        @match commit.reference.as_ref().and_then(|r| r.shorthand()) {
-          Some(ref reff) => ^reff,
-          None => ^commit.commit.id()
-        }
+        ^commit.shorthand_or_id()
       } {
         "Back to beginning (" ^reference::Commit(&commit.commit) ")"
       }
@@ -111,12 +110,10 @@ renderers! {
       @if let Some(ref next) = *next {
         div.column.fixed {
           a.float-right href={
-            ^root
+            "/"
+            ^context.path
             "/commits/"
-            @match commit.reference.as_ref().and_then(|r| r.shorthand()) {
-              Some(ref reff) => ^reff,
-              None => ^commit.commit.id()
-            }
+            ^commit.shorthand_or_id()
             "?start=" ^next.id()
           } {
             "Next page (" ^reference::Commit(next) ")"
@@ -127,10 +124,10 @@ renderers! {
   }
 }
 
-pub struct Commits<'repo, 'a>(pub &'a str, pub &'a ReferencedCommit<'a>, pub commit_tree::CommitTree<'repo>);
+pub struct Commits<'repo, 'a>(pub &'a RepositoryContext, pub &'a ReferencedCommit<'a>, pub commit_tree::CommitTree<'repo>);
 impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let Commits(root, commit, mut commits) = self;
+    let Commits(context, commit, mut commits) = self;
     let first = commits.next();
     let mut id = 0;
     html!(w, {
@@ -145,35 +142,35 @@ impl<'repo, 'a> RenderOnce for Commits<'repo, 'a> {
             }
           }
         }
-        ^CommitStub(root, &first)
+        ^CommitStub(context, &first)
         @if !sub.is_empty() {
           div.subtree {
             input.expander disabled?=(sub.len() == 1) id={ "commits-expander-" ^id } type="checkbox" checked? { }
             label for={ "commits-expander-" ^id } { i.fa.fa-fw.chevron {} }
-            ^CommitTree(root, &mut sub, &mut id)
+            ^CommitTree(context, &mut sub, &mut id)
           }
         }
-        ^CommitTree(root, &mut commits, &mut id)
-        ^NextPage(root, commit, &commits.next_after())
+        ^CommitTree(context, &mut commits, &mut id)
+        ^NextPage(context, commit, &commits.next_after())
       }
     })
   }
 }
 
-pub struct CommitTree<'a, 'repo: 'a>(pub &'a str, pub &'a mut commit_tree::CommitTree<'repo>, pub &'a mut u32);
+pub struct CommitTree<'a, 'repo: 'a>(pub &'a RepositoryContext, pub &'a mut commit_tree::CommitTree<'repo>, pub &'a mut u32);
 impl<'repo, 'a> RenderOnce for CommitTree<'repo, 'a> {
   fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    let CommitTree(root, commits, id) = self;
+    let CommitTree(context, commits, id) = self;
     *id = *id + 1;
     html!(w, {
       div.commits {
         @for (commit, mut sub) in commits {
-          ^CommitStub(root, &commit)
+          ^CommitStub(context, &commit)
           @if !sub.is_empty() {
             div.subtree {
               input.expander disabled?=(sub.len() == 1) id={ "commits-expander-" ^id } type="checkbox" checked? { }
               label for={ "commits-expander-" ^id } { i.fa.fa-fw.chevron {} }
-              ^CommitTree(root, &mut sub, id)
+              ^CommitTree(context, &mut sub, id)
             }
           }
         }

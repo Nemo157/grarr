@@ -44,7 +44,7 @@ pub fn get_tree_entry<'a>(context: &'a RepositoryContext, path: &'a str) -> Iron
   };
   let id = referenced_commit.commit.id();
   let idstr = format!("{}", id);
-  let reff = referenced_commit.reference.as_ref().and_then(|r| r.shorthand()).unwrap_or(&*idstr).to_owned();
+  let reff = referenced_commit.shorthand_or_id().into_owned();
   Ok(TreeEntryContext {
     entry: entry,
     repo_path: &context.path,

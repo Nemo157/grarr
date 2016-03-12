@@ -20,14 +20,14 @@ impl<'r> Render for Compare<'r> {
         div.block-header h3 { "Commits" }
         div.block-details {
           @for commit in &self.commits {
-            ^super::CommitStub(&("/".to_owned() + &self.context.path), commit)
+            ^super::CommitStub(&self.context, commit)
           }
         }
       }
       div.block {
         div.block-header h3 { "File changes" }
         div.block-details {
-          ^super::DiffCommits(&self.context.repository, &Some(&self.base), &self.new.commit)
+          ^super::DiffCommits(&self.context, &Some(&self.base), &self.new.commit)
         }
       }
     })

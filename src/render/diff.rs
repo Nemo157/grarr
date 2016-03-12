@@ -4,41 +4,49 @@ use std::path::PathBuf;
 use std::cell::RefCell;
 use git2::{ self, Commit, Repository };
 use maud::{ RenderOnce };
+use repository_context::RepositoryContext;
 
 renderers! {
-  DiffCommits(repo: &'a Repository, old_commit: &'a Option<&'a Commit<'a>>, new_commit: &'a Commit<'a>) {
-    @match repo.diff_tree_to_tree(old_commit.map(|commit| commit.tree().unwrap()).as_ref(), Some(&new_commit.tree().unwrap()), None) {
-      Ok(ref diff) => ^Diff(diff),
+  DiffCommits(context: &'a RepositoryContext, old_commit: &'a Option<&'a Commit<'a>>, new_commit: &'a git2::Commit<'a>) {
+    @match context.repository.diff_tree_to_tree(old_commit.map(|commit| commit.tree().unwrap()).as_ref(), Some(&new_commit.tree().unwrap()), None) {
+      Ok(ref diff) => ^Diff(context, new_commit, diff),
       Err(ref error) => ^super::Error(error),
     }
   }
 
-  DiffCommit(repo: &'a Repository, commit: &'a Commit<'a>) {
-    ^DiffCommits(repo, &commit.parents().nth(0).as_ref(), commit)
+  DiffCommit(context: &'a RepositoryContext, commit: &'a git2::Commit<'a>) {
+    ^DiffCommits(context, &commit.parents().nth(0).as_ref(), commit)
   }
 
-  DiffHeader(delta: &'a DiffDelta) {
-    div.block-header {
-      @match (delta.status.0, delta.new_file.as_ref(), delta.old_file.as_ref()) {
-        (git2::Delta::Added, Some(ref new_file), _) => {
-          h3 { span { "Added " span.path ^new_file.to_string_lossy() } }
-        },
-        (git2::Delta::Deleted, _, Some(ref old_file)) => {
-          h3 { span { "Deleted " span.path ^old_file.to_string_lossy() } }
-        },
-        (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file == new_file => {
-          h3 { span { "Modified " span.path ^new_file.to_string_lossy() } }
-        },
-        (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file != new_file => {
-          h3 { span { "Modified " span.path ^new_file.to_string_lossy() "(Previously " span.path ^old_file.to_string_lossy() ")" } }
-        },
-        (git2::Delta::Renamed, Some(ref new_file), Some(ref old_file)) => {
-          h3 { span { "Renamed " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
-        },
-        (git2::Delta::Copied, Some(ref new_file), Some(ref old_file)) => {
-          h3 { span { "Copied " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
-        },
-        (status, ref new_file, ref old_file) =>  ^(format!("{:?} ({:?} -> {:?}) (should not happen)", status, old_file, new_file))
+  DiffHeader(context: &'a RepositoryContext, new_commit: &'a git2::Commit<'a>, delta: &'a DiffDelta) {
+    div.block-header.row {
+      div.column {
+        @match (delta.status.0, delta.new_file.as_ref(), delta.old_file.as_ref()) {
+          (git2::Delta::Added, Some(ref new_file), _) => {
+            h3 { span { "Added " span.path ^new_file.to_string_lossy() } }
+          },
+          (git2::Delta::Deleted, _, Some(ref old_file)) => {
+            h3 { span { "Deleted " span.path ^old_file.to_string_lossy() } }
+          },
+          (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file == new_file => {
+            h3 { span { "Modified " span.path ^new_file.to_string_lossy() } }
+          },
+          (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file != new_file => {
+            h3 { span { "Modified " span.path ^new_file.to_string_lossy() "(Previously " span.path ^old_file.to_string_lossy() ")" } }
+          },
+          (git2::Delta::Renamed, Some(ref new_file), Some(ref old_file)) => {
+            h3 { span { "Renamed " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
+          },
+          (git2::Delta::Copied, Some(ref new_file), Some(ref old_file)) => {
+            h3 { span { "Copied " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
+          },
+          (status, ref new_file, ref old_file) =>  ^(format!("{:?} ({:?} -> {:?}) (should not happen)", status, old_file, new_file))
+        }
+      }
+      @if let Some(new_file) = delta.new_file.as_ref() {
+        div.column.fixed {
+          a href={ "/" ^context.path "/blob/" ^new_commit.id() "/" ^new_file.to_string_lossy() } { "View" }
+        }
       }
     }
   }
@@ -123,10 +131,10 @@ renderers! {
     }
   }
 
-  Diff(diff: &'a git2::Diff<'a>) {
+  Diff(context: &'a RepositoryContext, new_commit: &'a git2::Commit<'a>, diff: &'a git2::Diff<'a>) {
     @for (delta, hunks) in group(diff).unwrap() {
       div.diff.block id=^delta.id() {
-        ^DiffHeader(&delta)
+        ^DiffHeader(context, new_commit, &delta)
         ^DiffDetails(delta.id(), delta.new_file.or(delta.old_file).and_then(|path| path.extension().map(|s| s.to_string_lossy().into_owned())), hunks)
       }
     }
