@@ -2,12 +2,12 @@ use std::ascii::AsciiExt;
 use std::mem;
 use std::path::PathBuf;
 use std::cell::RefCell;
-use git2::{ self, Commit, Repository };
+use git2;
 use maud::{ RenderOnce };
 use repository_context::RepositoryContext;
 
 renderers! {
-  DiffCommits(context: &'a RepositoryContext, old_commit: &'a Option<&'a Commit<'a>>, new_commit: &'a git2::Commit<'a>) {
+  DiffCommits(context: &'a RepositoryContext, old_commit: &'a Option<&'a git2::Commit<'a>>, new_commit: &'a git2::Commit<'a>) {
     @match context.repository.diff_tree_to_tree(old_commit.map(|commit| commit.tree().unwrap()).as_ref(), Some(&new_commit.tree().unwrap()), None) {
       Ok(ref diff) => ^Diff(context, new_commit, diff),
       Err(ref error) => ^super::Error(error),
