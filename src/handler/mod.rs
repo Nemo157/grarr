@@ -21,7 +21,7 @@ mod tree;
 mod blob;
 mod pages;
 mod compare;
-pub mod git;
+pub mod git_smart_http;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;

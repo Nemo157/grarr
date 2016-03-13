@@ -1,5 +1,4 @@
 mod refs;
-mod head;
+mod utils;
 
 pub use self::refs::Refs;
-pub use self::head::Head;
