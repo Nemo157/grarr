@@ -21,6 +21,7 @@ mod tree;
 mod blob;
 mod pages;
 mod compare;
+pub mod git;
 
 pub use self::avatar::Avatars;
 pub use self::review::Review;
