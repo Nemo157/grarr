@@ -91,6 +91,7 @@ fn main() {
     .register(inject_repository_context(&config.repos.root, handler::Pages))
     .register(inject_repository_context(&config.repos.root, handler::Compare))
     .register(inject_repository_context(&config.repos.root, handler::git_smart_http::Refs))
+    .register(inject_repository_context(&config.repos.root, handler::git_smart_http::UploadPack))
     .register(statics![
       prefix: "./static/";
       "./static/js/highlight.js",
