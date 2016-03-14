@@ -66,10 +66,10 @@ pub struct RepositoryContextHandler<H: Handler> {
 impl<H: Handler> Handler for RepositoryContextHandler<H> {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let (path, reference) = {
-      let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
+      let router = itry!(req.extensions.get::<Router>().ok_or(Error::from("missing extension")), status::InternalServerError);
       (router.find("repo").map(ToOwned::to_owned), router.find("ref").map(ToOwned::to_owned))
     };
-    let path = itry!(path.ok_or(Error::MissingPathComponent), status::InternalServerError);
+    let path = itry!(path.ok_or(Error::from("missing path component")), status::InternalServerError);
     let full_path = self.canonical_root.join(&path);
     let full_canonical_path = itry!(fs::canonicalize(&full_path), status::NotFound);
     if full_path == full_canonical_path {

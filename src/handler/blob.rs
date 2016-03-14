@@ -8,8 +8,8 @@ pub struct Blob;
 
 impl Handler for Blob {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let router = itry!(req.extensions.get::<Router>().ok_or(Error::from("missing extension")), status::InternalServerError);
+    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
     let path = router.find("path").unwrap_or("");
     let entry = try!(tree_entry::get_tree_entry(&context, path));
     let referenced_commit = itry!(context.referenced_commit(), status::NotFound);

@@ -8,8 +8,8 @@ pub struct Tree;
 
 impl Handler for Tree {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let router = itry!(req.extensions.get::<Router>().ok_or(Error::from("missing extension")), status::InternalServerError);
+    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
     let entry = try!(tree_entry::get_tree_entry(&context, router.find("path").unwrap_or("")));
     match entry.entry.kind() {
       Some(git2::ObjectType::Tree) => {

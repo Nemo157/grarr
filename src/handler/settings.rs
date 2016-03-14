@@ -10,7 +10,7 @@ pub struct SettingsPost;
 
 impl Handler for Settings {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let settings = itry!(req.extensions.get::<settings::Settings>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let settings = itry!(req.extensions.get::<settings::Settings>().ok_or(Error::from("missing extension")), status::InternalServerError);
     Html {
       render: &render::Settings(settings),
       etag: None,
@@ -33,7 +33,7 @@ impl Handler for SettingsPost {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let settings = {
       let map: Map = itry!(req.get::<Params>(), status::InternalServerError);
-      let settings = itry!(req.extensions.get::<settings::Settings>().ok_or(Error::MissingExtension), status::InternalServerError);
+      let settings = itry!(req.extensions.get::<settings::Settings>().ok_or(Error::from("missing extension")), status::InternalServerError);
       settings.with(
         map.iter().filter_map(|(key, value)| match *value {
           Value::String(ref value) => Some((&**key, &**value)),

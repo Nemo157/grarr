@@ -7,7 +7,7 @@ pub struct Compare;
 
 impl Handler for Compare {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
     let new_commit = itry!(context.referenced_commit(), status::NotFound);
 
     // TODO: Read which old commit from url

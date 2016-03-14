@@ -49,8 +49,8 @@ impl Static {
 
 impl Handler for Static {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-    let path = Path::new(itry!(router.find("path").ok_or(Error::MissingPathComponent), status::InternalServerError));
+    let router = itry!(req.extensions.get::<Router>().ok_or(Error::from("missing extension")), status::InternalServerError);
+    let path = Path::new(itry!(router.find("path").ok_or(Error::from("missing path component")), status::InternalServerError));
     let File(mime, entity_tag, buffer) = itry!(self.find_file(path).ok_or(Error::from("Static file not found")), status::NotFound);
     let cache_headers = utils::cache_headers_for(&entity_tag, Duration::from_secs(86400));
     if req.cache_matches(&entity_tag) {

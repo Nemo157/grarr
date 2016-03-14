@@ -37,7 +37,7 @@ fn find_service(req: &Request) -> Option<String> {
 
 impl Handler for Refs {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
     match find_service(req).as_ref().map(|s| &**s) {
       Some("git-upload-pack") => {
         let head = itry!(context.repository.head());
