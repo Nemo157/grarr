@@ -15,6 +15,7 @@ fn format_ref(reff: git2::Reference) -> Result<String, Error> {
 fn format_refs(head: git2::Reference, refs: git2::References) -> Result<Vec<u8>, Error> {
   let mut result = Vec::new();
   try!(result.write_pkt_line("# service=git-upload-pack"));
+  try!(result.write_pkt_line_flush());
   let head_id = try!(head.target().ok_or(Error::from("HEAD missing target")));
   try!(result.write_pkt_line(format!("{} HEAD\0{}", head_id, "i-am-incapable")));
   // TODO: Sort refs by name in C locale
