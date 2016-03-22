@@ -8,7 +8,7 @@ use iron::modifiers::Header;
 use unicase::UniCase;
 use time;
 
-use git2::{ self, Oid, Repository };
+use git2::{ self, Oid, Repository, Buf };
 
 #[derive(Clone)]
 pub struct UploadPack;
@@ -145,6 +145,16 @@ fn compute_response(context: &UploadPackContext, request: &UploadPackRequest) ->
   }
 }
 
+fn build_pack(repository: &Repository, commits: Vec<Oid>) -> Result<Buf, Error> {
+  let mut builder = try!(repository.packbuilder());
+  for id in commits {
+    try!(builder.insert_commit(id));
+  }
+  let mut buf = Buf::new();
+  try!(builder.write_buf(&mut buf));
+  Ok(buf)
+}
+
 impl Handler for UploadPack {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let no_cache = (
@@ -164,9 +174,18 @@ impl Handler for UploadPack {
     let context2 = itry!(prepare_context(context), status::InternalServerError);
     itry!(validate_request(&context2, &request), status::BadRequest);
     let result = itry!(compute_response(&context2, &request), status::InternalServerError);
-    println!("request: {:?}", request);
-    println!("result: {:?}", result);
-    Err(IronError::new(Error::from("TODO"), (status::ImATeapot, no_cache)))
+    match result {
+      UploadPackResponse::Pack(commits) => {
+        let pack = itry!(build_pack(&context.repository, commits), status::InternalServerError);
+        println!("built {} byte pack", pack.len());
+        let mut response = vec![0; pack.len() + 8];
+        response[0..8].clone_from_slice(&[
+          b'0', b'0', b'0', b'8', b'N', b'A', b'K', b'\n',
+        ]);
+        response[8..].clone_from_slice(&*pack);
+        Ok(Response::with((status::Ok, no_cache, response)))
+      },
+    }
   }
 }
 
