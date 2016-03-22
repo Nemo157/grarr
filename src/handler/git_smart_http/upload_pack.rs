@@ -8,7 +8,7 @@ use iron::modifiers::Header;
 use unicase::UniCase;
 use time;
 
-use git2::{ Oid, Repository };
+use git2::{ self, Oid, Repository };
 
 #[derive(Clone)]
 pub struct UploadPack;
@@ -88,32 +88,43 @@ fn validate_request(context: &UploadPackContext, request: &UploadPackRequest) ->
   Ok(())
 }
 
+fn graph_ancestor_of_any<I: Iterator<Item=Oid>>(repository: &Repository, commit: Oid, descendants: I) -> Result<bool, git2::Error> {
+  for descendant in descendants {
+    if try!(repository.graph_descendant_of(descendant, commit)) {
+      return Ok(true);
+    }
+  }
+  Ok(false)
+}
+
+fn graph_descendant_of_any<I: Iterator<Item=Oid>>(repository: &Repository, commit: Oid, ancestors: I) -> Result<bool, git2::Error> {
+  for ancestor in ancestors {
+    if try!(repository.graph_descendant_of(commit, ancestor)) {
+      return Ok(true);
+    }
+  }
+  Ok(false)
+}
+
 // a commit set is closed if every commit in `descendants` has at least one ancestor in `ancestors`
 fn is_closed<I1: Iterator<Item=Oid>, I2: Iterator<Item=Oid> + Clone>(repository: &Repository, descendants: I1, ancestors: I2) -> Result<bool, Error> {
-  'outer: for descendant in descendants {
-    for ancestor in ancestors.clone() {
-      if try!(repository.graph_descendant_of(descendant, ancestor)) {
-        continue 'outer;
-      }
+  for descendant in descendants {
+    if !try!(graph_descendant_of_any(repository, descendant, ancestors.clone())) {
+      return Ok(false);
     }
-    return Ok(false);
   }
   Ok(true)
 }
 
+#[allow(collapsible_if)]
 fn compute_response(context: &UploadPackContext, request: &UploadPackRequest) -> Result<UploadPackResponse, Error> {
   let mut common = HashSet::<Oid>::new();
   // for each id given in have
-  'outer: for id in request.haves.iter().cloned() {
-    for r in context.refs.iter().cloned() {
-      // if it is an ancestor of a ref
-      if try!(context.repository.graph_descendant_of(r, id)) {
-        // and is not an ancestor of a common
-        for c in common.iter().cloned() {
-          if try!(context.repository.graph_descendant_of(c, id)) {
-            continue 'outer;
-          }
-        }
+  for id in request.haves.iter().cloned() {
+    // if it is an ancestor of a ref
+    if try!(graph_ancestor_of_any(&context.repository, id, context.refs.iter().cloned())) {
+      // and is not an ancestor of a common
+      if !try!(graph_ancestor_of_any(&context.repository, id, common.iter().cloned())) {
         // add it to common
         common.insert(id);
       }
