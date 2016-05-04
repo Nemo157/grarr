@@ -28,7 +28,7 @@ pub struct Avatars {
 pub struct Cache {
   pub enable: bool,
   pub capacity: usize,
-  pub ttl_seconds: i64,
+  pub ttl_seconds: u64,
 }
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]

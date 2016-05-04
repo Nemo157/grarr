@@ -151,7 +151,7 @@ fn build_pack(repository: &Repository, commits: Vec<Oid>) -> Result<Buf, Error> 
     try!(builder.insert_commit(id));
   }
   let mut buf = Buf::new();
-  try!(builder.write_buf(&mut buf));
+  try!(builder.write_buf(&mut buf, None));
   Ok(buf)
 }
 
