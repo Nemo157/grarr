@@ -12,30 +12,30 @@ maybe_cache = []
 
 [dependencies]
 
-git-appraise = "0.1.1"
-git2 = "0.4.2"
+git-appraise = "*"
+git2 = { git = "https://github.com/Nemo157/git2-rs", rev = "packbuilder" }
 
-hyper = "*"
+hyper = "0.8.1"
 iron = "*"
 router = { git = "https://github.com/Nemo157/router", rev = "reverse_priority" }
-logger = { git = "https://github.com/Nemo157/logger", rev = "allow-no-status" }
+logger = { git = "https://github.com/Nemo157/logger", rev = "personal_release" }
 typemap = "*"
-mime = "0.1.3"
+mime = "*"
 lru_time_cache = "*"
 time = "*"
 walkdir = "*"
-params = "*"
+# params = "*"
 
 chrono = "*"
-pulldown-cmark = "0.0.7"
-maud-pulldown-cmark = "0.1.0"
-gravatar = "0.1.4"
+pulldown-cmark = "*"
+maud-pulldown-cmark = "*"
+gravatar = "*"
 
-maud = "0.8.0"
-maud_macros = "0.8.0"
+maud = "*"
+maud_macros = "*"
 
-clippy = { version = "0", optional = true }
+clippy = { version = "*", optional = true }
 rust-crypto = "*"
 unicase = "*"
-toml = "0.1.27"
-rustc-serialize = "0.3"
+toml = "*"
+rustc-serialize = "*"

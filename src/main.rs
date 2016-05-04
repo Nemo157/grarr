@@ -27,7 +27,7 @@ extern crate pulldown_cmark;
 extern crate crypto;
 extern crate unicase;
 extern crate walkdir;
-extern crate params;
+// extern crate params;
 extern crate toml;
 extern crate rustc_serialize;
 
@@ -47,12 +47,12 @@ mod referenced_commit;
 mod config;
 mod tree_entry;
 
+use std::time::Duration;
 use std::env;
 use iron::prelude::*;
 use router::*;
 use logger::*;
 use handler::Register;
-use time::Duration;
 use repository_context::inject_repository_context;
 
 pub use repository_context::RepositoryContext;
@@ -109,7 +109,7 @@ fn main() {
       enable_gravatar: config.avatars.gravatar.enable,
       enable_cache: config.avatars.cache.enable,
       cache_capacity: config.avatars.cache.capacity,
-      cache_time_to_live: Duration::seconds(config.avatars.cache.ttl_seconds),
+      cache_time_to_live: Duration::from_secs(config.avatars.cache.ttl_seconds),
     }));
 
   let (logger_before, logger_after) = Logger::new(None);

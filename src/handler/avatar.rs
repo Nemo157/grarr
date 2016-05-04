@@ -13,7 +13,6 @@ use router::Router;
 use iron::status;
 use iron::method::Method;
 use lru_time_cache::LruCache;
-use time::Duration as Duration2;
 use std::sync::Mutex;
 use super::utils::{ self, sha1, File, CacheMatches };
 
@@ -34,7 +33,7 @@ pub struct Options {
   pub enable_gravatar: bool,
   pub enable_cache: bool,
   pub cache_capacity: usize,
-  pub cache_time_to_live: Duration2,
+  pub cache_time_to_live: Duration,
 }
 
 impl Avatars {
