@@ -3,7 +3,7 @@ name = "grarr"
 version = "0.0.3"
 dependencies = [
  "chrono 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy 0.0.64 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy 0.0.67 (registry+https://github.com/rust-lang/crates.io-index)",
  "git-appraise 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "gravatar 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -65,7 +65,7 @@ dependencies = [
 
 [[package]]
 name = "clippy"
-version = "0.0.64"
+version = "0.0.67"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "quine-mc_cluskey 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
