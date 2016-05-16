@@ -13,7 +13,7 @@ maybe_cache = []
 [dependencies]
 
 git-appraise = "*"
-git2 = { git = "https://github.com/Nemo157/git2-rs", rev = "packbuilder" }
+git2 = "*"
 
 hyper = "0.8.1"
 iron = "*"
