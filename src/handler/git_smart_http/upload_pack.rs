@@ -1,12 +1,14 @@
 use handler::base::*;
 use super::utils::*;
 
+use std::io::{ Read, Write };
 use std::collections::HashSet;
 
-use iron::headers::{ CacheControl, CacheDirective, Vary, Pragma, Expires, HttpDate };
+use iron::headers::{ CacheControl, CacheDirective, Vary, Pragma, Expires, HttpDate, ContentEncoding, Encoding };
 use iron::modifiers::Header;
 use unicase::UniCase;
 use time;
+use flate2::FlateReadExt;
 
 use git2::{ self, Oid, Repository, Buf };
 
@@ -39,7 +41,21 @@ fn parse_request(req: &mut Request) -> Result<UploadPackRequest, Error> {
     capabilities: Vec::new(),
     done: false,
   };
-  for line in req.body.pkt_lines() {
+  let encoding = if let Some(&ContentEncoding(ref encodings)) = req.headers.get() {
+    if encodings.len() != 1 {
+      return Err(Error::from("Can't handle multiple encodings"));
+    }
+    encodings[0].clone()
+  } else {
+    Encoding::Identity
+  };
+  let mut body = match encoding {
+    Encoding::Identity => Box::new(&mut req.body) as Box<Read>,
+    Encoding::Gzip => Box::new(try!((&mut req.body).gz_decode())) as Box<Read>,
+    Encoding::Deflate => Box::new((&mut req.body).deflate_decode()) as Box<Read>,
+    encoding => return Err(Error::from(format!("Can't handle encoding {}", encoding))),
+  };
+  for line in body.pkt_lines() {
     let line = try!(line);
     if line.len() < 4 { continue }
     match &line[0..4] {
@@ -145,13 +161,16 @@ fn compute_response(context: &UploadPackContext, request: &UploadPackRequest) ->
   }
 }
 
-fn build_pack(repository: &Repository, commits: Vec<Oid>) -> Result<Buf, Error> {
+fn build_pack(repository: &Repository, commits: Vec<Oid>) -> Result<Vec<u8>, Error> {
   let mut builder = try!(repository.packbuilder());
   for id in commits {
     try!(builder.insert_commit(id));
   }
-  let mut buf = Buf::new();
-  try!(builder.write_buf(&mut buf, None));
+  let mut buf = Vec::new();
+  try!(builder.foreach(|object| {
+    buf.write_all(object).unwrap();
+    true
+  }));
   Ok(buf)
 }
 
@@ -178,11 +197,9 @@ impl Handler for UploadPack {
       UploadPackResponse::Pack(commits) => {
         let pack = itry!(build_pack(&context.repository, commits), status::InternalServerError);
         println!("built {} byte pack", pack.len());
-        let mut response = vec![0; pack.len() + 8];
-        response[0..8].clone_from_slice(&[
-          b'0', b'0', b'0', b'8', b'N', b'A', b'K', b'\n',
-        ]);
-        response[8..].clone_from_slice(&*pack);
+        let mut response = Vec::with_capacity(pack.len() + 8);
+        response.write_pkt_line("NAK");
+        response.write_all(&*pack);
         Ok(Response::with((status::Ok, no_cache, response)))
       },
     }

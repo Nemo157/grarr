@@ -34,8 +34,9 @@ gravatar = "*"
 maud = "*"
 maud_macros = "*"
 
-clippy = { version = "*", optional = true }
+clippy = { version = "*", optional = true, git = "https://github.com/Manishearth/rust-clippy", rev = "rustup" }
 rust-crypto = "*"
 unicase = "*"
 toml = "*"
 rustc-serialize = "*"
+flate2 = "*"

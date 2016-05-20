@@ -30,6 +30,7 @@ extern crate walkdir;
 // extern crate params;
 extern crate toml;
 extern crate rustc_serialize;
+extern crate flate2;
 
 #[macro_use]
 mod macros;
