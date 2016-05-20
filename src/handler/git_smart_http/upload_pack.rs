@@ -15,11 +15,18 @@ use git2::{ self, Oid, Repository, Buf };
 #[derive(Clone)]
 pub struct UploadPack;
 
+#[derive(Debug, Eq, PartialEq)]
+enum Capability {
+  SideBand,
+  SideBand64K,
+  Unknown(String),
+}
+
 #[derive(Debug)]
 struct UploadPackRequest {
   wants: Vec<Oid>,
   haves: Vec<Oid>,
-  capabilities: Vec<String>,
+  capabilities: Vec<Capability>,
   done: bool,
 }
 
@@ -60,11 +67,10 @@ fn parse_request(req: &mut Request) -> Result<UploadPackRequest, Error> {
     if line.len() < 4 { continue }
     match &line[0..4] {
       "want" => {
-        let end = line.find(|c| c == '\n' || c == '\0').unwrap_or(line.len());
-        request.wants.push(try!(line[5..end].parse()));
-        if let Some(nul) = line.find('\0') {
-          request.capabilities.extend(line[nul..].trim().split(' ').map(ToOwned::to_owned));
-        }
+        let line = line[5..].trim();
+        let (want, caps) = line.split_at(line.find(' ').unwrap_or(line.len()));
+        request.wants.push(try!(want.parse()));
+        request.capabilities.extend(caps.split(' ').map(Capability::from));
       },
       "have" => {
         let end = line.find(|c| c == '\n' || c == '\0').unwrap_or(line.len());
@@ -161,17 +167,22 @@ fn compute_response(context: &UploadPackContext, request: &UploadPackRequest) ->
   }
 }
 
-fn build_pack(repository: &Repository, commits: Vec<Oid>) -> Result<Vec<u8>, Error> {
+fn build_pack(repository: &Repository, commits: Vec<Oid>, mut output: Multiplexer) -> Result<(), Error> {
   let mut builder = try!(repository.packbuilder());
   for id in commits {
     try!(builder.insert_commit(id));
   }
-  let mut buf = Vec::new();
+  let mut i = 0;
   try!(builder.foreach(|object| {
-    buf.write_all(object).unwrap();
+    i += 1;
+    write!(output.progress(), "\rpacked object {}", i).unwrap();
+    output.packfile().write_all(object).unwrap();
     true
   }));
-  Ok(buf)
+  try!(write!(output.progress(), "\r\n"));
+  try!(write!(output.progress(), "packed all {} objects\r\n", i));
+  try!(output.close());
+  Ok(())
 }
 
 impl Handler for UploadPack {
@@ -195,7 +206,18 @@ impl Handler for UploadPack {
     let result = itry!(compute_response(&context2, &request), status::InternalServerError);
     match result {
       UploadPackResponse::Pack(commits) => {
-        let pack = itry!(build_pack(&context.repository, commits), status::InternalServerError);
+        let mut pack = Vec::new();
+        {
+          let limit = if request.capabilities.contains(&Capability::SideBand64K) {
+            Some(65520)
+          } else if request.capabilities.contains(&Capability::SideBand) {
+            Some(1000)
+          } else {
+            None
+          };
+          let output = Multiplexer::new(&mut pack, limit);
+          itry!(build_pack(&context.repository, commits, output), status::InternalServerError);
+        }
         println!("built {} byte pack", pack.len());
         let mut response = Vec::with_capacity(pack.len() + 8);
         response.write_pkt_line("NAK");
@@ -213,5 +235,15 @@ impl Route for UploadPack {
 
   fn route() -> Cow<'static, str> {
     "/git-upload-pack".into()
+  }
+}
+
+impl<S: AsRef<str>> From<S> for Capability {
+  fn from(s: S) -> Capability {
+    match s.as_ref() {
+      "side-band" => Capability::SideBand,
+      "side-band-64k" => Capability::SideBand64K,
+      s => Capability::Unknown(s.to_owned()),
+    }
   }
 }

@@ -1,5 +1,52 @@
 use std::io::{ self, Write };
 use std::str;
+use std::cmp;
+
+pub struct Multiplexer<'a> {
+  stream: &'a mut io::Write,
+  limit: Option<usize>,
+  current_band: u8,
+}
+
+impl<'a> Multiplexer<'a> {
+  pub fn new(stream: &mut io::Write, limit: Option<usize>) -> Multiplexer {
+    Multiplexer { stream: stream, limit: limit, current_band: 0 }
+  }
+  pub fn packfile(&mut self) -> &mut io::Write {
+    self.current_band = 1;
+    self
+  }
+  pub fn progress(&mut self) -> &mut io::Write {
+    self.current_band = 2;
+    self
+  }
+  pub fn error(&mut self) -> &mut io::Write {
+    self.current_band = 3;
+    self
+  }
+  pub fn close(&mut self) -> io::Result<()> {
+    self.stream.write_all(b"0000")
+  }
+}
+
+impl<'a> io::Write for Multiplexer<'a> {
+  fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+    if let Some(limit) = self.limit {
+      let len = cmp::min(limit - 2, buf.len());
+      try!(write!(self.stream, "{:04x}", len + 5));
+      try!(self.stream.write(&[self.current_band]));
+      try!(self.stream.write_all(&buf[0..len]));
+      Ok(len)
+    } else if self.current_band == 1 {
+      self.stream.write(buf)
+    } else {
+      Ok(buf.len())
+    }
+  }
+  fn flush(&mut self) -> io::Result<()> {
+    self.stream.flush()
+  }
+}
 
 pub trait WritePktLine {
   fn write_pkt_line<S: AsRef<str>>(&mut self, buf: S) -> io::Result<()>;
@@ -7,7 +54,7 @@ pub trait WritePktLine {
   fn write_pkt_line_flush(&mut self) -> io::Result<()>;
 }
 
-impl WritePktLine for Vec<u8> {
+impl<W: io::Write> WritePktLine for W {
   fn write_pkt_line<S: AsRef<str>>(&mut self, buf: S) -> io::Result<()> {
     let buf = buf.as_ref().as_bytes();
     if buf.len() >= 65520 {
