@@ -1,11 +1,13 @@
 use handler::base::*;
 use super::utils::*;
 
-use std::io::{ Read, Write };
+use std::io::{ self, Read, Write };
 use std::collections::HashSet;
 
 use iron::headers::{ CacheControl, CacheDirective, Vary, Pragma, Expires, HttpDate, ContentEncoding, Encoding };
+use iron::modifier::Modifier;
 use iron::modifiers::Header;
+use iron::response::{ ResponseBody, WriteBody };
 use unicase::UniCase;
 use time;
 use flate2::FlateReadExt;
@@ -28,6 +30,7 @@ struct UploadPackRequest {
   haves: Vec<Oid>,
   capabilities: Vec<Capability>,
   done: bool,
+  context: RepositoryContext,
 }
 
 struct UploadPackContext<'a> {
@@ -41,12 +44,13 @@ enum UploadPackResponse {
   /* Continue( ... ), */
 }
 
-fn parse_request(req: &mut Request) -> Result<UploadPackRequest, Error> {
+fn parse_request(req: &mut Request, context: RepositoryContext) -> Result<UploadPackRequest, Error> {
   let mut request = UploadPackRequest {
     wants: Vec::new(),
     haves: Vec::new(),
     capabilities: Vec::new(),
     done: false,
+    context: context,
   };
   let encoding = if let Some(&ContentEncoding(ref encodings)) = req.headers.get() {
     if encodings.len() != 1 {
@@ -172,17 +176,44 @@ fn build_pack(repository: &Repository, commits: Vec<Oid>, mut output: Multiplexe
   for id in commits {
     try!(builder.insert_commit(id));
   }
-  let mut i = 0;
+  let mut error = None;
   try!(builder.foreach(|object| {
-    i += 1;
-    write!(output.progress(), "\rpacked object {}", i).unwrap();
-    output.packfile().write_all(object).unwrap();
-    true
+    match output.packfile().write_all(object) {
+      err @ Err(_) => {
+        error = Some(err);
+        false
+      }
+      Ok(()) => true
+    }
   }));
-  try!(write!(output.progress(), "\r\n"));
-  try!(write!(output.progress(), "packed all {} objects\r\n", i));
+  if let Some(err) = error {
+    try!(err);
+  }
   try!(output.close());
   Ok(())
+}
+
+impl WriteBody for UploadPackRequest {
+  fn write_body(&mut self, res: &mut ResponseBody) -> io::Result<()> {
+    let context2 = prepare_context(&self.context).unwrap();
+    validate_request(&context2, self).unwrap();
+    let result = compute_response(&context2, self).unwrap();
+    match result {
+      UploadPackResponse::Pack(commits) => {
+        res.write_pkt_line("NAK");
+        let limit = if self.capabilities.contains(&Capability::SideBand64K) {
+          Some(65520)
+        } else if self.capabilities.contains(&Capability::SideBand) {
+          Some(1000)
+        } else {
+          None
+        };
+        let output = Multiplexer::new(res, limit);
+        build_pack(&self.context.repository, commits, output).unwrap();
+      },
+    }
+    Ok(())
+  }
 }
 
 impl Handler for UploadPack {
@@ -199,32 +230,9 @@ impl Handler for UploadPack {
         UniCase("accept-encoding".to_owned()),
       ])),
     );
-    let request = itry!(parse_request(req), (status::BadRequest, no_cache));
-    let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
-    let context2 = itry!(prepare_context(context), status::InternalServerError);
-    itry!(validate_request(&context2, &request), status::BadRequest);
-    let result = itry!(compute_response(&context2, &request), status::InternalServerError);
-    match result {
-      UploadPackResponse::Pack(commits) => {
-        let mut pack = Vec::new();
-        {
-          let limit = if request.capabilities.contains(&Capability::SideBand64K) {
-            Some(65520)
-          } else if request.capabilities.contains(&Capability::SideBand) {
-            Some(1000)
-          } else {
-            None
-          };
-          let output = Multiplexer::new(&mut pack, limit);
-          itry!(build_pack(&context.repository, commits, output), status::InternalServerError);
-        }
-        println!("built {} byte pack", pack.len());
-        let mut response = Vec::with_capacity(pack.len() + 8);
-        response.write_pkt_line("NAK");
-        response.write_all(&*pack);
-        Ok(Response::with((status::Ok, no_cache, response)))
-      },
-    }
+    let context = itry!(req.extensions.remove::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
+    let request = itry!(parse_request(req, context), (status::BadRequest, no_cache));
+    Ok(Response::with((status::Ok, no_cache, Box::new(request) as Box<WriteBody>)))
   }
 }
 

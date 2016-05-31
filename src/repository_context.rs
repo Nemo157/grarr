@@ -1,5 +1,6 @@
 use git2;
 use std::fs;
+use std::fmt::{ self, Debug };
 use std::path::{ Path, PathBuf };
 use std::borrow::Cow;
 use typemap::Key;
@@ -92,4 +93,10 @@ impl<H: Handler> Handler for RepositoryContextHandler<H> {
 impl<'a, H: Handler + Route> Route for RepositoryContextHandler<H> {
   fn method() -> Method { H::method() }
   fn routes() -> Vec<Cow<'static, str>> { H::routes().into_iter().map(|r| ("/*repo".to_owned() + &r).into()).collect() }
+}
+
+impl Debug for RepositoryContext {
+  fn fmt(&self, w: &mut fmt::Formatter) -> fmt::Result {
+      write!(w, "RepositoryContext {{ path: {:?}, reference: {:?} }}", self.path, self.reference)
+  }
 }
