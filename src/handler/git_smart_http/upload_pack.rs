@@ -195,20 +195,28 @@ fn build_pack(repository: &Repository, commits: Vec<Oid>, mut output: Multiplexe
 
 impl WriteBody for UploadPackRequest {
   fn write_body(&mut self, res: &mut ResponseBody) -> io::Result<()> {
+    res.write_pkt_line("NAK").unwrap();
+    let limit = if self.capabilities.contains(&Capability::SideBand64K) {
+      Some(65520)
+    } else if self.capabilities.contains(&Capability::SideBand) {
+      Some(1000)
+    } else {
+      None
+    };
+    let mut output = Multiplexer::new(res, limit);
+    println!( "Preparing context for {}", self.context.path);
+    write!(output.progress(), "\nPreparing context for {}\r\n", self.context.path);
     let context2 = prepare_context(&self.context).unwrap();
+    println!( "Prepared context for {}", self.context.path);
+    write!(output.progress(), "\nPrepared context for {}\r\n", self.context.path);
     validate_request(&context2, self).unwrap();
+    println!( "Validated request for {}", self.context.path);
+    write!(output.progress(), "\nValidated request for {}\r\n", self.context.path);
     let result = compute_response(&context2, self).unwrap();
+    println!( "Computed response for {}", self.context.path);
+    write!(output.progress(), "\nComputed response for {}\r\n", self.context.path);
     match result {
       UploadPackResponse::Pack(commits) => {
-        res.write_pkt_line("NAK");
-        let limit = if self.capabilities.contains(&Capability::SideBand64K) {
-          Some(65520)
-        } else if self.capabilities.contains(&Capability::SideBand) {
-          Some(1000)
-        } else {
-          None
-        };
-        let output = Multiplexer::new(res, limit);
         build_pack(&self.context.repository, commits, output).unwrap();
       },
     }
@@ -232,6 +240,7 @@ impl Handler for UploadPack {
     );
     let context = itry!(req.extensions.remove::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
     let request = itry!(parse_request(req, context), (status::BadRequest, no_cache));
+    println!("Prepared request for {}", request.context.path);
     Ok(Response::with((status::Ok, no_cache, Box::new(request) as Box<WriteBody>)))
   }
 }
