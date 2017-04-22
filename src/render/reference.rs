@@ -6,15 +6,17 @@ fn short(oid: git2::Oid) -> String {
   oid.as_bytes().iter().take(3).flat_map(|b| vec![HEX[((b >> 4) & 0xFu8) as usize] as char, HEX[(b & 0xFu8) as usize] as char]).collect()
 }
 
-renderers! {
-  Commit(commit: &'a git2::Commit<'a>) {
-    span.id title=^commit.id() { ^short(commit.id()) }
+pub fn Commit(commit: &git2::Commit) -> ::maud::Markup {
+  html! {
+    span.id title=(commit.id()) { (short(commit.id())) }
   }
+}
 
-  Reference(commit: &'a ReferencedCommit<'a>) {
+pub fn Reference(commit: &ReferencedCommit) -> ::maud::Markup {
+  html! {
     @match commit.reference.as_ref().and_then(|r| r.shorthand()) {
-      Some(ref reff) => span.ref title=^commit.commit.id() { ^reff },
-      None => ^Commit(&commit.commit),
+      Some(ref reff) => span.ref title=(commit.commit.id()) { (reff) },
+      None => (Commit(&commit.commit)),
     }
   }
 }

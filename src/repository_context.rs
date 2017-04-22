@@ -10,10 +10,10 @@ use iron::response::Response;
 use iron::middleware::{ Handler };
 use iron::{ status, Url };
 use iron::modifiers::Redirect;
-use hyper::method::Method;
 use handler::route::Route;
 use error::Error;
 use referenced_commit::ReferencedCommit;
+use iron::method::Method;
 
 pub struct RepositoryContext {
   pub path: String,

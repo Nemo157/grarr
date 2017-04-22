@@ -1,8 +1,9 @@
 use std::str;
+use ammonia;
 use git2::{ self, Oid };
 use pulldown_cmark::{ Parser, html, Event, Tag };
 use maud::{ PreEscaped };
-use maud_pulldown_cmark::Markdown;
+use super::utils::Markdown;
 use super::fa::{ FA, FAM };
 use { RepositoryExtension };
 
@@ -15,14 +16,14 @@ fn find_readme(head_id: Oid, repo: &git2::Repository) -> Option<String> {
   str::from_utf8(blob.content()).ok().map(|s| s.to_owned())
 }
 
-fn description(repo: &git2::Repository) -> Option<String> {
+fn description(repo: &git2::Repository) -> Option<PreEscaped<String>> {
   let head_id = expect!(try_expect!(try_expect!(repo.head()).resolve()).target());
   // Render the readme and grab the first <p> element from it.
   find_readme(head_id, repo)
     .map(|readme| {
-      let mut s = String::new();
+      let mut unsafe_html = String::new();
       html::push_html(
-        &mut s,
+        &mut unsafe_html,
         Parser::new(&*readme)
           .skip_while(|ev| match *ev {
             Event::Start(Tag::Paragraph) => false,
@@ -32,42 +33,47 @@ fn description(repo: &git2::Repository) -> Option<String> {
             Event::End(Tag::Paragraph) => false,
             _ => true,
           }));
-      s
+      let safe_html = ammonia::clean(&unsafe_html);
+      PreEscaped(safe_html)
     })
 }
 
-renderers! {
-  Repository(repo: &'a git2::Repository, head_id: &'a Oid) {
+pub fn Repository(repo: &git2::Repository, head_id: &Oid) -> ::maud::Markup {
+  html! {
     @if let Some(readme) = find_readme(*head_id, repo) {
       div.block {
         div.block-details {
-          ^Markdown::from_string(&*readme).with_header_ids()
+          (Markdown(&*readme))
         }
       }
     }
   }
+}
 
-  RepositoryIcon(mul: &'a u8, repo: &'a git2::Repository) {
+pub fn RepositoryIcon(mul: &u8, repo: &git2::Repository) -> ::maud::Markup {
+  html! {
     @match repo.origin_url() {
-      Some(_) => ^FAM::X(*mul, FA::CodeFork),
-      None => ^FAM::X(*mul, FA::Home),
+      Some(_) => (FAM::X(*mul, FA::CodeFork)),
+      None => (FAM::X(*mul, FA::Home)),
     }
   }
+}
 
-  RepositoryHeader(path: &'a str, repo: &'a git2::Repository) {
+pub fn RepositoryHeader(path: &str, repo: &git2::Repository) -> ::maud::Markup {
+  html! {
     div.block-header {
       div.row.center {
-        ^RepositoryIcon(&3, repo)
+        (RepositoryIcon(&3, repo))
         div.column {
-          h1 { a href={ "/" ^path } { ^path } }
+          h1 { a href={ "/" (path) } { (path) } }
           @if let Some(origin) = repo.origin_url() {
-            h4 { "(fork of " ^super::MaybeLink(&origin, &origin) ")" }
+            h4 { "(fork of " (super::MaybeLink(&origin, &origin)) ")" }
           }
           @if let Some(mirrors) = repo.mirrors() {
             h4 {
               "(mirrored on"
               @for (name, url) in mirrors {
-                " " a href=^url { ^name }
+                " " a href=(url) { (name) }
               }
               ")"
             }
@@ -76,8 +82,8 @@ renderers! {
         @if repo.find_branch("gh-pages", git2::BranchType::Local).is_ok() {
           div.column.fixed {
             h3 {
-              a href={ "/" ^path "/pages/" } {
-                ^FAM::Lg(FA::Book)
+              a href={ "/" (path) "/pages/" } {
+                (FAM::Lg(FA::Book))
                 " Pages"
               }
             }
@@ -86,35 +92,39 @@ renderers! {
       }
     }
   }
+}
 
-  RepositoryStub(path: &'a str, repo: &'a git2::Repository) {
+pub fn RepositoryStub(path: &str, repo: &git2::Repository) -> ::maud::Markup {
+  html! {
     div.block {
       div.block-header {
         div.row.center {
-          ^RepositoryIcon(&2, repo)
+          (RepositoryIcon(&2, repo))
           div.column {
-            h3 { a href={ "/" ^path } { ^path } }
+            h3 { a href={ "/" (path) } { (path) } }
             @if let Some(origin) = repo.origin_url() {
-              h6 { "(fork of " ^super::MaybeLink(&origin, &origin) ")" }
+              h6 { "(fork of " (super::MaybeLink(&origin, &origin)) ")" }
             }
           }
         }
       }
       @if let Some(description) = description(repo) {
         div.block-details {
-          ^PreEscaped(description)
+          (description)
         }
       }
     }
   }
+}
 
-  Repositories(repos: Vec<(String, git2::Repository)>) {
+pub fn Repositories(repos: Vec<(String, git2::Repository)>) -> ::maud::Markup {
+  html! {
     @for (path, repo) in repos {
-      ^RepositoryStub(&path, &repo)
+      (RepositoryStub(&path, &repo))
     }
   }
 }
 
-impl<'a> super::repository_wrapper::RepositoryTab for &'a Repository<'a> {
-  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Overview) }
-}
+// impl<'a> super::repository_wrapper::RepositoryTab for &'a Repository<'a> {
+//   fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Overview) }
+// }

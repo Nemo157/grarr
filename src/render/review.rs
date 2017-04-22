@@ -1,27 +1,31 @@
 use git_appraise;
 
-renderers! {
-  Reviews(root: &'a str, reviews: &'a Vec<git_appraise::Review<'a>>) {
+pub fn Reviews(root: &str, reviews: &Vec<git_appraise::Review>) -> ::maud::Markup {
+  html! {
     @for review in reviews {
-      ^ReviewStub(root, review)
+      (ReviewStub(root, review))
     }
   }
+}
 
-  ReviewStub(root: &'a str, review: &'a git_appraise::Review<'a>) {
-    ^super::RequestStub(root, review.request())
+pub fn ReviewStub(root: &str, review: &git_appraise::Review) -> ::maud::Markup {
+  html! {
+    (super::RequestStub(root, review.request()))
   }
+}
 
-  Review(root: &'a str, review: &'a git_appraise::Review<'a>) {
+pub fn Review(root: &str, review: &git_appraise::Review) -> ::maud::Markup {
+  html! {
     div.review {
-      ^super::Events(root.to_owned(), review.events())
+      (super::Events(root.to_owned(), review.events()))
     }
   }
 }
 
-impl<'a> super::repository_wrapper::RepositoryTab for &'a Review<'a> {
-  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Reviews) }
-}
-
-impl<'a> super::repository_wrapper::RepositoryTab for &'a Reviews<'a> {
-  fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Reviews) }
-}
+// impl<'a> super::repository_wrapper::RepositoryTab for &'a Review<'a> {
+//   fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Reviews) }
+// }
+// 
+// impl<'a> super::repository_wrapper::RepositoryTab for &'a Reviews<'a> {
+//   fn tab() -> Option<super::repository_wrapper::Tab> { Some(super::repository_wrapper::Tab::Reviews) }
+// }

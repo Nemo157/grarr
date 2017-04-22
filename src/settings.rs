@@ -1,7 +1,8 @@
 use std::fmt;
 use std::str::FromStr;
 use iron::IronResult;
-use iron::headers::{ Cookie, CookiePair, SetCookie };
+use iron::headers::{ Cookie, SetCookie };
+use cookie::Cookie as CookiePair;
 use iron::middleware::BeforeMiddleware;
 use iron::request::Request;
 use iron::response::Response;
@@ -10,7 +11,7 @@ use iron::modifier::Modifier;
 use typemap::Key;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-#[cfg_attr(feature = "clippy", allow(enum_variant_names))] // Co-inkidink
+#[allow(enum_variant_names)] // Co-inkidink
 pub enum Theme {
   SolarizedDark,
   SolarizedLight,
@@ -73,9 +74,8 @@ impl Settings {
 
 impl<'a> Modifier<Response> for &'a Settings {
   fn modify(self, response: &mut Response) {
-    let mut theme = CookiePair::new("theme".to_owned(), self.theme.to_string());
-    theme.path = Some("/".to_owned());
-    Header(SetCookie(vec![theme])).modify(response);
+    let theme = CookiePair::build("theme", self.theme.to_string()).path("/").finish();
+    Header(SetCookie(vec![theme.to_string()])).modify(response);
   }
 }
 
@@ -83,7 +83,10 @@ impl BeforeMiddleware for Settings {
   fn before(&self, req: &mut Request) -> IronResult<()> {
     let settings = match req.headers.get() {
       Some(&Cookie(ref cookies)) =>
-        self.with(cookies.iter().map(|pair| (&*pair.name, &*pair.value))),
+        self.with(cookies.iter().map(|c| {
+            let pair = CookiePair::parse(c.as_ref()).unwrap();
+            (pair.name_raw().unwrap(), pair.value_raw().unwrap())
+        })),
       None =>
         self.clone(),
     };

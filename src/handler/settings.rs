@@ -12,7 +12,7 @@ impl Handler for Settings {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let settings = itry!(req.extensions.get::<settings::Settings>().ok_or(Error::MissingExtension), status::InternalServerError);
     Html {
-      render: &render::Settings(settings),
+      render: render::Settings(settings),
       etag: None,
       req: req,
     }.into()

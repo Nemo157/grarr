@@ -35,7 +35,7 @@ pub use self::analysis::{ Analysis };
 pub use self::avatar::{ Avatar };
 pub use self::commit::{ Commit, CommitStub, Commits };
 pub use self::repository::{ Repository, Repositories, RepositoryHeader };
-pub use self::repository_wrapper::{ RepositoryWrapper };
+pub use self::repository_wrapper::{ RepositoryWrapper, Tab };
 pub use self::error::{ Error };
 pub use self::tree::{ TreeEntry, Tree, Blob };
 pub use self::wrapper::Wrapper;

@@ -6,7 +6,7 @@ pub struct About;
 impl Handler for About {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     Html {
-      render: &render::About,
+      render: render::About(),
       etag: None,
       req: req,
     }.into()

@@ -1,9 +1,10 @@
 use std::fmt;
-use maud::RenderOnce;
+use maud::{ Render, Markup };
 
 macro_rules! fa {
   ($($e:ident => $v:expr,)*) => {
     #[allow(dead_code)]
+    #[derive(Clone, Copy)]
     pub enum FA { $($e,)* }
     impl FA {
       fn class(self) -> &'static str {
@@ -30,6 +31,7 @@ fa! {
 }
 
 #[allow(dead_code)]
+#[derive(Clone, Copy)]
 pub enum FAM {
   FixedWidth(FA),
   Lg(FA),
@@ -48,14 +50,14 @@ impl FAM {
   }
 }
 
-impl RenderOnce for FA {
-  fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    html!(w, { i class=^self.class() { } })
+impl Render for FA {
+  fn render(&self) -> Markup {
+    html!({ i class=(self.class()) { } })
   }
 }
 
-impl RenderOnce for FAM {
-  fn render_once(self, mut w: &mut fmt::Write) -> fmt::Result {
-    html!(w, { i class=^self.class() { } })
+impl Render for FAM {
+  fn render(&self) -> Markup {
+    html!({ i class=(self.class()) { } })
   }
 }
