@@ -4,30 +4,30 @@ use iron::modifier::Modifier;
 use iron::request::Request;
 use iron::response::Response;
 use iron::{ status, IronResult };
-use maud::RenderOnce;
+use maud::Render;
 use super::utils::{ self, CacheMatches };
 use render::Wrapper;
 use settings::Settings;
 
-pub struct Html<'a, 'b: 'a, 'c: 'b, R: RenderOnce> {
+pub struct Html<'a, 'b: 'a, 'c: 'b, R: Render> {
   pub req: &'a Request<'b, 'c>,
   pub render: R,
   pub etag: Option<EntityTag>,
 }
 
-impl<'a, 'b, 'c, R: RenderOnce> Into<Response> for Html<'a, 'b, 'c, R> {
+impl<'a, 'b, 'c, R: Render> Into<Response> for Html<'a, 'b, 'c, R> {
   fn into(self) -> Response {
     Response::with((status::Ok, self))
   }
 }
 
-impl<'a, 'b, 'c, R: RenderOnce> Into<IronResult<Response>> for Html<'a, 'b, 'c, R> {
+impl<'a, 'b, 'c, R: Render> Into<IronResult<Response>> for Html<'a, 'b, 'c, R> {
   fn into(self) -> IronResult<Response> {
     Ok(Response::with((status::Ok, self)))
   }
 }
 
-impl<'a, 'b, 'c, R: RenderOnce> Modifier<Response> for Html<'a, 'b, 'c, R> {
+impl<'a, 'b, 'c, R: Render> Modifier<Response> for Html<'a, 'b, 'c, R> {
   fn modify(self, response: &mut Response) {
     if let Some(ref etag) = self.etag {
       let cache_headers = utils::cache_headers_for(&etag, Duration::from_secs(0));
@@ -38,7 +38,7 @@ impl<'a, 'b, 'c, R: RenderOnce> Modifier<Response> for Html<'a, 'b, 'c, R> {
       }
     }
     let settings = self.req.extensions.get::<Settings>().cloned().unwrap_or_default();
-    let buffer = to_string!(^Wrapper(self.render, settings));
+    let buffer = Wrapper(self.render, settings).render();
     let mime = mime!(Text/Html; Charset=Utf8);
     (mime, buffer).modify(response)
   }

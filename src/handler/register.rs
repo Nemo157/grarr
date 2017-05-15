@@ -9,8 +9,8 @@ pub trait Register {
 
 impl<'a> Register for &'a mut Router {
   fn register<H: Route + Handler + Clone>(self, handler: H) -> &'a mut Router{
-    for route in <H as Route>::routes() {
-      self.route(<H as Route>::method(), route, handler.clone());
+    for route in H::routes() {
+      self.route(H::method(), route.clone(), handler.clone(), route);
     }
     self
   }

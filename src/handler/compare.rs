@@ -38,13 +38,13 @@ impl Handler for Compare {
       status::InternalServerError);
 
     Html {
-      render: RepositoryWrapper(&context, &render::Compare {
+      render: RepositoryWrapper(&context, render::Compare {
         context: &context,
         new: new_commit,
         old: old_commit,
         base: base,
         commits: commits,
-      }),
+      }, None),
       etag: Some(EntityTag::weak(versioned_sha1!())),
       req: req,
     }.into()

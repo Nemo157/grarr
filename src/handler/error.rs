@@ -9,7 +9,7 @@ macro_rules! error_handler {
       fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
         if err.response.status == Some(status::$name) {
           Ok(Response::with((status::$name, Html {
-            render: &render::error::$name(&*err.error),
+            render: render::error::$name(&*err.error),
             etag: None,
             req: req,
           })))

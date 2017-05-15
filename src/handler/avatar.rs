@@ -1,8 +1,6 @@
 use std::borrow::Cow;
 use std::time::Duration;
 use gravatar::{ self, Gravatar };
-use hyper;
-use hyper::client::Client;
 use iron::IronResult;
 use iron::headers::{ EntityTag, ContentType };
 use iron::middleware::Handler;
@@ -15,6 +13,7 @@ use iron::method::Method;
 use lru_time_cache::LruCache;
 use std::sync::Mutex;
 use super::utils::{ self, sha1, File, CacheMatches };
+use reqwest;
 
 pub struct Avatars {
   enable_gravatar: bool,
@@ -75,12 +74,11 @@ impl Avatars {
       let mut gravatar = Gravatar::new(user);
       gravatar.size = Some(30);
       gravatar.default = Some(gravatar::Default::Identicon);
-      let client = Client::new();
-      let mut res = client.get(&gravatar.image_url()).send().unwrap();
-      if res.status == hyper::Ok {
+      let mut res = reqwest::get(&gravatar.image_url()).unwrap();
+      if res.status().is_success() {
         let mut buf = Vec::new();
         res.read_to_end(&mut buf).unwrap();
-        let mime = res.headers.get::<ContentType>().unwrap().0.clone();
+        let mime = res.headers().get::<ContentType>().unwrap().0.clone();
         let entity_tag = EntityTag::strong(sha1(&buf));
         return Some(File(mime, entity_tag, buf.into()));
       }

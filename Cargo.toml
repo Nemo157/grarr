@@ -1,41 +1,45 @@
 [package]
-name = "grarr"
-version = "0.0.3"
 authors = ["Wim Looman <wim@nemo157.com>"]
 build = "build.rs"
-
-[features]
-# "maybe_cache" enables "cache" when building in release profile
-default = ["clippy", "maybe_cache"]
-cache = ["maybe_cache"]
-maybe_cache = []
+name = "grarr"
+version = "0.0.3"
 
 [dependencies]
+ammonia = "0.3.0"
+chrono = "0.3"
+cookie = "0.7.5"
+error-chain = "0.10.0"
+git2 = "0.6"
+gravatar = "0.1"
+iron = "0.5"
+logger = "0.3.0"
+lru_time_cache = "0.6"
+maud_macros = "=0.16.2"
+mime = "0.2"
+pulldown-cmark = "0.0.14"
+reqwest = "0.5.1"
+rust-crypto = "0.2"
+rustc-serialize = "0.3"
+serde = "1.0.0"
+serde_derive = "1.0.0"
+toml = "0.4"
+typemap = "0.3"
+unicase = "1.4"
+walkdir = "1.0"
 
-git-appraise = "*"
-git2 = "*"
+[dependencies.git-appraise]
+git = "https://github.com/Nemo157/git-appraise-rs"
+rev = "update"
 
-hyper = "0.8.1"
-iron = "*"
-router = { git = "https://github.com/Nemo157/router", rev = "reverse_priority" }
-logger = { git = "https://github.com/Nemo157/logger", rev = "personal_release" }
-typemap = "*"
-mime = "*"
-lru_time_cache = "*"
-time = "*"
-walkdir = "*"
-# params = "*"
+[dependencies.maud]
+features = ["iron"]
+version = "0.16"
 
-chrono = "*"
-pulldown-cmark = "*"
-maud-pulldown-cmark = "*"
-gravatar = "*"
+[dependencies.router]
+git = "https://github.com/Nemo157/router"
+rev = "reverse_priority"
 
-maud = "*"
-maud_macros = "*"
-
-clippy = { version = "*", optional = true }
-rust-crypto = "*"
-unicase = "*"
-toml = "*"
-rustc-serialize = "*"
+[features]
+cache = ["maybe_cache"]
+default = ["maybe_cache"]
+maybe_cache = []

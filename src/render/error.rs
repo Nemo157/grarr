@@ -1,34 +1,40 @@
 use iron;
 
-renderers! {
-  Error(error: &'a iron::Error) {
-    pre.block-details code ^error
+pub fn Error(error: &iron::Error) -> ::maud::Markup {
+  html! {
+    pre.block-details code (error)
   }
+}
 
-  BadRequest(error: &'a iron::Error) {
+pub fn BadRequest(error: &iron::Error) -> ::maud::Markup {
+  html! {
     div.block {
       div.block-header {
         h2 "Bad Request"
       }
-      ^Error(error)
+      (Error(error))
     }
   }
+}
 
-  NotFound(error: &'a iron::Error) {
+pub fn NotFound(error: &iron::Error) -> ::maud::Markup {
+  html! {
     div.block {
       div.block-header {
         h2 "Not Found"
       }
-      ^Error(error)
+      (Error(error))
     }
   }
+}
 
-  InternalServerError(error: &'a iron::Error) {
+pub fn InternalServerError(error: &iron::Error) -> ::maud::Markup {
+  html! {
     div.block {
       div.block-header {
         h2 "Internal Server Error"
       }
-      ^Error(error)
+      (Error(error))
     }
   }
 }
