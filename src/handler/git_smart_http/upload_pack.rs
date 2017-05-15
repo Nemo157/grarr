@@ -1,6 +1,8 @@
 use handler::base::*;
 use super::utils::*;
 
+use std::rc::Rc;
+use std::sync::Mutex;
 use std::io::{ self, Read, Write };
 use std::collections::HashSet;
 
@@ -11,7 +13,7 @@ use unicase::UniCase;
 use time;
 use flate2::FlateReadExt;
 
-use git2::{ self, Oid, Repository };
+use git2::{ self, Oid, Repository, Revwalk, PackBuilderStage };
 
 #[derive(Clone)]
 pub struct UploadPack;
@@ -37,9 +39,8 @@ struct UploadPackContext<'a> {
   refs: HashSet<Oid>,
 }
 
-#[derive(Debug)]
-enum UploadPackResponse {
-  Pack(Vec<Oid>),
+enum UploadPackResponse<'a> {
+  Pack(Revwalk<'a>),
   /* Continue( ... ), */
 }
 
@@ -142,7 +143,7 @@ fn is_closed<I1: Iterator<Item=Oid>, I2: Iterator<Item=Oid> + Clone>(repository:
 }
 
 #[allow(collapsible_if)]
-fn compute_response(context: &UploadPackContext, request: &UploadPackRequest) -> Result<UploadPackResponse, Error> {
+fn compute_response<'a>(context: &'a UploadPackContext, request: &'a UploadPackRequest) -> Result<UploadPackResponse<'a>, Error> {
   let mut common = HashSet::<Oid>::new();
   // for each id given in have
   for id in request.haves.iter().cloned() {
@@ -163,20 +164,49 @@ fn compute_response(context: &UploadPackContext, request: &UploadPackRequest) ->
     for id in common.iter().cloned() {
       try!(walker.hide(id));
     }
-    let commits = try!(walker.collect());
-    Ok(UploadPackResponse::Pack(commits))
+    Ok(UploadPackResponse::Pack(walker))
   } else {
     Err(Error::from("TODO: ......"))
   }
 }
 
-fn build_pack(repository: &Repository, commits: Vec<Oid>, mut output: Multiplexer) -> Result<(), Error> {
+fn build_pack<'a>(repository: &'a Repository, mut revwalk: Revwalk<'a>, output: Multiplexer) -> Result<(), Error> {
+  let output = Rc::new(Mutex::new(output));
   let mut builder = try!(repository.packbuilder());
-  for id in commits {
-    try!(builder.insert_commit(id));
+  {
+    let output = output.clone();
+    let mut first_delta = true;
+    try!(builder.set_progress_callback(move |stage, current, total| {
+      let mut output = output.lock().unwrap();
+      match stage {
+        PackBuilderStage::AddingObjects => {
+          let _ = write!(output.progress(), "Counting objects {}\r", current);
+        }
+        PackBuilderStage::Deltafication => {
+          if first_delta {
+            let _ = write!(output.progress(), "\n");
+            first_delta = false;
+          }
+          let percent = (current as f64 / total as f64) * 100.0;
+          let _ = write!(
+            output.progress(),
+            "Compressing objects: {:.0}% ({}/{})",
+            percent, current, total);
+          if current == total {
+            let _ = write!(output.progress(), ", done\n");
+          } else {
+            let _ = write!(output.progress(), "\r");
+          }
+        }
+      }
+      let _ = output.flush();
+      true
+    }));
   }
+  try!(builder.insert_walk(&mut revwalk));
   let mut error = None;
   try!(builder.foreach(|object| {
+    let mut output = output.lock().unwrap();
     match output.packfile().write_all(object) {
       err @ Err(_) => {
         error = Some(err);
@@ -188,7 +218,7 @@ fn build_pack(repository: &Repository, commits: Vec<Oid>, mut output: Multiplexe
   if let Some(err) = error {
     try!(err);
   }
-  try!(output.close());
+  try!(output.lock().unwrap().close());
   Ok(())
 }
 
@@ -202,21 +232,17 @@ impl WriteBody for UploadPackRequest {
     } else {
       None
     };
-    let mut output = Multiplexer::new(res, limit);
+    let output = Multiplexer::new(res, limit);
     println!( "Preparing context for {}", self.context.path);
-    write!(output.progress(), "\nPreparing context for {}\r\n", self.context.path)?;
     let context2 = prepare_context(&self.context).unwrap();
     println!( "Prepared context for {}", self.context.path);
-    write!(output.progress(), "\nPrepared context for {}\r\n", self.context.path)?;
     validate_request(&context2, self).unwrap();
     println!( "Validated request for {}", self.context.path);
-    write!(output.progress(), "\nValidated request for {}\r\n", self.context.path)?;
     let result = compute_response(&context2, self).unwrap();
     println!( "Computed response for {}", self.context.path);
-    write!(output.progress(), "\nComputed response for {}\r\n", self.context.path)?;
     match result {
-      UploadPackResponse::Pack(commits) => {
-        build_pack(&self.context.repository, commits, output).unwrap();
+      UploadPackResponse::Pack(revwalk) => {
+        build_pack(&self.context.repository, revwalk, output).unwrap();
       },
     }
     Ok(())
