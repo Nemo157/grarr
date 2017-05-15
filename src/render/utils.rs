@@ -1,5 +1,5 @@
 use ammonia;
-use maud::{ PreEscaped, Render };
+use maud::Render;
 use pulldown_cmark::{ Parser, html };
 
 pub fn MaybeLink(href: &str, text: &str) -> ::maud::Markup {

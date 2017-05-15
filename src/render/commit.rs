@@ -1,6 +1,5 @@
-use std::fmt;
 use git2;
-use maud::{ Render, PreEscaped, Markup };
+use maud::PreEscaped;
 use super::utils::Markdown;
 use commit_tree;
 use chrono::naive::datetime::NaiveDateTime;

@@ -23,14 +23,12 @@ extern crate reqwest;
 #[macro_use]
 extern crate mime;
 extern crate lru_time_cache;
-extern crate time;
 extern crate pulldown_cmark;
 extern crate crypto;
 extern crate unicase;
 extern crate walkdir;
 // extern crate params;
 extern crate toml;
-extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]

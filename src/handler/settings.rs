@@ -1,6 +1,5 @@
 use super::base::*;
 use settings;
-use iron::Plugin;
 // use params::{ Map, Params, Value };
 
 #[derive(Clone)]

@@ -1,4 +1,3 @@
-use std::fmt;
 use maud::{ Render, Markup };
 use super::Style;
 use super::fa::FA;

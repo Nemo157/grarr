@@ -1,4 +1,3 @@
-use std::fmt;
 use maud::{ Render, Markup };
 use git2;
 use repository_context::RepositoryContext;
@@ -33,7 +32,3 @@ impl<'r> Render for Compare<'r> {
     })
   }
 }
-
-// impl<'a> super::repository_wrapper::RepositoryTab for &'a Compare<'a> {
-//   fn tab() -> Option<super::repository_wrapper::Tab> { None }
-// }

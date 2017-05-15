@@ -1,5 +1,4 @@
-use std::{ env, ffi, io, fmt };
-use std::borrow::ToOwned;
+use std::{ env, ffi, io };
 use std::fs::File;
 use std::io::Read;
 use std::path::{ Path, PathBuf };

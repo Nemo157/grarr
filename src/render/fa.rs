@@ -1,4 +1,3 @@
-use std::fmt;
 use maud::{ Render, Markup };
 
 macro_rules! fa {

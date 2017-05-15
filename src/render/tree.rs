@@ -1,6 +1,5 @@
 use std::str;
 use std::cmp::{ Ord, PartialOrd, Ordering };
-use std::fmt;
 use super::fa::{ FA, FAM };
 use git2::{ self, ObjectType };
 use tree_entry::TreeEntryContext;
