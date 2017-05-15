@@ -17,7 +17,7 @@ impl Handler for Blob {
     match entry.entry.kind() {
       Some(git2::ObjectType::Blob) => {
         Html {
-          render: RepositoryWrapper(&context, &render::Blob(entry.entry.as_blob().unwrap(), &entry)),
+          render: RepositoryWrapper(&context, render::Blob(entry.entry.as_blob().unwrap(), &entry), Some(render::Tab::Files)),
           etag: Some(EntityTag::weak(versioned_sha1!(&id))),
           req: req,
         }.into()

@@ -1,36 +1,40 @@
 #![feature(plugin)]
-#![cfg_attr(feature = "clippy", plugin(clippy))]
 #![plugin(maud_macros)]
 #![warn(trivial_numeric_casts)]
 #![warn(unsafe_code)]
 #![warn(unused_extern_crates)]
 #![warn(unused_qualifications)]
 #![warn(variant_size_differences)]
+#![allow(unknown_lints)]
 
-extern crate maud;
+extern crate ammonia;
+extern crate chrono;
+extern crate cookie;
+extern crate crypto;
 #[macro_use]
-extern crate iron;
-extern crate router;
-extern crate logger;
+extern crate error_chain;
+extern crate flate2;
 extern crate git2;
 extern crate git_appraise;
-extern crate typemap;
-extern crate chrono;
-extern crate maud_pulldown_cmark;
 extern crate gravatar;
-extern crate hyper;
+#[macro_use]
+extern crate iron;
+extern crate logger;
+extern crate lru_time_cache;
+extern crate maud;
 #[macro_use]
 extern crate mime;
-extern crate lru_time_cache;
-extern crate time;
+// extern crate params;
 extern crate pulldown_cmark;
-extern crate crypto;
+extern crate reqwest;
+extern crate router;
+#[macro_use]
+extern crate serde_derive;
+extern crate time;
+extern crate toml;
+extern crate typemap;
 extern crate unicase;
 extern crate walkdir;
-// extern crate params;
-extern crate toml;
-extern crate rustc_serialize;
-extern crate flate2;
 
 #[macro_use]
 mod macros;
@@ -72,7 +76,7 @@ fn main() {
 
   println!("Running with config");
   println!("===================");
-  println!("{}", toml::encode_str(&config));
+  println!("{}", toml::to_string(&config).unwrap());
   println!("===================");
 
   let mut router = Router::new();

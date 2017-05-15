@@ -12,7 +12,7 @@ impl Handler for Reviews {
     reviews.reverse();
     let root = format!("/{}", context.path);
     Html {
-      render: RepositoryWrapper(&context, &render::Reviews(&root, &reviews)),
+      render: RepositoryWrapper(&context, render::Reviews(&root, &reviews), Some(render::Tab::Reviews)),
       etag: None,
       req: req,
     }.into()

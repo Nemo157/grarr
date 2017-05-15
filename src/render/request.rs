@@ -1,6 +1,6 @@
 use git_appraise;
 use git2::Oid;
-use maud_pulldown_cmark::Markdown;
+use super::utils::Markdown;
 use chrono::naive::datetime::NaiveDateTime;
 
 fn summary(request: &git_appraise::Request) -> Option<&str> {
@@ -13,60 +13,66 @@ fn short(oid: Oid) -> String {
   oid.as_bytes().iter().take(3).flat_map(|b| vec![HEX[((b >> 4) & 0xFu8) as usize] as char, HEX[(b & 0xFu8) as usize] as char]).collect()
 }
 
-renderers! {
-  Request(root: &'a str, request: &'a git_appraise::Request) {
+pub fn Request(root: &str, request: &git_appraise::Request) -> ::maud::Markup {
+  html! {
     div.block.request {
-      ^RequestHeader(root, request)
-      ^RequestDetails(request)
+      (RequestHeader(root, request))
+      (RequestDetails(request))
     }
   }
+}
 
-  RequestStub(root: &'a str, request: &'a git_appraise::Request) {
+pub fn RequestStub(root: &str, request: &git_appraise::Request) -> ::maud::Markup {
+  html! {
     div.block.request {
-      ^RequestHeader(root, request)
+      (RequestHeader(root, request))
     }
   }
+}
 
-  RequestHeader(root: &'a str, request: &'a git_appraise::Request) {
+pub fn RequestHeader(root: &str, request: &git_appraise::Request) -> ::maud::Markup {
+  html! {
     div.block-header {
       div.row {
-        ^super::Avatar(request.requester().unwrap_or("unknown@example.org"), &None)
+        (super::Avatar(request.requester().unwrap_or("unknown@example.org"), &None))
         div.column {
           div {
-            a href={ ^root "/review/" ^request.commit_id() } {
-              span.id ^short(request.commit_id())
+            a href={ (root) "/review/" (request.commit_id()) } {
+              span.id (short(request.commit_id()))
               " "
               @match summary(request) {
-                Some(summary) => ^summary,
+                Some(summary) => (summary),
                 None => "<No summary provided>",
               }
             }
           }
           small {
             span.user
-              ^request.requester().unwrap_or("<unknown requester>")
+              (request.requester().unwrap_or("<unknown requester>"))
             " wants to merge "
             span.ref
-              ^request.review_ref().unwrap_or("<unknown ref>")
+              (request.review_ref().unwrap_or("<unknown ref>"))
             " into "
             span.ref
-              ^request.target_ref().unwrap_or("<unknown ref>")
+              (request.target_ref().unwrap_or("<unknown ref>"))
           }
         }
         div.column.fixed {
           @if let Some(timestamp) = request.timestamp() {
             small.timestamp
-              ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
+              (NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
           }
         }
       }
     }
   }
+}
 
-  RequestDetails(request: &'a git_appraise::Request) {
+pub fn RequestDetails(request: &git_appraise::Request) -> ::maud::Markup {
+  html! {
     div.block-details.request-details {
       @match request.description() {
-        Some(description) => ^Markdown::from_string(description),
+        Some(description) => (Markdown(description)),
         None => i "No description provided",
       }
     }

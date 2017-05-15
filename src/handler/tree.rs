@@ -14,7 +14,7 @@ impl Handler for Tree {
     match entry.entry.kind() {
       Some(git2::ObjectType::Tree) => {
         Html {
-          render: RepositoryWrapper(&context, &render::Tree(entry.entry.as_tree().unwrap(), &entry)),
+          render: RepositoryWrapper(&context, render::Tree(entry.entry.as_tree().unwrap(), &entry), Some(render::Tab::Files)),
           etag: Some(EntityTag::weak(versioned_sha1!(&entry.commit.commit.id()))),
           req: req,
         }.into()

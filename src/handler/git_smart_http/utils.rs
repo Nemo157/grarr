@@ -1,4 +1,4 @@
-use std::io::{ self, Write };
+use std::io;
 use std::str;
 use std::cmp;
 
@@ -20,6 +20,7 @@ impl<'a> Multiplexer<'a> {
     self.current_band = 2;
     self
   }
+  #[allow(dead_code)]
   pub fn error(&mut self) -> &mut io::Write {
     self.current_band = 3;
     self

@@ -26,13 +26,13 @@ fn format_refs(head: git2::Reference, refs: git2::References) -> Result<Vec<u8>,
   Ok(result)
 }
 
+#[allow(deprecated)]
 fn find_service(req: &Request) -> Option<String> {
   req.url.clone().into_generic_url()
     .query_pairs()
-    .unwrap_or_default()
     .into_iter()
     .find(|&(ref key, _)| key == "service")
-    .map(|(_, ref id)| id.clone())
+    .map(|(_, ref id)| id.to_string())
 }
 
 impl Handler for Refs {

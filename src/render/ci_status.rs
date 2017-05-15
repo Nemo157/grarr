@@ -1,27 +1,29 @@
 use git_appraise::{ self, Status };
 use chrono::naive::datetime::NaiveDateTime;
 
-renderers! {
-  CIStatus(ci_status: &'a git_appraise::CIStatus) {
+pub fn CIStatus(ci_status: &git_appraise::CIStatus) -> ::maud::Markup {
+  html! {
     div.block.ci-status {
       div.block-header {
         small {
           @match ci_status.url() {
             Some(url) => {
-              a href={ ^url } {
-                ^CIStatusText(ci_status)
+              a href=(url) {
+                (CIStatusText(ci_status))
               }
             },
-            None => ^CIStatusText(ci_status)
+            None => (CIStatusText(ci_status))
           }
         }
       }
     }
   }
+}
 
-  CIStatusText(ci_status: &'a git_appraise::CIStatus) {
+pub fn CIStatusText(ci_status: &git_appraise::CIStatus) -> ::maud::Markup {
+  html! {
     span.agent {
-      ^ci_status.agent().unwrap_or("<Unknown agent>")
+      (ci_status.agent().unwrap_or("<Unknown agent>"))
     }
     " reported status "
     span class={
@@ -40,7 +42,7 @@ renderers! {
     }
     @if let Some(timestamp) = ci_status.timestamp() {
       " at "
-      span.timestamp ^NaiveDateTime::from_timestamp(timestamp.seconds(), 0)
+      span.timestamp (NaiveDateTime::from_timestamp(timestamp.seconds(), 0))
     }
   }
 }

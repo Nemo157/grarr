@@ -3,120 +3,127 @@ use std::mem;
 use std::path::PathBuf;
 use std::cell::RefCell;
 use git2;
-use maud::{ RenderOnce };
 use repository_context::RepositoryContext;
 
-renderers! {
-  DiffCommits(context: &'a RepositoryContext, old_commit: &'a Option<&'a git2::Commit<'a>>, new_commit: &'a git2::Commit<'a>) {
+pub fn DiffCommits(context: &RepositoryContext, old_commit: &Option<&git2::Commit>, new_commit: &git2::Commit) -> ::maud::Markup {
+  html! {
     @match context.repository.diff_tree_to_tree(old_commit.map(|commit| commit.tree().unwrap()).as_ref(), Some(&new_commit.tree().unwrap()), None) {
-      Ok(ref diff) => ^Diff(context, new_commit, diff),
-      Err(ref error) => ^super::Error(error),
+      Ok(ref diff) => (Diff(context, new_commit, diff)),
+      Err(ref error) => (super::Error(error)),
     }
   }
+}
 
-  DiffCommit(context: &'a RepositoryContext, commit: &'a git2::Commit<'a>) {
-    ^DiffCommits(context, &commit.parents().nth(0).as_ref(), commit)
+pub fn DiffCommit(context: &RepositoryContext, commit: &git2::Commit) -> ::maud::Markup {
+  html! {
+    (DiffCommits(context, &commit.parents().nth(0).as_ref(), commit))
   }
+}
 
-  DiffHeader(context: &'a RepositoryContext, new_commit: &'a git2::Commit<'a>, delta: &'a DiffDelta) {
+pub fn DiffHeader(context: &RepositoryContext, new_commit: &git2::Commit, delta: &DiffDelta) -> ::maud::Markup {
+  html! {
     div.block-header.row {
       div.column {
         @match (delta.status.0, delta.new_file.as_ref(), delta.old_file.as_ref()) {
           (git2::Delta::Added, Some(ref new_file), _) => {
-            h3 { span { "Added " span.path ^new_file.to_string_lossy() } }
+            h3 { span { "Added " span.path (new_file.to_string_lossy()) } }
           },
           (git2::Delta::Deleted, _, Some(ref old_file)) => {
-            h3 { span { "Deleted " span.path ^old_file.to_string_lossy() } }
+            h3 { span { "Deleted " span.path (old_file.to_string_lossy()) } }
           },
           (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file == new_file => {
-            h3 { span { "Modified " span.path ^new_file.to_string_lossy() } }
+            h3 { span { "Modified " span.path (new_file.to_string_lossy()) } }
           },
           (git2::Delta::Modified, Some(ref new_file), Some(ref old_file)) if old_file != new_file => {
-            h3 { span { "Modified " span.path ^new_file.to_string_lossy() "(Previously " span.path ^old_file.to_string_lossy() ")" } }
+            h3 { span { "Modified " span.path (new_file.to_string_lossy()) "(Previously " span.path (old_file.to_string_lossy()) ")" } }
           },
           (git2::Delta::Renamed, Some(ref new_file), Some(ref old_file)) => {
-            h3 { span { "Renamed " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
+            h3 { span { "Renamed " span.path (old_file.to_string_lossy()) " to " span.path (new_file.to_string_lossy()) } }
           },
           (git2::Delta::Copied, Some(ref new_file), Some(ref old_file)) => {
-            h3 { span { "Copied " span.path ^old_file.to_string_lossy() " to " span.path ^new_file.to_string_lossy() } }
+            h3 { span { "Copied " span.path (old_file.to_string_lossy()) " to " span.path (new_file.to_string_lossy()) } }
           },
-          (status, ref new_file, ref old_file) =>  ^(format!("{:?} ({:?} -> {:?}) (should not happen)", status, old_file, new_file))
+          (status, ref new_file, ref old_file) =>  (format!("{:?} ({:?} -> {:?}) (should not happen)", status, old_file, new_file))
         }
       }
       @if let Some(new_file) = delta.new_file.as_ref() {
         div.column.fixed {
-          a href={ "/" ^context.path "/blob/" ^new_commit.id() "/" ^new_file.to_string_lossy() } { "View" }
+          a href={ "/" (context.path) "/blob/" (new_commit.id()) "/" (new_file.to_string_lossy()) } { "View" }
         }
       }
     }
   }
+}
 
-  DiffLineNums(id: &'a str, old_lineno: &'a Option<u32>, new_lineno: &'a Option<u32>) {
+pub fn DiffLineNums(id: &str, old_lineno: &Option<u32>, new_lineno: &Option<u32>) -> ::maud::Markup {
+  html! {
     @if let Some(num) = *old_lineno {
       a.line-num
-        id={ ^id "L" ^num }
-        href={ "#" ^id "L" ^num }
-        data-line-num={ ^(format!("{: >4}", num)) }
+        id={ (id) "L" (num) }
+        href={ "#" (id) "L" (num) }
+        data-line-num=(format!("{: >4}", num))
         { }
     } @else {
       span.line-num { }
     }
     @if let Some(num) = *new_lineno {
       a.line-num
-        id={ ^id "R" ^num }
-        href={ "#" ^id "R" ^num }
-        data-line-num={ ^(format!("{: >4}", num)) }
+        id={ (id) "R" (num) }
+        href={ "#" (id) "R" (num) }
+        data-line-num=(format!("{: >4}", num))
         { " " }
     } @else {
       span.line-num { " " }
     }
   }
+}
 
-  DiffDetails(id: String, extension: Option<String>, hunks: Vec<(DiffHunk, Vec<DiffLine>)>) {
-    pre.block-details code class={ "hljs lang-" ^extension.unwrap_or("".to_owned()) } {
+pub fn DiffDetails(id: String, extension: Option<String>, hunks: Vec<(DiffHunk, Vec<DiffLine>)>) -> ::maud::Markup {
+  html! {
+    pre.block-details code class={ "hljs lang-" (extension.unwrap_or("".to_owned())) } {
       @if hunks.is_empty() {
         div.line.hunk-header span.text "No content"
       }
       @for (hunk, lines) in hunks {
         div.line.hunk-header {
-          ^DiffLineNums(&*id, &None, &None)
-          span.text ^hunk.header.unwrap()
+          (DiffLineNums(&*id, &None, &None))
+          span.text (hunk.header.unwrap())
         }
         @for line in lines {
           @match (line.origin, line.content) {
             (Origin::LineContext, Some(ref content)) => {
               div.line.context {
-                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
-                span.text ^content
+                (DiffLineNums(&*id, &line.old_lineno, &line.new_lineno))
+                span.text (content)
               }
             },
             (Origin::LineAddition, Some(ref content)) => {
               div.line.addition {
-                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
-                span.text ^content
+                (DiffLineNums(&*id, &line.old_lineno, &line.new_lineno))
+                span.text (content)
               }
             },
             (Origin::LineDeletion, Some(ref content)) => {
               div.line.deletion {
-                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
-                span.text ^content
+                (DiffLineNums(&*id, &line.old_lineno, &line.new_lineno))
+                span.text (content)
               }
             },
             (Origin::AddEOF, _) => {
               div.line.add-eof {
-                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
+                (DiffLineNums(&*id, &line.old_lineno, &line.new_lineno))
                 span.text "Added EOF"
               }
             },
             (Origin::RemoveEOF, _) => {
               div.line.remove-eof {
-                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
+                (DiffLineNums(&*id, &line.old_lineno, &line.new_lineno))
                 span.text "Removed EOF"
               }
             },
             (Origin::LineBinary, _) => {
               div.line.binary {
-                ^DiffLineNums(&*id, &line.old_lineno, &line.new_lineno)
+                (DiffLineNums(&*id, &line.old_lineno, &line.new_lineno))
                 span.text "Binary file changed"
               }
             },
@@ -130,15 +137,17 @@ renderers! {
       }
     }
   }
+}
 
-  Diff(context: &'a RepositoryContext, new_commit: &'a git2::Commit<'a>, diff: &'a git2::Diff<'a>) {
+pub fn Diff(context: &RepositoryContext, new_commit: &git2::Commit, diff: &git2::Diff) -> ::maud::Markup {
+  html! {
     @for (delta, hunks) in group(diff).unwrap() {
-      div.diff.block id=^delta.id() {
-        ^DiffHeader(context, new_commit, &delta)
-        ^DiffDetails(delta.id(), delta.new_file.or(delta.old_file).and_then(|path| path.extension().map(|s| s.to_string_lossy().into_owned())), hunks)
+      div.diff.block id=(delta.id()) {
+        (DiffHeader(context, new_commit, &delta))
+        (DiffDetails(delta.id(), delta.new_file.or(delta.old_file).and_then(|path| path.extension().map(|s| s.to_string_lossy().into_owned())), hunks))
       }
     }
-    ^super::HighlightJS
+    (super::HighlightJS())
   }
 }
 
@@ -249,7 +258,7 @@ impl<'a> From<git2::DiffLine<'a>> for DiffLine {
   }
 }
 
-#[cfg_attr(feature = "clippy", allow(type_complexity))] // This is temporary till I figure out a nicer way to do this without all the allocation
+#[allow(type_complexity)] // This is temporary till I figure out a nicer way to do this without all the allocation
 fn group(diff: &git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLine>)>)>, git2::Error> {
   let mut deltas = Vec::new();
   let hunks = RefCell::new(Vec::new());
@@ -296,7 +305,7 @@ fn group(diff: &git2::Diff) -> Result<Vec<(DiffDelta, Vec<(DiffHunk, Vec<DiffLin
 
 impl Eq for Delta { }
 impl PartialEq<Delta> for Delta {
-  #[cfg_attr(feature = "clippy", allow(match_same_arms))]
+  #[allow(match_same_arms)]
   fn eq(&self, other: &Delta) -> bool {
     match (self.0, other.0) {
       (git2::Delta::Unmodified, git2::Delta::Unmodified) => true,
