@@ -1,5 +1,4 @@
 use handler::base::*;
-use super::utils::*;
 
 use std::rc::Rc;
 use std::sync::Mutex;
@@ -14,24 +13,16 @@ use time;
 use flate2::FlateReadExt;
 
 use git2::{ self, Oid, Repository, Revwalk, PackBuilderStage };
+use git_ship::{pkt_line, PktLine, Multiplexer, Capability, Capabilities};
 
 #[derive(Clone)]
 pub struct UploadPack;
-
-#[derive(Debug, Eq, PartialEq)]
-enum Capability {
-    SideBand,
-    SideBand64K,
-    MultiAck,
-    MultiAckDetailed,
-    Unknown(String),
-}
 
 #[derive(Debug)]
 struct UploadPackRequest {
     wants: Vec<Oid>,
     haves: Vec<Oid>,
-    capabilities: Vec<Capability>,
+    capabilities: Capabilities,
     done: bool,
     context: RepositoryContext,
 }
@@ -55,7 +46,7 @@ fn parse_request(req: &mut Request, context: RepositoryContext) -> Result<Upload
     let mut request = UploadPackRequest {
         wants: Vec::new(),
         haves: Vec::new(),
-        capabilities: Vec::new(),
+        capabilities: Capabilities::empty(),
         done: false,
         context: context,
     };
@@ -73,27 +64,34 @@ fn parse_request(req: &mut Request, context: RepositoryContext) -> Result<Upload
         Encoding::Deflate => Box::new((&mut req.body).deflate_decode()) as Box<Read>,
         encoding => return Err(Error::from(format!("Can't handle encoding {}", encoding))),
     };
-    for line in body.pkt_lines() {
-        let line = try!(line);
-        if line.len() < 4 { continue }
+    pkt_line::each_str(&mut body, |line| {
+        println!("line {:?}", line);
+        let line = match line {
+            PktLine::Flush => return Ok(()),
+            PktLine::Line(line) => line,
+        };
+        if line.len() < 4 {
+            return Err(io::Error::new(io::ErrorKind::InvalidData, format!("Unexpected pkt-line {}", line)));
+        }
         match &line[0..4] {
             "want" => {
                 let line = line[5..].trim();
                 let (want, caps) = line.split_at(line.find(' ').unwrap_or(line.len()));
-                request.wants.push(try!(want.parse()));
-                request.capabilities.extend(caps.split(' ').filter(|s| !s.is_empty()).map(Capability::from));
+                request.wants.push(want.parse().map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?);
+                if !caps.is_empty() {
+                    request.capabilities = caps.parse().unwrap();
+                }
             },
             "have" => {
-                let end = line.find(|c| c == '\n' || c == '\0').unwrap_or(line.len());
-                request.haves.push(try!(line[5..end].parse()));
+                request.haves.push(line[5..].trim().parse().map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?);
             },
             "done" => {
                 request.done = true;
-                break;
             },
-            _ => return Err(Error::from(format!("Unexpected pkt-line {}", line))),
+            _ => return Err(io::Error::new(io::ErrorKind::InvalidData, format!("Unexpected pkt-line {}", line))),
         }
-    }
+        Ok(())
+    })?;
     println!("request: {:?}", request);
     Ok(request)
 }
@@ -182,55 +180,43 @@ fn compute_response<'a>(context: &'a UploadPackContext, request: &'a UploadPackR
     }
 }
 
-fn build_pack<'a>(repository: &'a Repository, mut revwalk: Revwalk<'a>, output: Multiplexer) -> Result<(), Error> {
-    let output = Rc::new(Mutex::new(output));
-    let mut builder = try!(repository.packbuilder());
+fn build_pack<'a>(repository: &'a Repository, mut revwalk: Revwalk<'a>, mut output: Multiplexer) -> Result<(), Error> {
     {
-        let output = output.clone();
-        let mut first_delta = true;
-        try!(builder.set_progress_callback(move |stage, current, total| {
-            let mut output = output.lock().unwrap();
-            match stage {
-                PackBuilderStage::AddingObjects => {
-                    let _ = write!(output.progress(), "Counting objects {}\r", current);
-                }
-                PackBuilderStage::Deltafication => {
-                    if first_delta {
-                        let _ = write!(output.progress(), "\n");
-                        first_delta = false;
+        let output = Rc::new(Mutex::new(&mut output));
+        let mut builder = repository.packbuilder()?;
+        {
+            let output = output.clone();
+            let mut first_delta = true;
+            builder.set_progress_callback(move |stage, current, total| {
+                let mut output = output.lock().unwrap();
+                match stage {
+                    PackBuilderStage::AddingObjects => {
+                        let _ = output.write_progress(format!("Counting objects {}\r", current));
                     }
-                    let percent = (current as f64 / total as f64) * 100.0;
-                    let _ = write!(
-                        output.progress(),
-                        "Compressing objects: {:.0}% ({}/{})",
-                        percent, current, total);
-                    if current == total {
-                        let _ = write!(output.progress(), ", done\n");
-                    } else {
-                        let _ = write!(output.progress(), "\r");
+                    PackBuilderStage::Deltafication => {
+                        if first_delta {
+                            let _ = output.write_progress("\n");
+                            first_delta = false;
+                        }
+                        let percent = (current as f64 / total as f64) * 100.0;
+                        if current == total {
+                            let _ = output.write_progress(format!(
+                                "Compressing objects: {:.0}% ({}/{}), done\n",
+                                percent, current, total));
+                        } else {
+                            let _ = output.write_progress(format!(
+                                "Compressing objects: {:.0}% ({}/{})\r",
+                                percent, current, total));
+                        }
                     }
                 }
-            }
-            let _ = output.flush();
-            true
-        }));
-    }
-    try!(builder.insert_walk(&mut revwalk));
-    let mut error = None;
-    try!(builder.foreach(|object| {
-        let mut output = output.lock().unwrap();
-        match output.packfile().write_all(object) {
-            err @ Err(_) => {
-                error = Some(err);
-                false
-            }
-            Ok(()) => true
+                true
+            })?;
         }
-    }));
-    if let Some(err) = error {
-        try!(err);
+        builder.insert_walk(&mut revwalk)?;
+        builder.foreach(|object| output.lock().unwrap().write_packfile(object).is_ok())?;
     }
-    try!(output.lock().unwrap().close());
+    pkt_line::flush(output.into_inner())?;
     Ok(())
 }
 
@@ -241,39 +227,32 @@ impl WriteBody for UploadPackRequest {
         let result = compute_response(&context2, self).unwrap();
         match result {
             UploadPackResponse::Pack { revwalk, common } => {
-                if self.capabilities.contains(&Capability::MultiAckDetailed) {
+                if !common.is_empty() && self.capabilities.contains(Capability::MultiAckDetailed) {
                     for id in &common {
                         let line = format!("ACK {} common", id);
                         println!("{}", line);
-                        res.write_pkt_line(line)?;
+                        pkt_line::write_str(&mut res, line)?;
                     }
                     let line = format!("ACK {}", common.iter().last().unwrap());
                     println!("{}", line);
-                    res.write_pkt_line(line)?;
+                    pkt_line::write_str(&mut res, line)?;
                 } else {
-                    res.write_pkt_line("NAK")?;
+                    pkt_line::write_str(&mut res, "NAK")?;
                 }
-                let limit = if self.capabilities.contains(&Capability::SideBand64K) {
-                    Some(65520)
-                } else if self.capabilities.contains(&Capability::SideBand) {
-                    Some(1000)
-                } else {
-                    None
-                };
-                let mut output = Multiplexer::new(res, limit);
+                let output = Multiplexer::new(res, &self.capabilities)?;
                 build_pack(&self.context.repository, revwalk, output).unwrap();
             },
             UploadPackResponse::Continue { common } => {
-                if self.capabilities.contains(&Capability::MultiAckDetailed) {
+                if self.capabilities.contains(Capability::MultiAckDetailed) {
                     for id in common {
                         let line = format!("ACK {} common", id);
                         println!("{}", line);
-                        res.write_pkt_line(line)?;
+                        pkt_line::write_str(&mut res, line)?;
                     }
                 } else {
                     // TODO
                 }
-                res.write_pkt_line("NAK")?;
+                pkt_line::write_str(&mut res, "NAK")?;
             },
         }
         Ok(())
@@ -308,17 +287,5 @@ impl Route for UploadPack {
 
     fn route() -> Cow<'static, str> {
         "/git-upload-pack".into()
-    }
-}
-
-impl<S: AsRef<str>> From<S> for Capability {
-    fn from(s: S) -> Capability {
-        match s.as_ref() {
-            "side-band" => Capability::SideBand,
-            "side-band-64k" => Capability::SideBand64K,
-            "multi_ack" => Capability::MultiAck,
-            "multi_ack_detailed" => Capability::MultiAckDetailed,
-            s => Capability::Unknown(s.to_owned()),
-        }
     }
 }

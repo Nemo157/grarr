@@ -51,6 +51,7 @@ mod settings;
 mod referenced_commit;
 mod config;
 mod tree_entry;
+mod git_ship;
 
 use std::time::Duration;
 use std::env;

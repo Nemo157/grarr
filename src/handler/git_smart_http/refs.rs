@@ -1,5 +1,5 @@
 use handler::base::*;
-use super::utils::*;
+use git_ship::pkt_line;
 
 use git2;
 
@@ -14,15 +14,15 @@ fn format_ref(reff: git2::Reference) -> Result<String, Error> {
 
 fn format_refs(head: git2::Reference, refs: git2::References) -> Result<Vec<u8>, Error> {
     let mut result = Vec::new();
-    try!(result.write_pkt_line("# service=git-upload-pack"));
-    try!(result.write_pkt_line_flush());
-    let head_id = try!(head.target().ok_or(Error::from("HEAD missing target")));
-    try!(result.write_pkt_line(format!("{} HEAD\0{}", head_id, "side-band side-band-64k multi_ack_detailed")));
+    pkt_line::write_str(&mut result, "# service=git-upload-pack")?;
+    pkt_line::flush(&mut result)?;
+    let head_id = head.target().ok_or(Error::from("HEAD missing target"))?;
+    pkt_line::write_str(&mut result, format!("{} HEAD\0{}", head_id, "side-band side-band-64k multi_ack_detailed"))?;
     // TODO: Sort refs by name in C locale
     for reff in refs {
-        try!(result.write_pkt_line(try!(format_ref(try!(reff)))));
+        pkt_line::write_str(&mut result, try!(format_ref(try!(reff))))?;
     }
-    try!(result.write_pkt_line_flush());
+    pkt_line::flush(&mut result)?;
     Ok(result)
 }
 
