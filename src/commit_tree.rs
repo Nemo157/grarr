@@ -18,7 +18,11 @@ impl<'repo> CommitTree<'repo> {
         let mut all_commits = walker.map(|id| id.and_then(|id| repo.find_commit(id)));
         let commits = try!((&mut all_commits).take(limit).collect());
         let next_after = all_commits.next().and_then(|c| c.ok());
-        Ok(CommitTree::create(repo, commits, next_after, Vec::new()))
+        let mut ignored = Vec::new();
+        if let Some(ref next) = next_after {
+            ignored.push(next.id());
+        }
+        Ok(CommitTree::create(repo, commits, next_after, ignored))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -68,8 +72,8 @@ impl<'repo> Iterator for CommitTree<'repo> {
             Some(commit) => {
                 self.next = self.commits.next();
                 let mut ignored = self.ignored.clone();
-                if self.next.is_some() {
-                    ignored.push(self.next.as_ref().unwrap().id());
+                if let Some(ref next) = self.next {
+                    ignored.push(next.id());
                 }
                 let sub = CommitTree::between(self.repo, &commit, ignored);
                 self.len = self.len - 1;
