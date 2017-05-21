@@ -1,3 +1,4 @@
+use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy)]
@@ -17,6 +18,10 @@ pub enum Capability {
 pub struct Capabilities(Vec<Capability>);
 
 impl Capabilities {
+    pub fn new(caps: Vec<Capability>) -> Capabilities {
+        Capabilities(caps)
+    }
+
     pub fn empty() -> Capabilities {
         Capabilities(Vec::new())
     }
@@ -39,6 +44,18 @@ impl FromStr for Capability {
     }
 }
 
+impl fmt::Display for Capability {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str(match *self {
+            Capability::SideBand => "side-band",
+            Capability::SideBand64K => "side-band-64k",
+            Capability::MultiAck => "multi_ack",
+            Capability::MultiAckDetailed => "multi_ack_detailed",
+            Capability::Unknown(ref s) => &**s,
+        })
+    }
+}
+
 impl FromStr for Capabilities {
     type Err = Void;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -47,5 +64,15 @@ impl FromStr for Capabilities {
             .filter(|s| !s.is_empty())
             .map(|s| s.parse().unwrap())
             .collect()))
+    }
+}
+
+impl fmt::Display for Capabilities {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for cap in &self.0 {
+            fmt::Display::fmt(cap, f)?;
+            f.write_str(" ")?;
+        }
+        Ok(())
     }
 }

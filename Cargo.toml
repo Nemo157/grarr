@@ -27,6 +27,7 @@ time = "0.1.36"
 toml = "0.4"
 typemap = "0.3"
 unicase = "1.4"
+url = "1.4.0"
 walkdir = "1.0"
 
 [dependencies.git-appraise]

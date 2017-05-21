@@ -4,7 +4,6 @@
 #![warn(unsafe_code)]
 #![warn(unused_extern_crates)]
 #![warn(unused_qualifications)]
-#![warn(variant_size_differences)]
 #![allow(unknown_lints)]
 
 extern crate ammonia;
