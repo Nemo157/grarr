@@ -45,7 +45,6 @@ fn parse(body: &mut io::Read) -> Result<Request> {
     };
 
     pkt_line::each_str(body, |line| {
-        println!("line {:?}", line);
         let line = match line {
             PktLine::Flush => return Ok(()),
             PktLine::Line(line) => line,
@@ -73,7 +72,6 @@ fn parse(body: &mut io::Read) -> Result<Request> {
         Ok(())
     })?;
 
-    println!("request: {:?}", request);
     Ok(request)
 }
 
@@ -110,7 +108,6 @@ fn graph_descendant_of_any(repo: &git2::Repository, commit: Oid, ancestors: &[Oi
 fn is_closed(repo: &git2::Repository, descendants: &[Oid], ancestors: &[Oid]) -> Result<bool> {
     for &descendant in descendants {
         if !graph_descendant_of_any(repo, descendant, ancestors)? {
-            println!("{:?} has no ancestors in {:?}", descendant, ancestors);
             return Ok(false);
         }
     }
@@ -131,8 +128,6 @@ fn compute_response(repo: git2::Repository, refs: Vec<Oid>, request: Request) ->
             }
         }
     }
-
-    println!("common: {:?}", common);
 
     if request.done || is_closed(&repo, &request.wants, &common)? {
         let commits = {
@@ -177,13 +172,9 @@ impl Pack {
     pub fn write_to(&mut self, mut writer: &mut io::Write) -> Result<()> {
         if !self.common.is_empty() && self.capabilities.contains(Capability::MultiAckDetailed) {
             for id in &self.common {
-                let line = format!("ACK {} common", id);
-                println!("{}", line);
-                pkt_line::write_str(&mut writer, line)?;
+                pkt_line::write_str(&mut writer, format!("ACK {} common", id))?;
             }
-            let line = format!("ACK {}", self.common.iter().last().unwrap());
-            println!("{}", line);
-            pkt_line::write_str(&mut writer, line)?;
+            pkt_line::write_str(&mut writer, format!("ACK {}", self.common.iter().last().unwrap()))?;
         } else {
             pkt_line::write_str(&mut writer, "NAK")?;
         }
@@ -234,9 +225,7 @@ impl Continue {
     pub fn write_to(&self, mut writer: &mut io::Write) -> Result<()> {
         if self.capabilities.contains(Capability::MultiAckDetailed) {
             for id in &self.common {
-                let line = format!("ACK {} common", id);
-                println!("{}", line);
-                pkt_line::write_str(&mut writer, line)?;
+                pkt_line::write_str(&mut writer, format!("ACK {} common", id))?;
             }
         } else {
             // TODO
