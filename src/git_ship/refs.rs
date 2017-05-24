@@ -4,7 +4,7 @@ use std::borrow::Borrow;
 use super::url::Url;
 use super::git2::{self, Oid};
 
-use super::{pkt_line, Capability, Capabilities};
+use super::{pkt_line, Capability, Capabilities, Result};
 
 #[derive(Debug)]
 pub struct UploadPack {
@@ -19,7 +19,7 @@ pub enum Response {
     Error(&'static str),
 }
 
-pub fn prepare(repo: &git2::Repository, url: &Url) -> Result<Response, git2::Error> {
+pub fn prepare(repo: &git2::Repository, url: &Url) -> Result<Response> {
     let service = url.query_pairs()
         .find(|&(ref key, _)| key == "service")
         .map(|(_, id)| id.clone());
@@ -38,7 +38,7 @@ pub fn prepare(repo: &git2::Repository, url: &Url) -> Result<Response, git2::Err
                         .expect("Resolved references always have a target");
                     Ok((name, target))
                 })
-                .collect::<Result<Vec<_>, git2::Error>>()?;
+                .collect::<::std::result::Result<_, git2::Error>>()?;
             // TODO: Sort refs by name in C locale
             let capabilities = Capabilities::new(vec![
                 Capability::SideBand,
@@ -58,7 +58,7 @@ pub fn prepare(repo: &git2::Repository, url: &Url) -> Result<Response, git2::Err
 }
 
 impl UploadPack {
-    pub fn write_to(&self, mut writer: &mut io::Write) -> io::Result<()> {
+    pub fn write_to(&self, mut writer: &mut io::Write) -> Result<()> {
         pkt_line::write_str(&mut writer, "# service=git-upload-pack")?;
         pkt_line::flush(&mut writer)?;
         pkt_line::write_str(&mut writer, format!("{} HEAD\0{}", self.head, self.capabilities))?;
@@ -85,10 +85,11 @@ impl Response {
         }
     }
 
-    pub fn write_to(&self, mut writer: &mut io::Write) -> io::Result<()> {
+    pub fn write_to(&self, mut writer: &mut io::Write) -> Result<()> {
         match *self {
-            Response::UploadPack(ref pack) => pack.write_to(writer),
-            Response::Error(ref msg) => writer.write_all(msg.as_bytes()),
+            Response::UploadPack(ref pack) => pack.write_to(writer)?,
+            Response::Error(ref msg) => writer.write_all(msg.as_bytes())?,
         }
+        Ok(())
     }
 }

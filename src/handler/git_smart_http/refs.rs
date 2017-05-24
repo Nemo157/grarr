@@ -23,6 +23,7 @@ struct W(refs::Response);
 impl WriteBody for W {
     fn write_body(&mut self, res: &mut io::Write) -> io::Result<()> {
         self.0.write_to(res)
+            .map_err(|err| io::Error::new(io::ErrorKind::Other, err))
     }
 }
 
