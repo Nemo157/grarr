@@ -12,7 +12,7 @@ impl Handler for Refs {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
         let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
         let response = itry!(refs::prepare(&context.repository, &req.url.clone().into()), status::InternalServerError);
-        println!("response: {:?}", response);
+        println!("refs response: {:?}", response);
         let status_code = status::Unregistered(response.status_code());
         let mime: Mime = response.mime_type().parse().unwrap();
         Ok(Response::with((status_code, mime, Box::new(W(response)) as Box<WriteBody>)))

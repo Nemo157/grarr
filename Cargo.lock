@@ -333,7 +333,7 @@ dependencies = [
 [[package]]
 name = "git-ship"
 version = "0.1.0"
-source = "git+https://github.com/Nemo157/git-ship-rs#8145d658d4b0e054b605f53da154ac8cd4929656"
+source = "git+https://github.com/Nemo157/git-ship-rs#dd5422a234c45bcce5ae962b5e5a4a217bae0f4e"
 dependencies = [
  "git2 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",

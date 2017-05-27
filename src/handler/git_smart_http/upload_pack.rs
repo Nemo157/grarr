@@ -3,6 +3,7 @@ use handler::base::*;
 use std::io;
 
 use iron::headers::{ CacheControl, CacheDirective, Vary, Pragma, Expires, HttpDate, ContentEncoding, Encoding };
+use iron::mime::Mime;
 use iron::modifiers::Header;
 use iron::response::WriteBody;
 use unicase::UniCase;
@@ -48,8 +49,10 @@ impl Handler for UploadPack {
         let context = itry!(req.extensions.remove::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
         let mut body = itry!(body_thing(req), (status::BadRequest, no_cache));
         let response = itry!(upload_pack::prepare(context.repository, &mut *body), (status::BadRequest, no_cache));
+        println!("upload_pack response: {:?}", response);
         let status_code = status::Unregistered(response.status_code());
-        Ok(Response::with((status_code, no_cache, Box::new(W(response)) as Box<WriteBody>)))
+        let mime: Mime = response.mime_type().parse().unwrap();
+        Ok(Response::with((status_code, mime, no_cache, Box::new(W(response)) as Box<WriteBody>)))
     }
 }
 
