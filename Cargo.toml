@@ -34,6 +34,9 @@ walkdir = "1.0"
 git = "https://github.com/Nemo157/git-appraise-rs"
 rev = "update"
 
+[dependencies.git-ship]
+git = "https://github.com/Nemo157/git-ship-rs"
+
 [dependencies.maud]
 features = ["iron"]
 version = "0.16"

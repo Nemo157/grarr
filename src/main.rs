@@ -15,6 +15,7 @@ extern crate error_chain;
 extern crate flate2;
 extern crate git2;
 extern crate git_appraise;
+extern crate git_ship;
 extern crate gravatar;
 #[macro_use]
 extern crate iron;
@@ -50,7 +51,6 @@ mod settings;
 mod referenced_commit;
 mod config;
 mod tree_entry;
-mod git_ship;
 
 use std::time::Duration;
 use std::env;

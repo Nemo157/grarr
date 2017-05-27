@@ -8,6 +8,7 @@ dependencies = [
  "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "flate2 0.2.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "git-appraise 0.3.0 (git+https://github.com/Nemo157/git-appraise-rs?rev=update)",
+ "git-ship 0.1.0 (git+https://github.com/Nemo157/git-ship-rs)",
  "git2 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "gravatar 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "iron 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -327,6 +328,15 @@ dependencies = [
  "serde 1.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "git-ship"
+version = "0.1.0"
+source = "git+https://github.com/Nemo157/git-ship-rs#8145d658d4b0e054b605f53da154ac8cd4929656"
+dependencies = [
+ "git2 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "url 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1161,6 +1171,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum gdi32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "0912515a8ff24ba900422ecda800b52f4016a56251922d397c576bf92c690518"
 "checksum getopts 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)" = "d9047cfbd08a437050b363d35ef160452c5fe8ea5187ae0a624708c91581d685"
 "checksum git-appraise 0.3.0 (git+https://github.com/Nemo157/git-appraise-rs?rev=update)" = "<none>"
+"checksum git-ship 0.1.0 (git+https://github.com/Nemo157/git-ship-rs)" = "<none>"
 "checksum git2 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)" = "9de9df4358c17e448a778d90cd0272e1dab5eae30244502333fa2001c4e24357"
 "checksum gravatar 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "1db2a0cee40395384856d54ada583ca7db8470f9ae216932c5b0cb8bfbc7089c"
 "checksum html5ever 0.13.1 (registry+https://github.com/rust-lang/crates.io-index)" = "d60508177ec4e5774a112efcf4d4d5f123cb00a43476fa5940b7da568371a165"
