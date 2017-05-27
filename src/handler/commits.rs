@@ -9,7 +9,7 @@ pub struct Commits;
 impl Handler for Commits {
     #[allow(deprecated)]
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
         let start_commit = req.url.clone().into_generic_url()
             .query_pairs()
             // .unwrap_or_default()

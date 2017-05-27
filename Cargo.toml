@@ -9,6 +9,7 @@ ammonia = "0.3.0"
 chrono = "0.3"
 cookie = "0.7.5"
 error-chain = "0.10.0"
+flate2 = "0.2.19"
 git2 = "0.6"
 gravatar = "0.1"
 iron = "0.5"
@@ -22,14 +23,19 @@ rust-crypto = "0.2"
 rustc-serialize = "0.3"
 serde = "1.0.0"
 serde_derive = "1.0.0"
+time = "0.1.36"
 toml = "0.4"
 typemap = "0.3"
 unicase = "1.4"
+url = "1.4.0"
 walkdir = "1.0"
 
 [dependencies.git-appraise]
 git = "https://github.com/Nemo157/git-appraise-rs"
 rev = "update"
+
+[dependencies.git-ship]
+git = "https://github.com/Nemo157/git-ship-rs"
 
 [dependencies.maud]
 features = ["iron"]

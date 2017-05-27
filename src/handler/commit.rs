@@ -5,7 +5,7 @@ pub struct Commit;
 
 impl Handler for Commit {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
         let commit = itry!(context.commit(), status::NotFound);
         Html {
             render: RepositoryWrapper(&context, render::Commit(&context, &commit), Some(render::Tab::Commits)),

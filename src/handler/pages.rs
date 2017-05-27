@@ -44,11 +44,11 @@ fn get_markdown_response(context: &RepositoryContext, path: &str) -> Result<Resp
 impl Handler for Pages {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
         {
-            let mut context = itry!(req.extensions.get_mut::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+            let mut context = itry!(req.extensions.get_mut::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
             context.reference = Some("gh-pages".to_owned());
         }
-        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
-        let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
+        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
+        let router = itry!(req.extensions.get::<Router>().ok_or(Error::from("missing extension")), status::InternalServerError);
 
         let mut path = router.find("path").unwrap_or("").to_owned();
         if path == "" || path.ends_with('/') {

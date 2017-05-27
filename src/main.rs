@@ -4,35 +4,37 @@
 #![warn(unsafe_code)]
 #![warn(unused_extern_crates)]
 #![warn(unused_qualifications)]
-#![warn(variant_size_differences)]
 #![allow(unknown_lints)]
 
 extern crate ammonia;
-extern crate cookie;
-extern crate maud;
-#[macro_use]
-extern crate iron;
-extern crate router;
-extern crate logger;
-extern crate git2;
-extern crate git_appraise;
-extern crate typemap;
 extern crate chrono;
-extern crate gravatar;
-extern crate reqwest;
-#[macro_use]
-extern crate mime;
-extern crate lru_time_cache;
-extern crate pulldown_cmark;
+extern crate cookie;
 extern crate crypto;
-extern crate unicase;
-extern crate walkdir;
-// extern crate params;
-extern crate toml;
-#[macro_use]
-extern crate serde_derive;
 #[macro_use]
 extern crate error_chain;
+extern crate flate2;
+extern crate git2;
+extern crate git_appraise;
+extern crate git_ship;
+extern crate gravatar;
+#[macro_use]
+extern crate iron;
+extern crate logger;
+extern crate lru_time_cache;
+extern crate maud;
+#[macro_use]
+extern crate mime;
+// extern crate params;
+extern crate pulldown_cmark;
+extern crate reqwest;
+extern crate router;
+#[macro_use]
+extern crate serde_derive;
+extern crate time;
+extern crate toml;
+extern crate typemap;
+extern crate unicase;
+extern crate walkdir;
 
 #[macro_use]
 mod macros;
@@ -93,6 +95,8 @@ fn main() {
         .register(inject_repository_context(&config.repos.root, handler::Blob))
         .register(inject_repository_context(&config.repos.root, handler::Pages))
         .register(inject_repository_context(&config.repos.root, handler::Compare))
+        .register(inject_repository_context(&config.repos.root, handler::git_smart_http::Refs))
+        .register(inject_repository_context(&config.repos.root, handler::git_smart_http::UploadPack))
         .register(statics![
             prefix: "./static/";
             "./static/js/highlight.js",

@@ -8,9 +8,9 @@ pub struct Review;
 
 impl Handler for Review {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        let router = itry!(req.extensions.get::<Router>().ok_or(Error::MissingExtension), status::InternalServerError);
-        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
-        let commit = itry!(router.find("ref").ok_or(Error::MissingPathComponent), status::InternalServerError);
+        let router = itry!(req.extensions.get::<Router>().ok_or(Error::from("missing extension")), status::InternalServerError);
+        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
+        let commit = itry!(router.find("ref").ok_or(Error::from("missing path component")), status::InternalServerError);
         let id = itry!(Oid::from_str(commit), status::BadRequest);
         let review = itry!(context.repository.review_for(id), status::NotFound);
         let root = format!("/{}", context.path);

@@ -6,7 +6,7 @@ pub struct Reviews;
 
 impl Handler for Reviews {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
-        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::MissingExtension), status::InternalServerError);
+        let context = itry!(req.extensions.get::<RepositoryContext>().ok_or(Error::from("missing extension")), status::InternalServerError);
         let mut reviews: Vec<_> = context.repository.all_reviews().and_then(|revs| revs.collect()).ok().unwrap_or_default();
         reviews.sort_by(|a, b| a.request().timestamp().cmp(&b.request().timestamp()));
         reviews.reverse();
