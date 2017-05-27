@@ -58,7 +58,7 @@ fn parse(body: &mut io::Read) -> Result<Request> {
                 let (want, caps) = line.split_at(line.find(' ').unwrap_or(line.len()));
                 request.wants.push(want.parse().map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?);
                 if !caps.is_empty() {
-                    request.capabilities = caps.parse().unwrap();
+                    request.capabilities = caps.parse().expect("Can't fail");
                 }
             },
             "have" => {
@@ -174,7 +174,7 @@ impl Pack {
             for id in &self.common {
                 pkt_line::write_str(&mut writer, format!("ACK {} common", id))?;
             }
-            pkt_line::write_str(&mut writer, format!("ACK {}", self.common.iter().last().unwrap()))?;
+            pkt_line::write_str(&mut writer, format!("ACK {}", self.common[self.common.len() - 1]))?;
         } else {
             pkt_line::write_str(&mut writer, "NAK")?;
         }
