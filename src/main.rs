@@ -1,3 +1,4 @@
+#![feature(conservative_impl_trait)]
 #![feature(plugin)]
 #![plugin(maud_macros)]
 #![warn(trivial_numeric_casts)]
@@ -35,6 +36,7 @@ extern crate toml;
 extern crate typemap;
 extern crate unicase;
 extern crate walkdir;
+extern crate take;
 
 #[macro_use]
 mod macros;

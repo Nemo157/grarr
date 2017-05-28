@@ -1,28 +1,37 @@
 use { REVISION, DATE };
-use super::utils::Markdown;
+use std::fmt;
+use super::utils::markdown;
 
-pub fn About() -> ::maud::Markup {
-    html! {
-        div.block {
-            div.block-header h3 "About"
-            div.block-details {
-                (Markdown(include_str!("../../README.md")))
-            }
-        }
-        div.block {
-            div.block-header h3 "Version"
-            div.block-details {
-                "Website generated using "
-                a href="https://git.nemo157.com/grarr" "grarr"
-                " version "
-                (env!("CARGO_PKG_VERSION"))
-                @match (REVISION, DATE) {
-                    (Some(rev), None) => " (" a href={ "https://git.nemo157.com/grarr/commits/" (rev) } (rev) ")",
-                    (None, Some(date)) => " (" (date) ")",
-                    (Some(rev), Some(date)) => " (" a href={ "https://git.nemo157.com/grarr/commits/" (rev) } (rev) " " (date) ")",
-                    (None, None) => {},
-                }
-            }
-        }
-    }
+pub fn about(_: ()) -> impl fmt::Display {
+    let url: &'static str = "https://git.nemo157.com/grarr";
+
+    let link = match (REVISION, DATE) {
+        (Some(rev), None)
+            => format!(r#"(<a href="{url}/commits/{rev}">{rev}</a>)"#, url=url, rev=rev),
+        (None, Some(date))
+            => format!("({})", date),
+        (Some(rev), Some(date))
+            => format!(r#"(<a href="{url}/commits/{rev}">{rev} {date}</a>)"#, url=url, rev=rev, date=date),
+        (None, None)
+            => String::new(),
+    };
+
+    fmt!(r#"
+        <div class="block">
+            <div class="block-header"><h3>About</h3></div>
+            <div class="block-details">{readme}</div>
+        </div>
+        <div class="block">
+            <div class="block-header"><h3>Version</h3></div>
+            <div class="block-details">
+                Website generated using
+                <a href="{url}">grarr</a>
+                version {version} {link}
+            </div>
+        </div>
+    "#,
+    readme=markdown(include_str!("../../README.md")),
+    url=url,
+    version=env!("CARGO_PKG_VERSION"),
+    link=link)
 }
