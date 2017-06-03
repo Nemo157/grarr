@@ -1,40 +1,15 @@
+use std::fmt;
+
 use iron;
+use iron::status::Status;
 
-pub fn Error(error: &iron::Error) -> ::maud::Markup {
-    html! {
-        pre.block-details code (error)
-    }
-}
-
-pub fn BadRequest(error: &iron::Error) -> ::maud::Markup {
-    html! {
-        div.block {
-            div.block-header {
-                h2 "Bad Request"
-            }
-            (Error(error))
-        }
-    }
-}
-
-pub fn NotFound(error: &iron::Error) -> ::maud::Markup {
-    html! {
-        div.block {
-            div.block-header {
-                h2 "Not Found"
-            }
-            (Error(error))
-        }
-    }
-}
-
-pub fn InternalServerError(error: &iron::Error) -> ::maud::Markup {
-    html! {
-        div.block {
-            div.block-header {
-                h2 "Internal Server Error"
-            }
-            (Error(error))
-        }
-    }
+pub fn error((status, error): (Status, Box<iron::Error + Send>)) -> impl fmt::Display {
+    fmt!(r#"
+        <div class="block">
+            <div class="block-header"><h2>{title}</h2></div>
+            <pre class="block-details">{details}</pre>
+        </div>
+    "#,
+    title=status.canonical_reason().unwrap_or("Unknown Error"),
+    details=error.to_string())
 }

@@ -127,9 +127,7 @@ fn main() {
 
     chain.link_before(logger_before);
     chain.link_before(settings::Settings::default());
-    chain.link_after(handler::error::NotFound);
-    chain.link_after(handler::error::BadRequest);
-    chain.link_after(handler::error::InternalServerError);
+    chain.link_after(handler::error::Error);
     chain.link_after(logger_after);
 
     Iron::new(chain).http("localhost:3000").unwrap();

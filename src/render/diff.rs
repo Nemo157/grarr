@@ -9,7 +9,7 @@ pub fn DiffCommits(context: &RepositoryContext, old_commit: &Option<&git2::Commi
     html! {
         @match context.repository.diff_tree_to_tree(old_commit.map(|commit| commit.tree().unwrap()).as_ref(), Some(&new_commit.tree().unwrap()), None) {
             Ok(ref diff) => (Diff(context, new_commit, diff)),
-            Err(ref error) => (super::Error(error)),
+            Err(ref error) => (html! { (error.to_string()) }),
         }
     }
 }

@@ -1,26 +1,32 @@
-use super::base::*;
-
 use iron::middleware::AfterMiddleware;
+use iron::request::Request;
+use iron::response::Response;
+use iron::{self, IronResult, IronError};
 
-macro_rules! error_handler {
-    ($name:ident) => {
-        pub struct $name;
-        impl AfterMiddleware for $name {
-            fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
-                if err.response.status == Some(status::$name) {
-                    Ok(Response::with((status::$name, Html {
-                        render: render::error::$name(&*err.error),
-                        etag: None,
-                        req: req,
-                    })))
-                } else {
-                    Err(err)
-                }
+use render;
+use super::html::Html2;
+
+pub struct Error;
+impl AfterMiddleware for Error {
+    fn catch(&self, req: &mut Request, err: IronError) -> IronResult<Response> {
+        if let Some(status) = err.response.status {
+            if status.is_client_error() || status.is_server_error() {
+                Ok(Response::with((status, Html2 {
+                    req: req,
+                    etag: None,
+                    renderer: render::error,
+                    data: (status, err.error),
+                })))
+            } else {
+                Err(err)
             }
+        } else {
+            Ok(Response::with((iron::status::InternalServerError, Html2 {
+                req: req,
+                etag: None,
+                renderer: render::error,
+                data: (iron::status::InternalServerError, err.error),
+            })))
         }
     }
 }
-
-error_handler!(BadRequest);
-error_handler!(NotFound);
-error_handler!(InternalServerError);
