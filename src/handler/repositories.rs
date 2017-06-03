@@ -1,4 +1,5 @@
 use super::base::*;
+use super::html::Html2;
 
 use git2;
 use walkdir::{ WalkDir, DirEntry, WalkDirIterator };
@@ -40,10 +41,11 @@ fn get_repos(root: &Path) -> Vec<(String, git2::Repository)> {
 impl Handler for Repositories {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
         let repos = get_repos(&self.root);
-        Html {
-            render: render::Repositories(repos),
-            etag: None,
+        Html2 {
             req: req,
+            etag: None,
+            renderer: render::repositories,
+            data: repos,
         }.into()
     }
 }

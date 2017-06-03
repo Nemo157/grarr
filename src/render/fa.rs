@@ -1,4 +1,4 @@
-use maud::{ Render, Markup };
+use std::fmt;
 
 macro_rules! fa {
     ($($e:ident => $v:expr,)*) => {
@@ -49,14 +49,20 @@ impl FAM {
     }
 }
 
-impl Render for FA {
-    fn render(&self) -> Markup {
-        html!({ i class=(self.class()) { } })
+impl fmt::Display for FA {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str("<i class=\"")?;
+        f.write_str(self.class())?;
+        f.write_str("\"></i>")?;
+        Ok(())
     }
 }
 
-impl Render for FAM {
-    fn render(&self) -> Markup {
-        html!({ i class=(self.class()) { } })
+impl fmt::Display for FAM {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str("<i class=\"")?;
+        f.write_str(&self.class())?;
+        f.write_str("\"></i>")?;
+        Ok(())
     }
 }

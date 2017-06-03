@@ -1,4 +1,5 @@
 #![feature(conservative_impl_trait)]
+#![feature(string_split_off)]
 #![feature(plugin)]
 #![plugin(maud_macros)]
 #![warn(trivial_numeric_casts)]

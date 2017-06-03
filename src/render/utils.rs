@@ -2,6 +2,7 @@ use std::fmt;
 use ammonia;
 use maud::Render;
 use pulldown_cmark::{ Parser, html };
+use take::Take;
 
 pub fn MaybeLink(href: &str, text: &str) -> ::maud::Markup {
     html! {
@@ -29,4 +30,19 @@ pub fn markdown(s: &str) -> impl fmt::Display {
     let parser = Parser::new(s);
     html::push_html(&mut unsafe_html, parser);
     ammonia::clean(&unsafe_html)
+}
+
+struct Joined<D, I>(Take<I>) where D: fmt::Display, I: Iterator<Item=D>;
+
+pub fn joined<D, I>(iter: I) -> impl fmt::Display where D: fmt::Display, I: Iterator<Item=D> {
+    Joined(Take::new(iter))
+}
+
+impl<D, I> fmt::Display for Joined<D, I> where D: fmt::Display, I: Iterator<Item=D> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for d in self.0.take() {
+            d.fmt(f)?;
+        }
+        Ok(())
+    }
 }
