@@ -5,17 +5,6 @@ use super::utils::markdown;
 pub fn about(_: ()) -> impl fmt::Display {
     let url: &'static str = "https://git.nemo157.com/grarr";
 
-    let link = match (REVISION, DATE) {
-        (Some(rev), None)
-            => format!(r#"(<a href="{url}/commits/{rev}">{rev}</a>)"#, url=url, rev=rev),
-        (None, Some(date))
-            => format!("({})", date),
-        (Some(rev), Some(date))
-            => format!(r#"(<a href="{url}/commits/{rev}">{rev} {date}</a>)"#, url=url, rev=rev, date=date),
-        (None, None)
-            => String::new(),
-    };
-
     fmt!(r#"
         <div class="block">
             <div class="block-header"><h3>About</h3></div>
@@ -33,5 +22,16 @@ pub fn about(_: ()) -> impl fmt::Display {
     readme=markdown(include_str!("../../README.md")),
     url=url,
     version=env!("CARGO_PKG_VERSION"),
-    link=link)
+    link={
+        match (REVISION, DATE) {
+            (Some(rev), None)
+                => format!(r#"(<a href="{url}/commits/{rev}">{rev}</a>)"#, url=url, rev=rev),
+            (None, Some(date))
+                => format!("({})", date),
+            (Some(rev), Some(date))
+                => format!(r#"(<a href="{url}/commits/{rev}">{rev} {date}</a>)"#, url=url, rev=rev, date=date),
+            (None, None)
+                => String::new(),
+        }
+    })
 }
