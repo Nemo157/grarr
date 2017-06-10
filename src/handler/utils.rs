@@ -12,13 +12,11 @@ use assets::File;
 
 #[macro_export]
 macro_rules! file {
-    ($x:expr) => ({
-        let bytes = include_bytes!($x);
-        $crate::handler::utils::FileData(
+    ($x:expr) => ((
+        $crate::handler::utils::FileData::from((
             $crate::handler::utils::mime($x),
-            ::iron::headers::EntityTag::strong(sha1!(bytes as &[u8])),
-            ::std::borrow::Cow::Borrowed(bytes))
-    });
+            include_bytes!($x).as_ref()))
+    ));
 }
 
 #[macro_export]
@@ -50,13 +48,17 @@ impl fmt::Debug for FileData {
     }
 }
 
+impl From<&'static File> for FileData {
+    fn from(file: &'static File) -> FileData {
+        FileData::from((mime(file.name()), file.contents))
+    }
+}
 
-impl<'a> From<&'a File> for FileData {
-    fn from(file: &'a File) -> FileData {
-        FileData(
-            mime(file.name()),
-            EntityTag::strong(sha1(&file.contents)),
-            Cow::Borrowed(&file.contents))
+impl<B> From<(Mime, B)> for FileData where B: Into<Cow<'static, [u8]>> {
+    fn from((mime, content): (Mime, B)) -> FileData {
+        let content = content.into();
+        let etag = EntityTag::strong(sha1(content.as_ref()));
+        FileData(mime, etag, content)
     }
 }
 

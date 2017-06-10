@@ -72,8 +72,8 @@ impl Route for Static {
     }
 }
 
-impl<'a> From<&'a Dir> for Static {
-    fn from(dir: &'a Dir) -> Static {
+impl From<&'static Dir> for Static {
+    fn from(dir: &'static Dir) -> Static {
         Static::new(dir
             .walk()
             .filter_map(|file| {

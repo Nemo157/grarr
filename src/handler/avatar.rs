@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::time::Duration;
 use gravatar::{ self, Gravatar };
 use iron::IronResult;
-use iron::headers::{ EntityTag, ContentType };
+use iron::headers::ContentType;
 use iron::middleware::Handler;
 use iron::request::Request;
 use iron::response::Response;
@@ -12,7 +12,7 @@ use iron::status;
 use iron::method::Method;
 use lru_time_cache::LruCache;
 use std::sync::Mutex;
-use super::utils::{ self, sha1, FileData, CacheMatches };
+use super::utils::{ self, FileData, CacheMatches };
 use reqwest;
 
 pub struct Avatars {
@@ -79,8 +79,7 @@ impl Avatars {
                 let mut buf = Vec::new();
                 res.read_to_end(&mut buf).unwrap();
                 let mime = res.headers().get::<ContentType>().unwrap().0.clone();
-                let entity_tag = EntityTag::strong(sha1(&buf));
-                return Some(FileData(mime, entity_tag, buf.into()));
+                return Some(FileData::from((mime, buf)));
             }
         }
         None
@@ -94,9 +93,9 @@ impl Avatars {
 impl Handler for Avatars {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
         let user = req.extensions.get::<Router>().unwrap().find("user").unwrap();
-        let FileData(mime, entity_tag, buffer) = self.find_image(user);
-        let cache_headers = utils::cache_headers_for(&entity_tag, Duration::from_secs(86400));
-        if req.cache_matches(&entity_tag) {
+        let FileData(mime, etag, buffer) = self.find_image(user);
+        let cache_headers = utils::cache_headers_for(&etag, Duration::from_secs(86400));
+        if req.cache_matches(&etag) {
             return Ok(Response::with((status::NotModified, cache_headers)));
         }
         Ok(Response::with((status::Ok, mime, cache_headers, buffer.as_ref())))
