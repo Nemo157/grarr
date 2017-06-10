@@ -54,6 +54,7 @@ mod settings;
 mod referenced_commit;
 mod config;
 mod tree_entry;
+mod assets;
 
 use std::time::Duration;
 use std::env;
@@ -100,21 +101,7 @@ fn main() {
         .register(inject_repository_context(&config.repos.root, handler::Compare))
         .register(inject_repository_context(&config.repos.root, handler::git_smart_http::Refs))
         .register(inject_repository_context(&config.repos.root, handler::git_smart_http::UploadPack))
-        .register(statics![
-            prefix: "./static/";
-            "./static/js/highlight.js",
-            "./static/css/highlight-solarized-light.css",
-            "./static/css/layout.css",
-            "./static/css/theme-solarized-dark.css",
-            "./static/css/theme-solarized-light.css",
-            "./static/css/font-awesome.min.css",
-            "./static/fonts/FontAwesome.otf",
-            "./static/fonts/fontawesome-webfont.eot",
-            "./static/fonts/fontawesome-webfont.svg",
-            "./static/fonts/fontawesome-webfont.ttf",
-            "./static/fonts/fontawesome-webfont.woff",
-            "./static/fonts/fontawesome-webfont.woff2",
-        ])
+        .register(handler::Static::from(&assets::FILES))
         .register(handler::Avatars::new(handler::avatar::Options {
             enable_gravatar: config.avatars.gravatar.enable,
             enable_cache: config.avatars.cache.enable,

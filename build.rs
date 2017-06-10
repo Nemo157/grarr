@@ -1,8 +1,12 @@
+extern crate include_dir;
+
 use std::env;
 use std::io::Write;
 use std::fs::File;
 use std::path::Path;
 use std::process::Command;
+
+use include_dir::include_dir;
 
 fn main() {
   if let Ok("release") = env::var("PROFILE").as_ref().map(|s| &**s) {
@@ -22,11 +26,14 @@ fn main() {
   };
 
   let out_dir = env::var("OUT_DIR").unwrap();
-  let dest_path = Path::new(&out_dir).join("version.rs");
-  let mut f = File::create(&dest_path).unwrap();
+  let version_path = Path::new(&out_dir).join("version.rs");
+  let mut f = File::create(&version_path).unwrap();
 
   f.write_all(format!("
     static REVISION: Option<&'static str> = {};
     static DATE: Option<&'static str> = {};
   ", rev, date).as_bytes()).unwrap();
+
+  let assets = Path::new(&out_dir).join("static.rs");
+  include_dir("src/static").as_variable("FILES").to_file(assets).unwrap();
 }

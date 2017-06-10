@@ -4,6 +4,13 @@ build = "build.rs"
 name = "grarr"
 version = "0.0.3"
 
+[build-dependencies]
+
+[build-dependencies.include_dir]
+git = "https://github.com/Nemo157/include_dir"
+rev = "1.15-compat"
+optional = false
+
 [dependencies]
 ammonia = "0.3.0"
 chrono = "0.3"

@@ -12,11 +12,13 @@ use std::sync::Mutex;
 use error::Error;
 use std::collections::HashMap;
 use std::path::{ Path, PathBuf };
-use super::utils::{ self, File, CacheMatches };
+use super::utils::{ self, FileData, CacheMatches };
+
+use assets::{Dir, DirEntry};
 
 #[derive(Debug)]
 pub struct Static {
-    files: Mutex<HashMap<PathBuf, File>>,
+    files: Mutex<HashMap<PathBuf, FileData>>,
 }
 
 impl Clone for Static {
@@ -36,13 +38,13 @@ macro_rules! statics {
 }
 
 impl Static {
-    pub fn new(files: HashMap<PathBuf, File>) -> Static {
+    pub fn new(files: HashMap<PathBuf, FileData>) -> Static {
         Static {
             files: Mutex::new(files),
         }
     }
 
-    fn find_file(&self, path: &Path) -> Option<File> {
+    fn find_file(&self, path: &Path) -> Option<FileData> {
         self.files.lock().unwrap().get(path).cloned()
     }
 }
@@ -51,7 +53,7 @@ impl Handler for Static {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
         let router = itry!(req.extensions.get::<Router>().ok_or(Error::from("missing extension")), status::InternalServerError);
         let path = Path::new(itry!(router.find("path").ok_or(Error::from("missing path component")), status::InternalServerError));
-        let File(mime, entity_tag, buffer) = itry!(self.find_file(path).ok_or(Error::from("Static file not found")), status::NotFound);
+        let FileData(mime, entity_tag, buffer) = itry!(self.find_file(path).ok_or(Error::from("Static file not found")), status::NotFound);
         let cache_headers = utils::cache_headers_for(&entity_tag, Duration::from_secs(86400));
         if req.cache_matches(&entity_tag) {
             return Ok(Response::with((status::NotModified, cache_headers)));
@@ -67,5 +69,17 @@ impl Route for Static {
 
     fn route() -> Cow<'static, str> {
         "/-/static/*path".into()
+    }
+}
+
+impl<'a> From<&'a Dir> for Static {
+    fn from(dir: &'a Dir) -> Static {
+        Static::new(dir
+            .walk()
+            .filter_map(|file| {
+                if let DirEntry::File(file) = file { Some(file) } else { None }
+            })
+            .map(|file| (file.path().to_owned(), FileData::from(file)))
+            .collect())
     }
 }
